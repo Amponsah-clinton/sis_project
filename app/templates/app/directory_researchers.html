@@ -1,0 +1,1096 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Directory of Researchers - ScholarIndex{% endblock %}
+
+{% block content %}
+<style>
+  .directory-page {
+    padding: 3rem 1.5rem;
+    background-color: var(--background);
+    min-height: calc(100vh - 5rem);
+  }
+
+  .directory-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .directory-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .directory-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--foreground);
+  }
+
+  .directory-header p {
+    font-size: 1.125rem;
+    color: var(--muted-foreground);
+  }
+
+  .directory-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 2rem;
+  }
+
+  @media (max-width: 1024px) {
+    .directory-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .directory-sidebar {
+      order: 2;
+      position: static;
+      margin-bottom: 2rem;
+    }
+  }
+
+  .directory-sidebar {
+    position: sticky;
+    top: 6rem;
+    height: fit-content;
+  }
+
+  .filter-section {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) + 4px);
+    padding: 1.5rem;
+  }
+
+  .filter-section-header {
+    display: none;
+  }
+
+  @media (max-width: 1024px) {
+    .filter-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .filter-section-header h3 {
+      margin: 0;
+      font-size: 1.125rem;
+    }
+
+    .filter-toggle-btn {
+      background: none;
+      border: none;
+      color: var(--primary);
+      cursor: pointer;
+      padding: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .filter-toggle-btn:hover {
+      color: var(--accent);
+    }
+
+    .filter-toggle-btn svg {
+      transition: transform 0.3s ease;
+    }
+
+    .filter-section.collapsed .filter-toggle-btn svg {
+      transform: rotate(-90deg);
+    }
+
+    .filter-section.collapsed .filter-content {
+      display: none;
+    }
+
+    .filter-content {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  }
+
+  @media (min-width: 1025px) {
+    .filter-section.collapsed .filter-content {
+      display: block !important;
+    }
+  }
+
+  .filter-section h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--foreground);
+  }
+
+  @media (max-width: 1024px) {
+    .filter-section h3 {
+      display: none;
+    }
+  }
+
+  .filter-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .filter-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--foreground);
+    margin-bottom: 0.5rem;
+  }
+
+  .filter-input,
+  .filter-select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) - 2px);
+    font-size: 0.9375rem;
+    color: var(--foreground);
+    background-color: var(--background);
+    transition: all 0.2s ease;
+  }
+
+  .filter-input:focus,
+  .filter-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .btn-filter-clear {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: var(--muted);
+    color: var(--foreground);
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) - 2px);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-filter-clear:hover {
+    background-color: var(--border);
+  }
+
+  .directory-main {
+    min-width: 0;
+  }
+
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .results-count {
+    font-size: 0.9375rem;
+    color: var(--muted-foreground);
+  }
+
+  .results-count span {
+    font-weight: 600;
+    color: var(--foreground);
+  }
+
+  .view-toggle {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .view-btn {
+    padding: 0.5rem;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) - 2px);
+    color: var(--muted-foreground);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .view-btn:hover {
+    background-color: var(--muted);
+    color: var(--foreground);
+  }
+
+  .view-btn.active {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border-color: var(--primary);
+  }
+
+  .researchers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .researchers-grid.list-view {
+    grid-template-columns: 1fr;
+  }
+
+  @media (max-width: 768px) {
+    .researchers-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .researcher-card {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 0;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    position: relative;
+  }
+
+  .researcher-card:hover {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    transform: translateY(-6px);
+    border-color: #d1d5db;
+  }
+
+  .researcher-image-wrapper {
+    width: 100%;
+    height: 320px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .researcher-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+
+  .researcher-card:hover .researcher-image-wrapper img {
+    transform: scale(1.05);
+  }
+
+  .researcher-image-wrapper span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3rem;
+    font-weight: 600;
+    color: #9ca3af;
+    z-index: 1;
+  }
+
+  .researcher-image-wrapper:has(img) span {
+    display: none;
+  }
+
+  .researcher-card-content {
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    background-color: #ffffff;
+  }
+
+  .researcher-name-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin-bottom: 0.375rem;
+    flex-wrap: wrap;
+  }
+
+  .researcher-name {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: #1e40af;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .verification-icon {
+    width: 22px;
+    height: 22px;
+    color: #3b82f6;
+    flex-shrink: 0;
+    filter: drop-shadow(0 1px 2px rgba(59, 130, 246, 0.3));
+  }
+
+  .researcher-id {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    margin-bottom: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.025em;
+    font-family: 'Courier New', monospace;
+  }
+
+  .researcher-title-affiliation {
+    font-size: 0.9375rem;
+    color: #dc2626;
+    font-weight: 600;
+    margin-bottom: 0.625rem;
+    line-height: 1.4;
+  }
+
+  .researcher-interests {
+    font-size: 0.875rem;
+    color: #4b5563;
+    margin-bottom: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .researcher-interests-label {
+    font-weight: 600;
+    color: #374151;
+    margin-right: 0.25rem;
+  }
+
+  .researcher-scholar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-top: 1rem;
+    border-top: 2px solid #f3f4f6;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .scholar-link {
+    font-size: 0.875rem;
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+    flex: 1;
+    min-width: 0;
+    word-break: break-word;
+  }
+
+  .scholar-link:hover {
+    color: #2563eb;
+    text-decoration: underline;
+  }
+
+  .btn-view-scholar {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border: none;
+    color: #ffffff;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+  }
+
+  .btn-view-scholar:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+  }
+
+  .btn-download-profile {
+    width: 100%;
+    padding: 0.875rem 1.25rem;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-download-profile::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .btn-download-profile:hover::before {
+    left: 100%;
+  }
+
+  .btn-download-profile:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+  }
+
+  .btn-download-profile svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 3rem;
+  }
+
+  .pagination-btn {
+    padding: 0.625rem 1rem;
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) - 2px);
+    color: var(--foreground);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .pagination-btn:hover:not(:disabled) {
+    background-color: var(--muted);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  .pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .pagination-numbers {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+  }
+
+  .pagination-number {
+    min-width: 2.5rem;
+    height: 2.5rem;
+    padding: 0.5rem;
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) - 2px);
+    color: var(--foreground);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pagination-number:hover {
+    background-color: var(--muted);
+    border-color: var(--primary);
+  }
+
+  .pagination-number.active {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border-color: var(--primary);
+  }
+
+  .pagination-ellipsis {
+    padding: 0 0.5rem;
+    color: var(--muted-foreground);
+  }
+
+  @media (max-width: 640px) {
+    .directory-page {
+      padding: 2rem 1rem;
+    }
+
+    .directory-header h1 {
+      font-size: 2rem;
+    }
+
+    .directory-header p {
+      font-size: 1rem;
+    }
+
+    .filter-section {
+      padding: 1.25rem;
+    }
+
+    .filter-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .results-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .researcher-image-wrapper {
+      height: 280px;
+    }
+
+    .researcher-card-content {
+      padding: 1.5rem;
+    }
+
+    .researcher-name {
+      font-size: 1.25rem;
+    }
+
+    .researcher-scholar {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .btn-view-scholar {
+      width: 100%;
+    }
+
+    .researcher-stats {
+      gap: 1rem;
+    }
+
+    .researcher-actions {
+      flex-direction: column;
+    }
+
+    .btn-view-profile,
+    .btn-contact {
+      width: 100%;
+    }
+
+    .pagination {
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
+  }
+</style>
+
+<div class="directory-page">
+  <div class="container">
+    <div class="directory-wrapper">
+      <!-- Page Header -->
+      <div class="directory-header">
+        <h1>Directory of Researchers</h1>
+        <p>Connect with researchers and scholars from around the world</p>
+      </div>
+
+      <div class="directory-layout">
+        <!-- Sidebar Filters -->
+        <aside class="directory-sidebar">
+          <div class="filter-section collapsed" id="filterSection">
+            <div class="filter-section-header">
+              <h3>Filters</h3>
+              <button class="filter-toggle-btn" onclick="toggleFilters()">
+                <span>Show Filters</span>
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </button>
+            </div>
+            
+            <div class="filter-content">
+              <!-- Search Filter -->
+              <div class="filter-group">
+                <label>Search Researchers</label>
+                <input type="text" class="filter-input" placeholder="Search by name, institution..." id="researcherSearch">
+              </div>
+
+              <!-- Discipline Filter -->
+              <div class="filter-group">
+                <label>Discipline</label>
+                <select class="filter-select" id="disciplineFilter">
+                  <option value="">All Disciplines</option>
+                  <option value="computer-science">Computer Science</option>
+                  <option value="mathematics">Mathematics</option>
+                  <option value="physics">Physics</option>
+                  <option value="chemistry">Chemistry</option>
+                  <option value="biology">Biology</option>
+                  <option value="medicine">Medicine</option>
+                  <option value="engineering">Engineering</option>
+                  <option value="social-sciences">Social Sciences</option>
+                  <option value="humanities">Humanities</option>
+                </select>
+              </div>
+
+              <!-- Institution Filter -->
+              <div class="filter-group">
+                <label>Institution</label>
+                <select class="filter-select" id="institutionFilter">
+                  <option value="">All Institutions</option>
+                  <option value="mit">MIT</option>
+                  <option value="stanford">Stanford University</option>
+                  <option value="harvard">Harvard University</option>
+                  <option value="oxford">Oxford University</option>
+                  <option value="cambridge">Cambridge University</option>
+                  <option value="eth-zurich">ETH Zurich</option>
+                  <option value="nus">National University of Singapore</option>
+                  <option value="tsinghua">Tsinghua University</option>
+                </select>
+              </div>
+
+              <!-- Country Filter -->
+              <div class="filter-group">
+                <label>Country</label>
+                <select class="filter-select" id="countryFilter">
+                  <option value="">All Countries</option>
+                  <option value="US">United States</option>
+                  <option value="UK">United Kingdom</option>
+                  <option value="CA">Canada</option>
+                  <option value="AU">Australia</option>
+                  <option value="DE">Germany</option>
+                  <option value="FR">France</option>
+                  <option value="IT">Italy</option>
+                  <option value="ES">Spain</option>
+                  <option value="NL">Netherlands</option>
+                  <option value="CH">Switzerland</option>
+                </select>
+              </div>
+
+              <!-- Sort By -->
+              <div class="filter-group">
+                <label>Sort By</label>
+                <select class="filter-select" id="sortFilter">
+                  <option value="name">Name (A-Z)</option>
+                  <option value="citations">Most Cited</option>
+                  <option value="publications">Most Publications</option>
+                  <option value="recent">Recently Added</option>
+                </select>
+              </div>
+
+              <!-- Clear Filters -->
+              <button class="btn-filter-clear" onclick="clearFilters()">Clear All Filters</button>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="directory-main">
+          <!-- Results Header -->
+          <div class="results-header">
+            <div class="results-count">
+              <span id="resultsCount">2,456</span> researchers found
+            </div>
+            <div class="view-toggle">
+              <button class="view-btn active" data-view="grid" onclick="toggleView('grid')">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                </svg>
+              </button>
+              <button class="view-btn" data-view="list" onclick="toggleView('list')">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Researchers Grid -->
+          <div class="researchers-grid" id="researchersContainer">
+            <!-- Researcher Card 1 -->
+            <article class="researcher-card">
+              <div class="researcher-image-wrapper">
+                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face" alt="Dr. Sarah Martinez">
+                <span>SM</span>
+              </div>
+              <div class="researcher-card-content">
+                <div class="researcher-name-wrapper">
+                  <h3 class="researcher-name">Dr. Sarah Martinez</h3>
+                  <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                <p class="researcher-id">SIS8542DR128</p>
+                <p class="researcher-title-affiliation">Senior Research Director, Stanford University</p>
+                <p class="researcher-interests">
+                  <span class="researcher-interests-label">Areas Of Interest:</span> Computer Science, Machine Learning
+                </p>
+                <div class="researcher-scholar">
+                  <a href="#" class="scholar-link">Dr. Sarah Martinez@ Google Scholar</a>
+                  <button class="btn-view-scholar">VIEW PROFILE</button>
+                </div>
+                <button class="btn-download-profile">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                  </svg>
+                  Download Profile
+                </button>
+              </div>
+            </article>
+
+            <!-- Researcher Card 2 -->
+            <article class="researcher-card">
+              <div class="researcher-image-wrapper">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face" alt="Prof. James Park">
+                <span>JP</span>
+              </div>
+              <div class="researcher-card-content">
+                <div class="researcher-name-wrapper">
+                  <h3 class="researcher-name">Prof. James Park</h3>
+                  <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                <p class="researcher-id">SIS6547DR127</p>
+                <p class="researcher-title-affiliation">Quantum Computing Expert, MIT</p>
+                <p class="researcher-interests">
+                  <span class="researcher-interests-label">Areas Of Interest:</span> Quantum Physics, Computing
+                </p>
+                <div class="researcher-scholar">
+                  <a href="#" class="scholar-link">Prof. James Park@ Google Scholar</a>
+                  <button class="btn-view-scholar">VIEW PROFILE</button>
+                </div>
+                <button class="btn-download-profile">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                  </svg>
+                  Download Profile
+                </button>
+              </div>
+            </article>
+
+            <!-- Researcher Card 3 -->
+            <article class="researcher-card">
+              <div class="researcher-image-wrapper">
+                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face" alt="Dr. Emily Watson">
+                <span>EW</span>
+              </div>
+              <div class="researcher-card-content">
+                <div class="researcher-name-wrapper">
+                  <h3 class="researcher-name">Dr. Emily Watson</h3>
+                  <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                <p class="researcher-id">SIS7543DR126</p>
+                <p class="researcher-title-affiliation">Neuroscience Researcher, Harvard Medical School</p>
+                <p class="researcher-interests">
+                  <span class="researcher-interests-label">Areas Of Interest:</span> Neuroscience, Medicine
+                </p>
+                <div class="researcher-scholar">
+                  <a href="#" class="scholar-link">Dr. Emily Watson@ Google Scholar</a>
+                  <button class="btn-view-scholar">VIEW PROFILE</button>
+                </div>
+                <button class="btn-download-profile">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                  </svg>
+                  Download Profile
+                </button>
+              </div>
+            </article>
+
+            <!-- Researcher Card 4 -->
+            <article class="researcher-card">
+              <div class="researcher-image-wrapper">
+                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=face" alt="Dr. Michael Chen">
+                <span>MC</span>
+              </div>
+              <div class="researcher-card-content">
+                <div class="researcher-name-wrapper">
+                  <h3 class="researcher-name">Dr. Michael Chen</h3>
+                  <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                <p class="researcher-id">SIS8541DR125</p>
+                <p class="researcher-title-affiliation">AI & Machine Learning, ETH Zurich</p>
+                <p class="researcher-interests">
+                  <span class="researcher-interests-label">Areas Of Interest:</span> Artificial Intelligence, Machine Learning
+                </p>
+                <div class="researcher-scholar">
+                  <a href="#" class="scholar-link">Dr. Michael Chen@ Google Scholar</a>
+                  <button class="btn-view-scholar">VIEW PROFILE</button>
+                </div>
+                <button class="btn-download-profile">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                  </svg>
+                  Download Profile
+                </button>
+              </div>
+            </article>
+
+            <!-- Researcher Card 5 -->
+            <article class="researcher-card">
+              <div class="researcher-image-wrapper">
+                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=face" alt="Dr. Rachel Green">
+                <span>RG</span>
+              </div>
+              <div class="researcher-card-content">
+                <div class="researcher-name-wrapper">
+                  <h3 class="researcher-name">Dr. Rachel Green</h3>
+                  <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                <p class="researcher-id">SIS7540DR124</p>
+                <p class="researcher-title-affiliation">Biotechnology Specialist, Oxford University</p>
+                <p class="researcher-interests">
+                  <span class="researcher-interests-label">Areas Of Interest:</span> Biotechnology, Biology
+                </p>
+                <div class="researcher-scholar">
+                  <a href="#" class="scholar-link">Dr. Rachel Green@ Google Scholar</a>
+                  <button class="btn-view-scholar">VIEW PROFILE</button>
+                </div>
+                <button class="btn-download-profile">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                  </svg>
+                  Download Profile
+                </button>
+              </div>
+            </article>
+
+            <!-- Researcher Card 6 -->
+            <article class="researcher-card">
+              <div class="researcher-image-wrapper">
+                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face" alt="Dr. David Kim">
+                <span>DK</span>
+              </div>
+              <div class="researcher-card-content">
+                <div class="researcher-name-wrapper">
+                  <h3 class="researcher-name">Dr. David Kim</h3>
+                  <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                <p class="researcher-id">SIS6539DR123</p>
+                <p class="researcher-title-affiliation">Renewable Energy Expert, Cambridge University</p>
+                <p class="researcher-interests">
+                  <span class="researcher-interests-label">Areas Of Interest:</span> Renewable Energy, Engineering
+                </p>
+                <div class="researcher-scholar">
+                  <a href="#" class="scholar-link">Dr. David Kim@ Google Scholar</a>
+                  <button class="btn-view-scholar">VIEW PROFILE</button>
+                </div>
+                <button class="btn-download-profile">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                  </svg>
+                  Download Profile
+                </button>
+              </div>
+            </article>
+
+            <!-- Researcher Card 7 -->
+            <article class="researcher-card">
+              <div class="researcher-image-wrapper">
+                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop&crop=face" alt="Dr. Lisa Brown">
+                <span>LB</span>
+              </div>
+              <div class="researcher-card-content">
+                <div class="researcher-name-wrapper">
+                  <h3 class="researcher-name">Dr. Lisa Brown</h3>
+                  <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                <p class="researcher-id">SIS5538DR122</p>
+                <p class="researcher-title-affiliation">Data Science Researcher, National University of Singapore</p>
+                <p class="researcher-interests">
+                  <span class="researcher-interests-label">Areas Of Interest:</span> Data Science, Statistics
+                </p>
+                <div class="researcher-scholar">
+                  <a href="#" class="scholar-link">Dr. Lisa Brown@ Google Scholar</a>
+                  <button class="btn-view-scholar">VIEW PROFILE</button>
+                </div>
+                <button class="btn-download-profile">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                  </svg>
+                  Download Profile
+                </button>
+              </div>
+            </article>
+
+            <!-- Researcher Card 8 -->
+            <article class="researcher-card">
+              <div class="researcher-image-wrapper">
+                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face" alt="Dr. Thomas Wilson">
+                <span>TW</span>
+              </div>
+              <div class="researcher-card-content">
+                <div class="researcher-name-wrapper">
+                  <h3 class="researcher-name">Dr. Thomas Wilson</h3>
+                  <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                <p class="researcher-id">SIS4537DR121</p>
+                <p class="researcher-title-affiliation">Genomics Researcher, Tsinghua University</p>
+                <p class="researcher-interests">
+                  <span class="researcher-interests-label">Areas Of Interest:</span> Genomics, Biology
+                </p>
+                <div class="researcher-scholar">
+                  <a href="#" class="scholar-link">Dr. Thomas Wilson@ Google Scholar</a>
+                  <button class="btn-view-scholar">VIEW PROFILE</button>
+                </div>
+                <button class="btn-download-profile">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                  </svg>
+                  Download Profile
+                </button>
+              </div>
+            </article>
+          </div>
+
+          <!-- Pagination -->
+          <div class="pagination">
+            <button class="pagination-btn" disabled>
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+              Previous
+            </button>
+            <div class="pagination-numbers">
+              <button class="pagination-number active">1</button>
+              <button class="pagination-number">2</button>
+              <button class="pagination-number">3</button>
+              <button class="pagination-number">4</button>
+              <button class="pagination-number">5</button>
+              <span class="pagination-ellipsis">...</span>
+              <button class="pagination-number">82</button>
+            </div>
+            <button class="pagination-btn">
+              Next
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleView(view) {
+    const container = document.getElementById('researchersContainer');
+    const buttons = document.querySelectorAll('.view-btn');
+    
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.closest('.view-btn').classList.add('active');
+    
+    if (view === 'list') {
+      container.classList.add('list-view');
+    } else {
+      container.classList.remove('list-view');
+    }
+  }
+
+  function toggleFilters() {
+    const filterSection = document.getElementById('filterSection');
+    const toggleBtn = filterSection.querySelector('.filter-toggle-btn span');
+    
+    filterSection.classList.toggle('collapsed');
+    
+    if (filterSection.classList.contains('collapsed')) {
+      toggleBtn.textContent = 'Show Filters';
+    } else {
+      toggleBtn.textContent = 'Hide Filters';
+    }
+  }
+
+  function clearFilters() {
+    document.getElementById('researcherSearch').value = '';
+    document.getElementById('disciplineFilter').value = '';
+    document.getElementById('institutionFilter').value = '';
+    document.getElementById('countryFilter').value = '';
+    document.getElementById('sortFilter').value = 'name';
+  }
+
+  // Filter functionality
+  document.getElementById('researcherSearch')?.addEventListener('input', function(e) {
+    filterResearchers();
+  });
+
+  document.getElementById('disciplineFilter')?.addEventListener('change', function(e) {
+    filterResearchers();
+  });
+
+  document.getElementById('institutionFilter')?.addEventListener('change', function(e) {
+    filterResearchers();
+  });
+
+  function filterResearchers() {
+    // Filter logic would go here
+    console.log('Filtering researchers...');
+  }
+
+  // Hide initials when images load
+  document.querySelectorAll('.researcher-image-wrapper img').forEach(img => {
+    img.addEventListener('load', function() {
+      const span = this.nextElementSibling;
+      if (span && span.tagName === 'SPAN') {
+        span.style.display = 'none';
+      }
+    });
+    // If image fails to load, show initials
+    img.addEventListener('error', function() {
+      const span = this.nextElementSibling;
+      if (span && span.tagName === 'SPAN') {
+        span.style.display = 'block';
+      }
+      this.style.display = 'none';
+    });
+  });
+</script>
+{% endblock %}
+

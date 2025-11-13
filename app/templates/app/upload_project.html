@@ -1,0 +1,985 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Upload | Archive Project - ScholarIndex{% endblock %}
+
+{% block content %}
+<style>
+  .upload-project-page {
+    padding: 3rem 1.5rem;
+    background-color: var(--background);
+    min-height: calc(100vh - 5rem);
+  }
+
+  .upload-form-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .upload-page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .upload-page-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--foreground);
+  }
+
+  .upload-page-header p {
+    font-size: 1.125rem;
+    color: var(--muted-foreground);
+  }
+
+  .upload-project-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .form-section {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) + 4px);
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--foreground);
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-group.full-width {
+    grid-column: 1 / -1;
+  }
+
+  .form-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--foreground);
+  }
+
+  .form-group label .required {
+    color: #ef4444;
+    margin-left: 0.25rem;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) - 2px);
+    font-size: 0.9375rem;
+    color: var(--foreground);
+    background-color: var(--background);
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .form-group input::placeholder,
+  .form-group textarea::placeholder {
+    color: var(--muted-foreground);
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .char-count {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    text-align: right;
+    margin-top: 0.25rem;
+  }
+
+  .form-hint {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    margin-top: 0.25rem;
+  }
+
+  /* Team Member Section */
+  .member-item {
+    background-color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) - 2px);
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .member-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .member-item-header span {
+    font-weight: 600;
+    color: var(--foreground);
+  }
+
+  .btn-remove-member {
+    background: none;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s ease;
+  }
+
+  .btn-remove-member:hover {
+    color: hsl(0, 84%, 60%);
+  }
+
+  .btn-add-member {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.5rem;
+    background-color: var(--muted);
+    color: var(--foreground);
+    border: 2px dashed var(--border);
+    border-radius: calc(var(--radius) - 2px);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+  }
+
+  .btn-add-member:hover {
+    background-color: var(--border);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  /* File Upload */
+  .file-upload-area {
+    border: 2px dashed var(--border);
+    border-radius: calc(var(--radius) - 2px);
+    padding: 2.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background-color: var(--background);
+    position: relative;
+  }
+
+  .file-upload-area:hover {
+    border-color: var(--primary);
+    background-color: var(--muted);
+  }
+
+  .file-upload-area.drag-over {
+    border-color: var(--primary);
+    background-color: rgba(59, 130, 246, 0.05);
+  }
+
+  .file-upload-area.has-file {
+    border-color: var(--primary);
+    background-color: rgba(59, 130, 246, 0.05);
+  }
+
+  .file-input {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+  }
+
+  .file-upload-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .file-upload-content svg {
+    color: var(--muted-foreground);
+  }
+
+  .file-upload-text {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--foreground);
+    margin: 0;
+  }
+
+  .file-upload-hint {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+    margin: 0;
+  }
+
+  .file-name {
+    font-size: 0.875rem;
+    color: var(--primary);
+    font-weight: 500;
+    margin-top: 0.5rem;
+    word-break: break-all;
+  }
+
+  /* Checkbox Group */
+  .checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    cursor: pointer;
+    color: var(--foreground);
+    font-size: 0.875rem;
+  }
+
+  .checkbox-label input[type="checkbox"] {
+    width: auto;
+    cursor: pointer;
+    margin-top: 0.125rem;
+    flex-shrink: 0;
+  }
+
+  .checkbox-label a {
+    color: var(--primary);
+    text-decoration: none;
+  }
+
+  .checkbox-label a:hover {
+    text-decoration: underline;
+  }
+
+  /* Form Actions */
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn-save-draft,
+  .btn-submit {
+    padding: 0.875rem 2rem;
+    border-radius: calc(var(--radius) - 2px);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+  }
+
+  .btn-save-draft {
+    background-color: var(--muted);
+    color: var(--foreground);
+    border: 1px solid var(--border);
+  }
+
+  .btn-save-draft:hover {
+    background-color: var(--border);
+  }
+
+  .btn-submit {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .btn-submit:hover {
+    background-color: hsl(215, 85%, 30%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+
+  @media (max-width: 768px) {
+    .upload-project-page {
+      padding: 2rem 1rem;
+    }
+
+    .upload-page-header h1 {
+      font-size: 2rem;
+    }
+
+    .form-section {
+      padding: 1.5rem;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .member-item {
+      padding: 1.25rem;
+    }
+
+    .file-upload-area {
+      padding: 2rem 1.5rem;
+    }
+
+    .form-actions {
+      flex-direction: column;
+    }
+
+    .btn-save-draft,
+    .btn-submit {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .upload-project-page {
+      padding: 1.5rem 1rem;
+    }
+
+    .upload-page-header h1 {
+      font-size: 1.75rem;
+    }
+
+    .upload-page-header p {
+      font-size: 1rem;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+    }
+
+    .form-section {
+      padding: 1.25rem;
+    }
+  }
+</style>
+
+<div class="upload-project-page">
+  <div class="container">
+    <div class="upload-form-wrapper">
+      <!-- Page Header -->
+      <div class="upload-page-header">
+        <h1>Upload | Archive Project</h1>
+        <p>Submit your research project to be archived in our database</p>
+      </div>
+
+      <form class="upload-project-form" method="post" action="{% url 'app:upload_project' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Project Information Section -->
+        <div class="form-section">
+          <h2 class="section-title">Project Information</h2>
+          
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label for="project_title">Project Title <span class="required">*</span></label>
+              <input type="text" id="project_title" name="project_title" required placeholder="Enter the full title of your research project">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="project_type">Project Type <span class="required">*</span></label>
+              <select id="project_type" name="project_type" required>
+                <option value="">Select project type</option>
+                <option value="research-project">Research Project</option>
+                <option value="collaboration">Collaboration</option>
+                <option value="grant-funded">Grant Funded</option>
+                <option value="institutional">Institutional</option>
+                <option value="international">International</option>
+                <option value="ongoing">Ongoing Project</option>
+                <option value="completed">Completed Project</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="project_status">Project Status <span class="required">*</span></label>
+              <select id="project_status" name="project_status" required>
+                <option value="">Select status</option>
+                <option value="active">Active</option>
+                <option value="completed">Completed</option>
+                <option value="archived">Archived</option>
+                <option value="on-hold">On Hold</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="start_date">Start Date <span class="required">*</span></label>
+              <input type="date" id="start_date" name="start_date" required>
+            </div>
+
+            <div class="form-group">
+              <label for="end_date">End Date</label>
+              <input type="date" id="end_date" name="end_date">
+              <div class="form-hint">Leave blank if project is ongoing</div>
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="project_description">Project Description <span class="required">*</span></label>
+            <textarea id="project_description" name="project_description" required placeholder="Provide a comprehensive description of your research project, objectives, and methodology" rows="5" maxlength="2000"></textarea>
+            <div class="char-count"><span id="descriptionCount">0</span> / 2000 characters</div>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="project_objectives">Project Objectives</label>
+            <textarea id="project_objectives" name="project_objectives" placeholder="List the main objectives and goals of the project" rows="3"></textarea>
+          </div>
+        </div>
+
+        <!-- Institution & Funding Section -->
+        <div class="form-section">
+          <h2 class="section-title">Institution & Funding</h2>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="institution_name">Institution Name <span class="required">*</span></label>
+              <input type="text" id="institution_name" name="institution_name" required placeholder="Primary institution">
+            </div>
+
+            <div class="form-group">
+              <label for="institution_country">Institution Country <span class="required">*</span></label>
+              <select id="institution_country" name="institution_country" required>
+                <option value="">Select country</option>
+                <option value="US">United States</option>
+                <option value="UK">United Kingdom</option>
+                <option value="CA">Canada</option>
+                <option value="AU">Australia</option>
+                <option value="DE">Germany</option>
+                <option value="FR">France</option>
+                <option value="IT">Italy</option>
+                <option value="ES">Spain</option>
+                <option value="NL">Netherlands</option>
+                <option value="CH">Switzerland</option>
+                <option value="SG">Singapore</option>
+                <option value="JP">Japan</option>
+                <option value="CN">China</option>
+                <option value="IN">India</option>
+                <option value="BR">Brazil</option>
+                <option value="ZA">South Africa</option>
+                <option value="NG">Nigeria</option>
+                <option value="KE">Kenya</option>
+                <option value="GH">Ghana</option>
+                <option value="EG">Egypt</option>
+                <option value="ET">Ethiopia</option>
+                <option value="MA">Morocco</option>
+                <option value="TZ">Tanzania</option>
+                <option value="UG">Uganda</option>
+                <option value="ZW">Zimbabwe</option>
+                <option value="BW">Botswana</option>
+                <option value="NA">Namibia</option>
+                <option value="MW">Malawi</option>
+                <option value="RW">Rwanda</option>
+                <option value="ZM">Zambia</option>
+                <option value="MZ">Mozambique</option>
+                <option value="AO">Angola</option>
+                <option value="CM">Cameroon</option>
+                <option value="SN">Senegal</option>
+                <option value="CI">Ivory Coast</option>
+                <option value="BF">Burkina Faso</option>
+                <option value="ML">Mali</option>
+                <option value="NE">Niger</option>
+                <option value="TD">Chad</option>
+                <option value="CD">Democratic Republic of the Congo</option>
+                <option value="CG">Republic of the Congo</option>
+                <option value="GA">Gabon</option>
+                <option value="GN">Guinea</option>
+                <option value="SL">Sierra Leone</option>
+                <option value="LR">Liberia</option>
+                <option value="TG">Togo</option>
+                <option value="BJ">Benin</option>
+                <option value="GM">Gambia</option>
+                <option value="MU">Mauritius</option>
+                <option value="SC">Seychelles</option>
+                <option value="KM">Comoros</option>
+                <option value="MG">Madagascar</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="funding_amount">Funding Amount</label>
+              <input type="number" id="funding_amount" name="funding_amount" step="0.01" min="0" placeholder="e.g., 2500000">
+              <div class="form-hint">Enter amount in USD</div>
+            </div>
+
+            <div class="form-group">
+              <label for="funding_source">Funding Source</label>
+              <input type="text" id="funding_source" name="funding_source" placeholder="e.g., NSF, NIH, EU Horizon">
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="funding_details">Funding Details</label>
+            <textarea id="funding_details" name="funding_details" placeholder="Additional information about funding, grants, or sponsors" rows="3"></textarea>
+          </div>
+        </div>
+
+        <!-- Team Members Section -->
+        <div class="form-section">
+          <h2 class="section-title">Team Members</h2>
+          
+          <div id="membersContainer">
+            <div class="member-item" data-member-index="0">
+              <div class="member-item-header">
+                <span>Team Member 1 (Principal Investigator)</span>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="member0_first_name">First Name <span class="required">*</span></label>
+                  <input type="text" id="member0_first_name" name="members[0][first_name]" required placeholder="First name">
+                </div>
+                <div class="form-group">
+                  <label for="member0_last_name">Last Name <span class="required">*</span></label>
+                  <input type="text" id="member0_last_name" name="members[0][last_name]" required placeholder="Last name">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="member0_email">Email <span class="required">*</span></label>
+                  <input type="email" id="member0_email" name="members[0][email]" required placeholder="email@example.com">
+                </div>
+                <div class="form-group">
+                  <label for="member0_role">Role</label>
+                  <input type="text" id="member0_role" name="members[0][role]" placeholder="e.g., Principal Investigator">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="member0_affiliation">Affiliation</label>
+                  <input type="text" id="member0_affiliation" name="members[0][affiliation]" placeholder="Institution/University">
+                </div>
+                <div class="form-group">
+                  <label for="member0_country">Country</label>
+                  <select id="member0_country" name="members[0][country]">
+                    <option value="">Select country</option>
+                    <option value="US">United States</option>
+                    <option value="UK">United Kingdom</option>
+                    <option value="CA">Canada</option>
+                    <option value="AU">Australia</option>
+                    <option value="DE">Germany</option>
+                    <option value="FR">France</option>
+                    <option value="IT">Italy</option>
+                    <option value="ES">Spain</option>
+                    <option value="NL">Netherlands</option>
+                    <option value="CH">Switzerland</option>
+                    <option value="ZA">South Africa</option>
+                    <option value="NG">Nigeria</option>
+                    <option value="KE">Kenya</option>
+                    <option value="GH">Ghana</option>
+                    <option value="EG">Egypt</option>
+                    <option value="ET">Ethiopia</option>
+                    <option value="MA">Morocco</option>
+                    <option value="TZ">Tanzania</option>
+                    <option value="UG">Uganda</option>
+                    <option value="ZW">Zimbabwe</option>
+                    <option value="BW">Botswana</option>
+                    <option value="NA">Namibia</option>
+                    <option value="MW">Malawi</option>
+                    <option value="RW">Rwanda</option>
+                    <option value="ZM">Zambia</option>
+                    <option value="MZ">Mozambique</option>
+                    <option value="AO">Angola</option>
+                    <option value="CM">Cameroon</option>
+                    <option value="SN">Senegal</option>
+                    <option value="CI">Ivory Coast</option>
+                    <option value="BF">Burkina Faso</option>
+                    <option value="ML">Mali</option>
+                    <option value="NE">Niger</option>
+                    <option value="TD">Chad</option>
+                    <option value="CD">Democratic Republic of the Congo</option>
+                    <option value="CG">Republic of the Congo</option>
+                    <option value="GA">Gabon</option>
+                    <option value="GN">Guinea</option>
+                    <option value="SL">Sierra Leone</option>
+                    <option value="LR">Liberia</option>
+                    <option value="TG">Togo</option>
+                    <option value="BJ">Benin</option>
+                    <option value="GM">Gambia</option>
+                    <option value="MU">Mauritius</option>
+                    <option value="SC">Seychelles</option>
+                    <option value="KM">Comoros</option>
+                    <option value="MG">Madagascar</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button type="button" class="btn-add-member" onclick="addMember()">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Add Team Member
+          </button>
+        </div>
+
+        <!-- Project Details Section -->
+        <div class="form-section">
+          <h2 class="section-title">Project Details</h2>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="discipline">Primary Discipline <span class="required">*</span></label>
+              <select id="discipline" name="discipline" required>
+                <option value="">Select discipline</option>
+                <option value="computer-science">Computer Science</option>
+                <option value="mathematics">Mathematics</option>
+                <option value="physics">Physics</option>
+                <option value="chemistry">Chemistry</option>
+                <option value="biology">Biology</option>
+                <option value="medicine">Medicine</option>
+                <option value="engineering">Engineering</option>
+                <option value="social-sciences">Social Sciences</option>
+                <option value="humanities">Humanities</option>
+                <option value="environmental">Environmental Science</option>
+                <option value="agriculture">Agriculture</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="keywords">Keywords</label>
+              <input type="text" id="keywords" name="keywords" placeholder="Enter keywords separated by commas">
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="methodology">Methodology</label>
+            <textarea id="methodology" name="methodology" placeholder="Describe the research methodology and approach" rows="4"></textarea>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="expected_outcomes">Expected Outcomes</label>
+            <textarea id="expected_outcomes" name="expected_outcomes" placeholder="Describe the expected outcomes and deliverables" rows="3"></textarea>
+          </div>
+        </div>
+
+        <!-- Project Files Section -->
+        <div class="form-section">
+          <h2 class="section-title">Project Files & Documentation</h2>
+          
+          <div class="form-group full-width">
+            <label>Project Documentation</label>
+            <div class="file-upload-area" id="docUploadArea" onclick="document.getElementById('projectDocs').click()">
+              <input type="file" id="projectDocs" name="project_docs" accept=".pdf,.doc,.docx" multiple class="file-input" onchange="handleDocsSelect(event)">
+              <div class="file-upload-content">
+                <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                <p class="file-upload-text">Click to upload or drag and drop</p>
+                <p class="file-upload-hint">PDF, DOC, DOCX files (Max size: 50MB per file)</p>
+                <div class="file-name" id="docsFileName"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Project Images</label>
+            <div class="file-upload-area" id="imageUploadArea" onclick="document.getElementById('projectImages').click()">
+              <input type="file" id="projectImages" name="project_images" accept="image/*" multiple class="file-input" onchange="handleImagesSelect(event)">
+              <div class="file-upload-content">
+                <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <p class="file-upload-text">Click to upload or drag and drop</p>
+                <p class="file-upload-hint">Image files (JPG, PNG, GIF - Max size: 10MB per file)</p>
+                <div class="file-name" id="imagesFileName"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Information Section -->
+        <div class="form-section">
+          <h2 class="section-title">Additional Information</h2>
+          
+          <div class="form-group full-width">
+            <label for="publications">Related Publications</label>
+            <textarea id="publications" name="publications" placeholder="List any publications related to this project (DOIs, titles, etc.)" rows="3"></textarea>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="collaborations">Collaborations</label>
+            <textarea id="collaborations" name="collaborations" placeholder="List collaborating institutions or organizations" rows="2"></textarea>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="website">Project Website</label>
+            <input type="url" id="website" name="website" placeholder="https://project.example.com">
+          </div>
+
+          <div class="checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" name="public_archive" checked>
+              <span>Make this project publicly accessible in the archive</span>
+            </label>
+
+            <label class="checkbox-label">
+              <input type="checkbox" name="terms" required>
+              <span>I confirm that all information provided is accurate and I have the authority to archive this project <span class="required">*</span></span>
+            </label>
+
+            <label class="checkbox-label">
+              <input type="checkbox" name="copyright" required>
+              <span>I agree to the <a href="#">Terms and Conditions</a> and <a href="#">Archive Policy</a> <span class="required">*</span></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button type="button" class="btn-save-draft">Save as Draft</button>
+          <button type="submit" class="btn-submit">Upload & Archive Project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  let memberCount = 1;
+
+  function addMember() {
+    const container = document.getElementById('membersContainer');
+    const memberItem = document.createElement('div');
+    memberItem.className = 'member-item';
+    memberItem.setAttribute('data-member-index', memberCount);
+    
+    memberItem.innerHTML = `
+      <div class="member-item-header">
+        <span>Team Member ${memberCount + 1}</span>
+        <button type="button" class="btn-remove-member" onclick="removeMember(this)">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="member${memberCount}_first_name">First Name <span class="required">*</span></label>
+          <input type="text" id="member${memberCount}_first_name" name="members[${memberCount}][first_name]" required placeholder="First name">
+        </div>
+        <div class="form-group">
+          <label for="member${memberCount}_last_name">Last Name <span class="required">*</span></label>
+          <input type="text" id="member${memberCount}_last_name" name="members[${memberCount}][last_name]" required placeholder="Last name">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="member${memberCount}_email">Email <span class="required">*</span></label>
+          <input type="email" id="member${memberCount}_email" name="members[${memberCount}][email]" required placeholder="email@example.com">
+        </div>
+        <div class="form-group">
+          <label for="member${memberCount}_role">Role</label>
+          <input type="text" id="member${memberCount}_role" name="members[${memberCount}][role]" placeholder="e.g., Co-Investigator">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="member${memberCount}_affiliation">Affiliation</label>
+          <input type="text" id="member${memberCount}_affiliation" name="members[${memberCount}][affiliation]" placeholder="Institution/University">
+        </div>
+        <div class="form-group">
+          <label for="member${memberCount}_country">Country</label>
+          <select id="member${memberCount}_country" name="members[${memberCount}][country]">
+            <option value="">Select country</option>
+            <option value="US">United States</option>
+            <option value="UK">United Kingdom</option>
+            <option value="CA">Canada</option>
+            <option value="AU">Australia</option>
+            <option value="DE">Germany</option>
+            <option value="FR">France</option>
+            <option value="IT">Italy</option>
+            <option value="ES">Spain</option>
+            <option value="NL">Netherlands</option>
+            <option value="CH">Switzerland</option>
+            <option value="ZA">South Africa</option>
+            <option value="NG">Nigeria</option>
+            <option value="KE">Kenya</option>
+            <option value="GH">Ghana</option>
+            <option value="EG">Egypt</option>
+            <option value="ET">Ethiopia</option>
+            <option value="MA">Morocco</option>
+            <option value="TZ">Tanzania</option>
+            <option value="UG">Uganda</option>
+            <option value="ZW">Zimbabwe</option>
+            <option value="BW">Botswana</option>
+            <option value="NA">Namibia</option>
+            <option value="MW">Malawi</option>
+            <option value="RW">Rwanda</option>
+            <option value="ZM">Zambia</option>
+            <option value="MZ">Mozambique</option>
+            <option value="AO">Angola</option>
+            <option value="CM">Cameroon</option>
+            <option value="SN">Senegal</option>
+            <option value="CI">Ivory Coast</option>
+            <option value="BF">Burkina Faso</option>
+            <option value="ML">Mali</option>
+            <option value="NE">Niger</option>
+            <option value="TD">Chad</option>
+            <option value="CD">Democratic Republic of the Congo</option>
+            <option value="CG">Republic of the Congo</option>
+            <option value="GA">Gabon</option>
+            <option value="GN">Guinea</option>
+            <option value="SL">Sierra Leone</option>
+            <option value="LR">Liberia</option>
+            <option value="TG">Togo</option>
+            <option value="BJ">Benin</option>
+            <option value="GM">Gambia</option>
+            <option value="MU">Mauritius</option>
+            <option value="SC">Seychelles</option>
+            <option value="KM">Comoros</option>
+            <option value="MG">Madagascar</option>
+          </select>
+        </div>
+      </div>
+    `;
+    
+    container.appendChild(memberItem);
+    memberCount++;
+  }
+
+  function removeMember(button) {
+    const memberItem = button.closest('.member-item');
+    memberItem.remove();
+    updateMemberNumbers();
+  }
+
+  function updateMemberNumbers() {
+    const members = document.querySelectorAll('.member-item');
+    members.forEach((member, index) => {
+      const header = member.querySelector('.member-item-header span');
+      if (index === 0) {
+        header.textContent = 'Team Member 1 (Principal Investigator)';
+      } else {
+        header.textContent = `Team Member ${index + 1}`;
+      }
+    });
+  }
+
+  function handleDocsSelect(event) {
+    const files = event.target.files;
+    const fileName = document.getElementById('docsFileName');
+    const uploadArea = document.getElementById('docUploadArea');
+    
+    if (files.length > 0) {
+      const fileNames = Array.from(files).map(f => f.name).join(', ');
+      fileName.textContent = `${files.length} file(s): ${fileNames}`;
+      uploadArea.classList.add('has-file');
+    } else {
+      fileName.textContent = '';
+      uploadArea.classList.remove('has-file');
+    }
+  }
+
+  function handleImagesSelect(event) {
+    const files = event.target.files;
+    const fileName = document.getElementById('imagesFileName');
+    const uploadArea = document.getElementById('imageUploadArea');
+    
+    if (files.length > 0) {
+      const fileNames = Array.from(files).map(f => f.name).join(', ');
+      fileName.textContent = `${files.length} file(s): ${fileNames}`;
+      uploadArea.classList.add('has-file');
+    } else {
+      fileName.textContent = '';
+      uploadArea.classList.remove('has-file');
+    }
+  }
+
+  // Character counter for description
+  document.getElementById('project_description')?.addEventListener('input', function(e) {
+    const count = e.target.value.length;
+    document.getElementById('descriptionCount').textContent = count;
+  });
+
+  // Drag and drop functionality for docs
+  const docUploadArea = document.getElementById('docUploadArea');
+  const docInput = document.getElementById('projectDocs');
+
+  docUploadArea.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    docUploadArea.classList.add('drag-over');
+  });
+
+  docUploadArea.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    docUploadArea.classList.remove('drag-over');
+  });
+
+  docUploadArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    docUploadArea.classList.remove('drag-over');
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      docInput.files = files;
+      handleDocsSelect({ target: docInput });
+    }
+  });
+
+  // Drag and drop functionality for images
+  const imageUploadArea = document.getElementById('imageUploadArea');
+  const imageInput = document.getElementById('projectImages');
+
+  imageUploadArea.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    imageUploadArea.classList.add('drag-over');
+  });
+
+  imageUploadArea.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    imageUploadArea.classList.remove('drag-over');
+  });
+
+  imageUploadArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    imageUploadArea.classList.remove('drag-over');
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      imageInput.files = files;
+      handleImagesSelect({ target: imageInput });
+    }
+  });
+</script>
+{% endblock %}
+

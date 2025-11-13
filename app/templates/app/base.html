@@ -1,0 +1,257 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}ScholarIndex - Discover Scholarly Research & Publications{% endblock %}</title>
+  <meta name="description" content="{% block description %}Access millions of peer-reviewed articles, research papers, and academic publications from leading scholars worldwide.{% endblock %}" />
+  <meta name="author" content="ScholarIndex" />
+  <link rel="icon" type="image/jpeg" href="https://res.cloudinary.com/dsypclqxk/image/upload/v1763051843/SIS_wcdf5h_31ba42.jpg" />
+  <link rel="shortcut icon" type="image/jpeg" href="https://res.cloudinary.com/dsypclqxk/image/upload/v1763051843/SIS_wcdf5h_31ba42.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&family=Lato:wght@300;400;700&family=Playfair+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'app/css/style.css' %}">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <!-- Page Loader -->
+  {% comment %}
+  <div class="page-loader">
+    <div id="loadCon" class="loader-container">
+      <div id="inner1" class="loader-inner-1">
+        <div id="inner2" class="loader-inner-2">
+          <img src="https://res.cloudinary.com/dsypclqxk/image/upload/v1763051843/SIS_wcdf5h_31ba42.jpg" alt="Logo" class="loader-logo" />
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endcomment %}
+  <!-- Navbar -->
+  <header>
+    <nav>
+      <div class="logo-container">
+        <img src="https://res.cloudinary.com/dsypclqxk/image/upload/v1763051843/SIS_wcdf5h_31ba42.jpg" alt="ScholarIndex Logo" class="logo-image" />
+        <span class="logo-text">ScholarIndex</span>
+      </div>
+      
+      <div class="nav-links">
+        <div class="nav-dropdown">
+          <button class="nav-link nav-dropdown-toggle" onclick="toggleDropdown(event)">
+            Documentation
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div class="nav-dropdown-menu">
+            <a href="{% url 'app:indexed_articles' %}" class="nav-dropdown-item">Indexed Articles</a>
+            <a href="{% url 'app:indexed_journals' %}" class="nav-dropdown-item">Indexed journals</a>
+            <a href="{% url 'app:project_archive' %}" class="nav-dropdown-item">Project | Research archive</a>
+            <a href="{% url 'app:upload_article' %}" class="nav-dropdown-item">Upload an article</a>
+            <a href="{% url 'app:register_journal' %}" class="nav-dropdown-item">Register a journal</a>
+            <a href="{% url 'app:upload_project' %}" class="nav-dropdown-item">Upload | archive project</a>
+          </div>
+        </div>
+        <div class="nav-dropdown">
+          <button class="nav-link nav-dropdown-toggle" onclick="toggleDropdown(event)">
+            Communities
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div class="nav-dropdown-menu">
+            <a href="{% url 'app:directory_researchers' %}" class="nav-dropdown-item">Directory of Researchers</a>
+            <a href="{% url 'app:council_members' %}" class="nav-dropdown-item">Council Members</a>
+            <a href="{% url 'app:team_members' %}" class="nav-dropdown-item">Team Members</a>
+            <a href="{% url 'app:sponsors' %}" class="nav-dropdown-item">Sponsors</a>
+            <a href="{% url 'app:request_membership' %}" class="nav-dropdown-item">Request For Membership</a>
+            <a href="{% url 'app:apply_directory' %}" class="nav-dropdown-item">Apply For Directory of Researcher</a>
+          </div>
+        </div>
+        <div class="nav-dropdown">
+          <button class="nav-link nav-dropdown-toggle" onclick="toggleDropdown(event)">
+            Thesis & Plagiarism
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div class="nav-dropdown-menu">
+            <div class="nav-dropdown-section">
+              <div class="nav-dropdown-section-title">Plagiarism</div>
+              <a href="{% url 'app:check_turnitin' %}" class="nav-dropdown-item">Check Turnitin Plagiarism</a>
+              <a href="{% url 'app:work_plagiarism' %}" class="nav-dropdown-item">Work My Plagiarism</a>
+            </div>
+            <div class="nav-dropdown-section">
+              <div class="nav-dropdown-section-title">Thesis Extraction</div>
+              <a href="{% url 'app:thesis_to_article' %}" class="nav-dropdown-item">Thesis To Article</a>
+              <a href="{% url 'app:thesis_to_book' %}" class="nav-dropdown-item">Thesis To Book</a>
+              <a href="{% url 'app:thesis_to_book_chapter' %}" class="nav-dropdown-item">Thesis To Book Chapter</a>
+              <a href="{% url 'app:powerpoint_preparation' %}" class="nav-dropdown-item">Power Point Preparation</a>
+            </div>
+          </div>
+        </div>
+        <div class="nav-dropdown">
+          <button class="nav-link nav-dropdown-toggle" onclick="toggleDropdown(event)">
+            Hall of Fame
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div class="nav-dropdown-menu">
+            <a href="{% url 'app:hall_of_fame' %}" class="nav-dropdown-item">List</a>
+            <a href="{% url 'app:hall_of_fame_apply' %}" class="nav-dropdown-item">Apply</a>
+          </div>
+        </div>
+        <a href="{% url 'app:submit' %}" class="nav-link">Submit</a>
+        <div class="nav-dropdown">
+          <button class="nav-link nav-dropdown-toggle" onclick="toggleDropdown(event)">
+            About
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div class="nav-dropdown-menu">
+            <a href="{% url 'app:about_sis' %}" class="nav-dropdown-item">About S.I.S</a>
+            <a href="{% url 'app:mission' %}" class="nav-dropdown-item">Mission</a>
+            <a href="{% url 'app:criteria' %}" class="nav-dropdown-item">Criteria</a>
+            <a href="{% url 'app:tolerance_policy' %}" class="nav-dropdown-item">Tolerance Policy</a>
+            <a href="{% url 'app:service_solution' %}" class="nav-dropdown-item">Service & Solution</a>
+            <a href="{% url 'app:policy_terms' %}" class="nav-dropdown-item">Policy terms and Conditions</a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="nav-search">
+        <div class="nav-search-box">
+          <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <input type="text" class="nav-search-input" placeholder="Quick search..." />
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+          <svg class="theme-icon" id="lightIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+          </svg>
+          <svg class="theme-icon" id="darkIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+          </svg>
+        </button>
+        <a href="{% url 'app:auth' %}" class="btn btn-ghost">Sign In</a>
+        <a href="{% url 'app:auth' %}" class="btn btn-primary">Get Started</a>
+      </div>
+
+      <button class="menu-button" onclick="toggleMenu()">
+        <svg class="menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Mobile Menu -->
+  <div class="sheet-overlay" id="sheetOverlay" onclick="closeMenu()">
+    <div class="sheet-content" onclick="event.stopPropagation()">
+      <button class="sheet-close" onclick="closeMenu()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+      <div class="sheet-links">
+        <a href="{% url 'app:landing' %}" class="sheet-link" onclick="closeMenu()">Browse</a>
+        <a href="{% url 'app:landing' %}#disciplines" class="sheet-link" onclick="closeMenu()">Disciplines</a>
+        <a href="{% url 'app:submit' %}" class="sheet-link" onclick="closeMenu()">Submit</a>
+        <a href="{% url 'app:about' %}" class="sheet-link" onclick="closeMenu()">About</a>
+      </div>
+      <div class="sheet-buttons">
+        <button class="btn btn-ghost" onclick="toggleTheme(); closeMenu();">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+          </svg>
+          Toggle Theme
+        </button>
+        <a href="{% url 'app:auth' %}" class="btn btn-ghost" onclick="closeMenu()">Sign In</a>
+        <a href="{% url 'app:auth' %}" class="btn btn-primary" onclick="closeMenu()">Get Started</a>
+      </div>
+    </div>
+  </div>
+
+  {% block content %}{% endblock %}
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-content">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="logo-container" style="margin-bottom: 1rem;">
+            <img src="https://res.cloudinary.com/dsypclqxk/image/upload/v1763051843/SIS_wcdf5h_31ba42.jpg" alt="ScholarIndex Logo" class="logo-image" />
+            <span class="logo-text">ScholarIndex</span>
+          </div>
+          <p style="font-size: 0.875rem; color: var(--muted-foreground);">
+            Connecting researchers worldwide through open access to scholarly publications.
+          </p>
+        </div>
+        
+        <div>
+          <h3 class="footer-category-title">Platform</h3>
+          <ul class="footer-links">
+            <li><a href="{% url 'app:browse' %}">Browse Articles</a></li>
+            <li><a href="{% url 'app:submit' %}">Submit Research</a></li>
+            <li><a href="#">For Authors</a></li>
+            <li><a href="#">For Reviewers</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="footer-category-title">Resources</h3>
+          <ul class="footer-links">
+            <li><a href="#">Documentation</a></li>
+            <li><a href="#">API Access</a></li>
+            <li><a href="#">Guidelines</a></li>
+            <li><a href="#">FAQs</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="footer-category-title">Company</h3>
+          <ul class="footer-links">
+            <li><a href="{% url 'app:about' %}">About Us</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Press</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="footer-category-title">Legal</h3>
+          <ul class="footer-links">
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Cookie Policy</a></li>
+            <li><a href="#">Accessibility</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p class="footer-copyright">
+          © 2025 ScholarIndex. All rights reserved.
+        </p>
+        <div class="footer-social">
+          <a href="#">Twitter</a>
+          <a href="#">LinkedIn</a>
+          <a href="#">GitHub</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{% static 'app/js/main.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
+

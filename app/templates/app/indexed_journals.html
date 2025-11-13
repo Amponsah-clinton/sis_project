@@ -1,0 +1,460 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Indexed Journals - ScholarIndex{% endblock %}
+
+{% block content %}
+<div class="indexed-journals-page">
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1>Indexed Journals</h1>
+      <p>Browse through our comprehensive collection of indexed academic journals</p>
+    </div>
+
+    <div class="journals-layout">
+      <!-- Sidebar Filters -->
+      <aside class="journals-sidebar">
+        <div class="filter-section collapsed" id="filterSection">
+          <div class="filter-section-header">
+            <h3>Filters</h3>
+            <button class="filter-toggle-btn" onclick="toggleFilters()">
+              <span>Show Filters</span>
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="filter-content">
+            <!-- Search Filter -->
+            <div class="filter-group">
+              <label>Search Journals</label>
+              <input type="text" class="filter-input" placeholder="Search by name, ISSN..." id="journalSearch">
+            </div>
+
+            <!-- Subject Area Filter -->
+            <div class="filter-group">
+              <label>Subject Area</label>
+              <select class="filter-select" id="subjectFilter">
+                <option value="">All Subjects</option>
+                <option value="computer-science">Computer Science</option>
+                <option value="mathematics">Mathematics</option>
+                <option value="physics">Physics</option>
+                <option value="chemistry">Chemistry</option>
+                <option value="biology">Biology</option>
+                <option value="medicine">Medicine</option>
+                <option value="engineering">Engineering</option>
+                <option value="social-sciences">Social Sciences</option>
+                <option value="humanities">Humanities</option>
+                <option value="business">Business</option>
+                <option value="economics">Economics</option>
+              </select>
+            </div>
+
+            <!-- Publisher Filter -->
+            <div class="filter-group">
+              <label>Publisher</label>
+              <select class="filter-select" id="publisherFilter">
+                <option value="">All Publishers</option>
+                <option value="elsevier">Elsevier</option>
+                <option value="springer">Springer</option>
+                <option value="ieee">IEEE</option>
+                <option value="acm">ACM</option>
+                <option value="nature">Nature</option>
+                <option value="wiley">Wiley</option>
+                <option value="taylor-francis">Taylor & Francis</option>
+                <option value="oxford">Oxford University Press</option>
+                <option value="cambridge">Cambridge University Press</option>
+              </select>
+            </div>
+
+            <!-- Impact Factor Filter -->
+            <div class="filter-group">
+              <label>Impact Factor</label>
+              <select class="filter-select" id="impactFilter">
+                <option value="">All Impact Factors</option>
+                <option value="high">High (5.0+)</option>
+                <option value="medium">Medium (2.0 - 5.0)</option>
+                <option value="low">Low (Below 2.0)</option>
+              </select>
+            </div>
+
+            <!-- Sort By -->
+            <div class="filter-group">
+              <label>Sort By</label>
+              <select class="filter-select" id="sortFilter">
+                <option value="name">Name (A-Z)</option>
+                <option value="impact">Impact Factor</option>
+                <option value="articles">Number of Articles</option>
+                <option value="recent">Recently Added</option>
+              </select>
+            </div>
+
+            <!-- Clear Filters -->
+            <button class="btn-filter-clear" onclick="clearFilters()">Clear All Filters</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="journals-main">
+        <!-- Results Header -->
+        <div class="results-header">
+          <div class="results-count">
+            <span id="resultsCount">856</span> journals found
+          </div>
+          <div class="view-toggle">
+            <button class="view-btn active" data-view="grid" onclick="toggleView('grid')">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+              </svg>
+            </button>
+            <button class="view-btn" data-view="list" onclick="toggleView('list')">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Journals Grid -->
+        <div class="journals-grid" id="journalsContainer">
+          <!-- Journal Card 1 -->
+          <article class="journal-card">
+            <div class="journal-header">
+              <span class="journal-badge">Computer Science</span>
+              <span class="journal-impact">IF: 8.5</span>
+            </div>
+            <div class="journal-logo">
+              <div class="journal-logo-placeholder">
+                <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+              </div>
+            </div>
+            <h3 class="journal-title">
+              <a href="#">Journal of Machine Learning Research</a>
+            </h3>
+            <p class="journal-publisher">
+              <strong>Publisher:</strong> MIT Press
+            </p>
+            <p class="journal-issn">
+              <strong>ISSN:</strong> 1532-4435
+            </p>
+            <div class="journal-stats">
+              <span class="stat-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                12,450 Articles
+              </span>
+              <span class="stat-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Established: 2000
+              </span>
+            </div>
+            <div class="journal-actions">
+              <a href="#" class="btn-view-journal">View Journal</a>
+              <a href="#" class="btn-browse-articles">Browse Articles</a>
+            </div>
+          </article>
+
+          <!-- Journal Card 2 -->
+          <article class="journal-card">
+            <div class="journal-header">
+              <span class="journal-badge">Physics</span>
+              <span class="journal-impact">IF: 9.2</span>
+            </div>
+            <div class="journal-logo">
+              <div class="journal-logo-placeholder">
+                <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+              </div>
+            </div>
+            <h3 class="journal-title">
+              <a href="#">Physical Review Letters</a>
+            </h3>
+            <p class="journal-publisher">
+              <strong>Publisher:</strong> American Physical Society
+            </p>
+            <p class="journal-issn">
+              <strong>ISSN:</strong> 0031-9007
+            </p>
+            <div class="journal-stats">
+              <span class="stat-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                45,230 Articles
+              </span>
+              <span class="stat-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Established: 1958
+              </span>
+            </div>
+            <div class="journal-actions">
+              <a href="#" class="btn-view-journal">View Journal</a>
+              <a href="#" class="btn-browse-articles">Browse Articles</a>
+            </div>
+          </article>
+
+          <!-- Journal Card 3 -->
+          <article class="journal-card">
+            <div class="journal-header">
+              <span class="journal-badge">Medicine</span>
+              <span class="journal-impact">IF: 11.8</span>
+            </div>
+            <div class="journal-logo">
+              <div class="journal-logo-placeholder">
+                <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+              </div>
+            </div>
+            <h3 class="journal-title">
+              <a href="#">The Lancet</a>
+            </h3>
+            <p class="journal-publisher">
+              <strong>Publisher:</strong> Elsevier
+            </p>
+            <p class="journal-issn">
+              <strong>ISSN:</strong> 0140-6736
+            </p>
+            <div class="journal-stats">
+              <span class="stat-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                8,920 Articles
+              </span>
+              <span class="stat-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Established: 1823
+              </span>
+            </div>
+            <div class="journal-actions">
+              <a href="#" class="btn-view-journal">View Journal</a>
+              <a href="#" class="btn-browse-articles">Browse Articles</a>
+            </div>
+          </article>
+
+          <!-- Journal Card 4 -->
+          <article class="journal-card">
+            <div class="journal-header">
+              <span class="journal-badge">Engineering</span>
+              <span class="journal-impact">IF: 7.3</span>
+            </div>
+            <div class="journal-logo">
+              <div class="journal-logo-placeholder">
+                <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+              </div>
+            </div>
+            <h3 class="journal-title">
+              <a href="#">IEEE Transactions on Information Theory</a>
+            </h3>
+            <p class="journal-publisher">
+              <strong>Publisher:</strong> IEEE
+            </p>
+            <p class="journal-issn">
+              <strong>ISSN:</strong> 0018-9448
+            </p>
+            <div class="journal-stats">
+              <span class="stat-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                15,680 Articles
+              </span>
+              <span class="stat-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Established: 1955
+              </span>
+            </div>
+            <div class="journal-actions">
+              <a href="#" class="btn-view-journal">View Journal</a>
+              <a href="#" class="btn-browse-articles">Browse Articles</a>
+            </div>
+          </article>
+
+          <!-- Journal Card 5 -->
+          <article class="journal-card">
+            <div class="journal-header">
+              <span class="journal-badge">Biology</span>
+              <span class="journal-impact">IF: 10.5</span>
+            </div>
+            <div class="journal-logo">
+              <div class="journal-logo-placeholder">
+                <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+              </div>
+            </div>
+            <h3 class="journal-title">
+              <a href="#">Nature Biotechnology</a>
+            </h3>
+            <p class="journal-publisher">
+              <strong>Publisher:</strong> Nature Publishing Group
+            </p>
+            <p class="journal-issn">
+              <strong>ISSN:</strong> 1087-0156
+            </p>
+            <div class="journal-stats">
+              <span class="stat-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                6,340 Articles
+              </span>
+              <span class="stat-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Established: 1983
+              </span>
+            </div>
+            <div class="journal-actions">
+              <a href="#" class="btn-view-journal">View Journal</a>
+              <a href="#" class="btn-browse-articles">Browse Articles</a>
+            </div>
+          </article>
+
+          <!-- Journal Card 6 -->
+          <article class="journal-card">
+            <div class="journal-header">
+              <span class="journal-badge">Chemistry</span>
+              <span class="journal-impact">IF: 6.8</span>
+            </div>
+            <div class="journal-logo">
+              <div class="journal-logo-placeholder">
+                <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+              </div>
+            </div>
+            <h3 class="journal-title">
+              <a href="#">Journal of the American Chemical Society</a>
+            </h3>
+            <p class="journal-publisher">
+              <strong>Publisher:</strong> American Chemical Society
+            </p>
+            <p class="journal-issn">
+              <strong>ISSN:</strong> 0002-7863
+            </p>
+            <div class="journal-stats">
+              <span class="stat-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                28,950 Articles
+              </span>
+              <span class="stat-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Established: 1879
+              </span>
+            </div>
+            <div class="journal-actions">
+              <a href="#" class="btn-view-journal">View Journal</a>
+              <a href="#" class="btn-browse-articles">Browse Articles</a>
+            </div>
+          </article>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+          <button class="pagination-btn" disabled>
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Previous
+          </button>
+          <div class="pagination-numbers">
+            <button class="pagination-number active">1</button>
+            <button class="pagination-number">2</button>
+            <button class="pagination-number">3</button>
+            <button class="pagination-number">4</button>
+            <button class="pagination-number">5</button>
+            <span class="pagination-ellipsis">...</span>
+            <button class="pagination-number">18</button>
+          </div>
+          <button class="pagination-btn">
+            Next
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleView(view) {
+    const container = document.getElementById('journalsContainer');
+    const buttons = document.querySelectorAll('.view-btn');
+    
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.closest('.view-btn').classList.add('active');
+    
+    if (view === 'list') {
+      container.classList.add('list-view');
+    } else {
+      container.classList.remove('list-view');
+    }
+  }
+
+  function toggleFilters() {
+    const filterSection = document.getElementById('filterSection');
+    const toggleBtn = filterSection.querySelector('.filter-toggle-btn span');
+    
+    filterSection.classList.toggle('collapsed');
+    
+    if (filterSection.classList.contains('collapsed')) {
+      toggleBtn.textContent = 'Show Filters';
+    } else {
+      toggleBtn.textContent = 'Hide Filters';
+    }
+  }
+
+  function clearFilters() {
+    document.getElementById('journalSearch').value = '';
+    document.getElementById('subjectFilter').value = '';
+    document.getElementById('publisherFilter').value = '';
+    document.getElementById('impactFilter').value = '';
+    document.getElementById('sortFilter').value = 'name';
+  }
+
+  // Filter functionality
+  document.getElementById('journalSearch')?.addEventListener('input', function(e) {
+    filterJournals();
+  });
+
+  document.getElementById('subjectFilter')?.addEventListener('change', function(e) {
+    filterJournals();
+  });
+
+  document.getElementById('publisherFilter')?.addEventListener('change', function(e) {
+    filterJournals();
+  });
+
+  function filterJournals() {
+    // Filter logic would go here
+    console.log('Filtering journals...');
+  }
+</script>
+{% endblock %}
+

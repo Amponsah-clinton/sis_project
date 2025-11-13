@@ -1,0 +1,706 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Apply For Hall of Fame - ScholarIndex{% endblock %}
+
+{% block content %}
+<style>
+  .apply-hall-page {
+    padding: 3rem 1.5rem;
+    background-color: var(--background);
+    min-height: calc(100vh - 5rem);
+  }
+
+  .apply-hall-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .apply-hall-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .apply-hall-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--foreground);
+  }
+
+  .apply-hall-header p {
+    font-size: 1.125rem;
+    color: var(--muted-foreground);
+  }
+
+  .apply-hall-form {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .form-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--foreground);
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-group.full-width {
+    grid-column: 1 / -1;
+  }
+
+  .form-group label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--foreground);
+  }
+
+  .form-group label .required {
+    color: #dc2626;
+    margin-left: 0.25rem;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    color: var(--foreground);
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .form-group input::placeholder,
+  .form-group textarea::placeholder {
+    color: #9ca3af;
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .form-hint {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+  }
+
+  .char-count {
+    font-size: 0.75rem;
+    color: #6b7280;
+    text-align: right;
+    margin-top: 0.25rem;
+  }
+
+  .file-upload-area {
+    border: 2px dashed #e5e7eb;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background-color: #f9fafb;
+    position: relative;
+  }
+
+  .file-upload-area:hover {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+  }
+
+  .file-upload-area.drag-over {
+    border-color: #3b82f6;
+    background-color: #dbeafe;
+  }
+
+  .file-upload-area.has-file {
+    border-color: #10b981;
+    background-color: #f0fdf4;
+  }
+
+  .file-input {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+  }
+
+  .file-upload-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .file-upload-content svg {
+    color: #6b7280;
+  }
+
+  .file-upload-text {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--foreground);
+    margin: 0;
+  }
+
+  .file-upload-hint {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0;
+  }
+
+  .file-name {
+    font-size: 0.875rem;
+    color: #10b981;
+    font-weight: 500;
+    margin-top: 0.5rem;
+    word-break: break-all;
+  }
+
+  .checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    cursor: pointer;
+    color: var(--foreground);
+    font-size: 0.875rem;
+  }
+
+  .checkbox-label input[type="checkbox"] {
+    width: auto;
+    cursor: pointer;
+    margin-top: 0.125rem;
+    flex-shrink: 0;
+  }
+
+  .checkbox-label a {
+    color: #3b82f6;
+    text-decoration: none;
+  }
+
+  .checkbox-label a:hover {
+    text-decoration: underline;
+  }
+
+  .eligibility-info {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border-left: 4px solid #3b82f6;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .eligibility-info h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1e40af;
+    margin-bottom: 0.75rem;
+  }
+
+  .eligibility-info ul {
+    margin: 0;
+    padding-left: 1.5rem;
+    color: #1e3a8a;
+  }
+
+  .eligibility-info li {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding-top: 1.5rem;
+    border-top: 2px solid #e5e7eb;
+    margin-top: 2rem;
+  }
+
+  .btn-cancel,
+  .btn-submit {
+    padding: 0.875rem 2rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+  }
+
+  .btn-cancel {
+    background-color: #f3f4f6;
+    color: var(--foreground);
+    border: 1px solid #e5e7eb;
+  }
+
+  .btn-cancel:hover {
+    background-color: #e5e7eb;
+  }
+
+  .btn-submit {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+  }
+
+  .btn-submit:hover {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(251, 191, 36, 0.4);
+  }
+
+  @media (max-width: 768px) {
+    .apply-hall-page {
+      padding: 2rem 1rem;
+    }
+
+    .apply-hall-header h1 {
+      font-size: 2rem;
+    }
+
+    .apply-hall-form {
+      padding: 1.5rem;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .file-upload-area {
+      padding: 1.5rem;
+    }
+
+    .form-actions {
+      flex-direction: column;
+    }
+
+    .btn-cancel,
+    .btn-submit {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="apply-hall-page">
+  <div class="container">
+    <div class="apply-hall-wrapper">
+      <!-- Page Header -->
+      <div class="apply-hall-header">
+        <h1>Apply For Hall of Fame</h1>
+        <p>Nominate yourself or an exceptional researcher for induction into our Hall of Fame</p>
+      </div>
+
+      <form class="apply-hall-form" method="post" action="{% url 'app:hall_of_fame_apply' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Eligibility Information -->
+        <div class="eligibility-info">
+          <h3>Eligibility Criteria</h3>
+          <ul>
+            <li>Minimum 15 years of research experience</li>
+            <li>At least 100 peer-reviewed publications</li>
+            <li>Significant contributions to your field of research</li>
+            <li>Recognition through awards, honors, or significant impact</li>
+            <li>Active engagement in the research community</li>
+          </ul>
+        </div>
+
+        <!-- Nominee Information Section -->
+        <div class="form-section">
+          <h2 class="section-title">Nominee Information</h2>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nominee_first_name">First Name <span class="required">*</span></label>
+              <input type="text" id="nominee_first_name" name="nominee_first_name" required placeholder="Enter first name">
+            </div>
+
+            <div class="form-group">
+              <label for="nominee_last_name">Last Name <span class="required">*</span></label>
+              <input type="text" id="nominee_last_name" name="nominee_last_name" required placeholder="Enter last name">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nominee_email">Email Address <span class="required">*</span></label>
+              <input type="email" id="nominee_email" name="nominee_email" required placeholder="nominee.email@example.com">
+            </div>
+
+            <div class="form-group">
+              <label for="nominee_phone">Phone Number</label>
+              <input type="tel" id="nominee_phone" name="nominee_phone" placeholder="+1234567890">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nominee_title">Academic Title <span class="required">*</span></label>
+              <input type="text" id="nominee_title" name="nominee_title" required placeholder="e.g., Professor, Dr.">
+            </div>
+
+            <div class="form-group">
+              <label for="nominee_position">Position <span class="required">*</span></label>
+              <input type="text" id="nominee_position" name="nominee_position" required placeholder="Current position">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nominee_institution">Institution <span class="required">*</span></label>
+              <input type="text" id="nominee_institution" name="nominee_institution" required placeholder="Institution name">
+            </div>
+
+            <div class="form-group">
+              <label for="nominee_country">Country <span class="required">*</span></label>
+              <select id="nominee_country" name="nominee_country" required>
+                <option value="">Select country</option>
+                <option value="US">United States</option>
+                <option value="UK">United Kingdom</option>
+                <option value="CA">Canada</option>
+                <option value="AU">Australia</option>
+                <option value="DE">Germany</option>
+                <option value="FR">France</option>
+                <option value="IT">Italy</option>
+                <option value="ES">Spain</option>
+                <option value="NL">Netherlands</option>
+                <option value="CH">Switzerland</option>
+                <option value="ZA">South Africa</option>
+                <option value="NG">Nigeria</option>
+                <option value="KE">Kenya</option>
+                <option value="GH">Ghana</option>
+                <option value="EG">Egypt</option>
+                <option value="ET">Ethiopia</option>
+                <option value="MA">Morocco</option>
+                <option value="TZ">Tanzania</option>
+                <option value="UG">Uganda</option>
+                <option value="ZW">Zimbabwe</option>
+                <option value="BW">Botswana</option>
+                <option value="NA">Namibia</option>
+                <option value="MW">Malawi</option>
+                <option value="RW">Rwanda</option>
+                <option value="ZM">Zambia</option>
+                <option value="MZ">Mozambique</option>
+                <option value="AO">Angola</option>
+                <option value="CM">Cameroon</option>
+                <option value="SN">Senegal</option>
+                <option value="CI">Ivory Coast</option>
+                <option value="BF">Burkina Faso</option>
+                <option value="ML">Mali</option>
+                <option value="NE">Niger</option>
+                <option value="TD">Chad</option>
+                <option value="CD">Democratic Republic of the Congo</option>
+                <option value="CG">Republic of the Congo</option>
+                <option value="GA">Gabon</option>
+                <option value="GN">Guinea</option>
+                <option value="SL">Sierra Leone</option>
+                <option value="LR">Liberia</option>
+                <option value="TG">Togo</option>
+                <option value="BJ">Benin</option>
+                <option value="GM">Gambia</option>
+                <option value="MU">Mauritius</option>
+                <option value="SC">Seychelles</option>
+                <option value="KM">Comoros</option>
+                <option value="MG">Madagascar</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Research Achievements Section -->
+        <div class="form-section">
+          <h2 class="section-title">Research Achievements</h2>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="discipline">Primary Discipline <span class="required">*</span></label>
+              <select id="discipline" name="discipline" required>
+                <option value="">Select discipline</option>
+                <option value="computer-science">Computer Science</option>
+                <option value="mathematics">Mathematics</option>
+                <option value="physics">Physics</option>
+                <option value="chemistry">Chemistry</option>
+                <option value="biology">Biology</option>
+                <option value="medicine">Medicine</option>
+                <option value="engineering">Engineering</option>
+                <option value="social-sciences">Social Sciences</option>
+                <option value="humanities">Humanities</option>
+                <option value="environmental">Environmental Science</option>
+                <option value="agriculture">Agriculture</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="years_experience">Years of Research Experience <span class="required">*</span></label>
+              <input type="number" id="years_experience" name="years_experience" required min="0" placeholder="Years">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="publications_count">Number of Publications <span class="required">*</span></label>
+              <input type="number" id="publications_count" name="publications_count" required min="0" placeholder="0">
+            </div>
+
+            <div class="form-group">
+              <label for="citations_count">Total Citations <span class="required">*</span></label>
+              <input type="number" id="citations_count" name="citations_count" required min="0" placeholder="0">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="google_scholar">Google Scholar Profile URL</label>
+              <input type="url" id="google_scholar" name="google_scholar" placeholder="https://scholar.google.com/...">
+            </div>
+
+            <div class="form-group">
+              <label for="orcid">ORCID ID</label>
+              <input type="text" id="orcid" name="orcid" placeholder="0000-0000-0000-0000">
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="research_interests">Research Interests <span class="required">*</span></label>
+            <textarea id="research_interests" name="research_interests" required placeholder="List main research interests and areas of expertise" rows="3"></textarea>
+          </div>
+        </div>
+
+        <!-- Achievements and Impact Section -->
+        <div class="form-section">
+          <h2 class="section-title">Achievements and Impact</h2>
+          
+          <div class="form-group full-width">
+            <label for="major_achievements">Major Achievements <span class="required">*</span></label>
+            <textarea id="major_achievements" name="major_achievements" required placeholder="Describe major research achievements, breakthroughs, and contributions to your field" rows="5" maxlength="2000"></textarea>
+            <div class="char-count"><span id="achievementsCount">0</span> / 2000 characters</div>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="awards_honors">Awards and Honors</label>
+            <textarea id="awards_honors" name="awards_honors" placeholder="List significant awards, honors, and recognitions received" rows="4"></textarea>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="impact_statement">Impact Statement <span class="required">*</span></label>
+            <textarea id="impact_statement" name="impact_statement" required placeholder="Explain the impact of your research on the field, society, or industry" rows="5" maxlength="1500"></textarea>
+            <div class="char-count"><span id="impactCount">0</span> / 1500 characters</div>
+          </div>
+        </div>
+
+        <!-- Supporting Documents Section -->
+        <div class="form-section">
+          <h2 class="section-title">Supporting Documents</h2>
+          
+          <div class="form-group full-width">
+            <label for="cv_resume">Upload CV/Resume <span class="required">*</span></label>
+            <div class="file-upload-area" id="cvUploadArea" onclick="document.getElementById('cv_resume').click()">
+              <input type="file" id="cv_resume" name="cv_resume" accept=".pdf,.doc,.docx" required class="file-input" onchange="handleFileSelect(event, 'cv')">
+              <div class="file-upload-content">
+                <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                <p class="file-upload-text">Click to upload or drag and drop</p>
+                <p class="file-upload-hint">PDF, DOC, DOCX files (Max size: 10MB)</p>
+                <div class="file-name" id="cvFileName"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="supporting_docs">Additional Supporting Documents</label>
+            <div class="file-upload-area" id="docsUploadArea" onclick="document.getElementById('supporting_docs').click()">
+              <input type="file" id="supporting_docs" name="supporting_docs" accept=".pdf,.doc,.docx" multiple class="file-input" onchange="handleFileSelect(event, 'docs')">
+              <div class="file-upload-content">
+                <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                <p class="file-upload-text">Click to upload or drag and drop</p>
+                <p class="file-upload-hint">PDF, DOC, DOCX files (Max size: 10MB per file)</p>
+                <div class="file-name" id="docsFileName"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nominator Information Section -->
+        <div class="form-section">
+          <h2 class="section-title">Nominator Information</h2>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nominator_name">Your Name <span class="required">*</span></label>
+              <input type="text" id="nominator_name" name="nominator_name" required placeholder="Enter your name">
+            </div>
+
+            <div class="form-group">
+              <label for="nominator_email">Your Email <span class="required">*</span></label>
+              <input type="email" id="nominator_email" name="nominator_email" required placeholder="your.email@example.com">
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="nominator_relationship">Relationship to Nominee <span class="required">*</span></label>
+            <select id="nominator_relationship" name="nominator_relationship" required>
+              <option value="">Select relationship</option>
+              <option value="self">Self-nomination</option>
+              <option value="colleague">Colleague</option>
+              <option value="supervisor">Supervisor</option>
+              <option value="student">Student/Former Student</option>
+              <option value="peer">Peer Researcher</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Terms and Conditions -->
+        <div class="form-section">
+          <div class="checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" name="terms" required>
+              <span>I confirm that all information provided is accurate and the nominee meets the eligibility criteria <span class="required">*</span></span>
+            </label>
+
+            <label class="checkbox-label">
+              <input type="checkbox" name="privacy" required>
+              <span>I agree to the <a href="#">Terms and Conditions</a> and <a href="#">Privacy Policy</a> <span class="required">*</span></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" onclick="window.history.back()">Cancel</button>
+          <button type="submit" class="btn-submit">Submit Application</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function handleFileSelect(event, type) {
+    const files = event.target.files;
+    const fileName = document.getElementById(type === 'cv' ? 'cvFileName' : 'docsFileName');
+    const uploadArea = document.getElementById(type === 'cv' ? 'cvUploadArea' : 'docsUploadArea');
+    
+    if (files.length > 0) {
+      if (type === 'docs' && files.length > 1) {
+        fileName.textContent = `${files.length} files selected`;
+      } else {
+        fileName.textContent = files[0].name;
+      }
+      uploadArea.classList.add('has-file');
+    } else {
+      fileName.textContent = '';
+      uploadArea.classList.remove('has-file');
+    }
+  }
+
+  // Character counters
+  document.getElementById('major_achievements')?.addEventListener('input', function(e) {
+    const count = e.target.value.length;
+    document.getElementById('achievementsCount').textContent = count;
+  });
+
+  document.getElementById('impact_statement')?.addEventListener('input', function(e) {
+    const count = e.target.value.length;
+    document.getElementById('impactCount').textContent = count;
+  });
+
+  // Drag and drop functionality for CV
+  const cvUploadArea = document.getElementById('cvUploadArea');
+  const cvInput = document.getElementById('cv_resume');
+
+  cvUploadArea.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    cvUploadArea.classList.add('drag-over');
+  });
+
+  cvUploadArea.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    cvUploadArea.classList.remove('drag-over');
+  });
+
+  cvUploadArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    cvUploadArea.classList.remove('drag-over');
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      cvInput.files = files;
+      handleFileSelect({ target: cvInput }, 'cv');
+    }
+  });
+
+  // Drag and drop functionality for supporting docs
+  const docsUploadArea = document.getElementById('docsUploadArea');
+  const docsInput = document.getElementById('supporting_docs');
+
+  docsUploadArea.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    docsUploadArea.classList.add('drag-over');
+  });
+
+  docsUploadArea.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    docsUploadArea.classList.remove('drag-over');
+  });
+
+  docsUploadArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    docsUploadArea.classList.remove('drag-over');
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      docsInput.files = files;
+      handleFileSelect({ target: docsInput }, 'docs');
+    }
+  });
+</script>
+{% endblock %}
+

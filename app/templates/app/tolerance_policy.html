@@ -1,0 +1,343 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Tolerance Policy - ScholarIndex{% endblock %}
+
+{% block content %}
+<style>
+  .tolerance-page {
+    padding: 3rem 1.5rem;
+    background-color: var(--background);
+    min-height: calc(100vh - 5rem);
+  }
+
+  .tolerance-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .tolerance-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .tolerance-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--foreground);
+  }
+
+  .tolerance-header p {
+    font-size: 1.125rem;
+    color: var(--muted-foreground);
+  }
+
+  .tolerance-content {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 3rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .content-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .content-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .content-section h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--foreground);
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .content-section p {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--foreground);
+    margin-bottom: 1rem;
+  }
+
+  .policy-box {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .policy-box h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e40af;
+    margin-bottom: 0.75rem;
+  }
+
+  .policy-box p {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--foreground);
+    margin-bottom: 0.5rem;
+  }
+
+  .policy-box ul {
+    margin: 0.75rem 0 0 1.5rem;
+    padding: 0;
+  }
+
+  .policy-box li {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--foreground);
+    margin-bottom: 0.5rem;
+  }
+
+  .tolerance-levels {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
+
+  .tolerance-card {
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .tolerance-card.low {
+    border-color: #10b981;
+  }
+
+  .tolerance-card.medium {
+    border-color: #f59e0b;
+  }
+
+  .tolerance-card.high {
+    border-color: #ef4444;
+  }
+
+  .tolerance-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .tolerance-card h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .tolerance-card.low h3 {
+    color: #059669;
+  }
+
+  .tolerance-card.medium h3 {
+    color: #d97706;
+  }
+
+  .tolerance-card.high h3 {
+    color: #dc2626;
+  }
+
+  .tolerance-card .percentage {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .tolerance-card p {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--foreground);
+    margin: 0;
+  }
+
+  .highlight-box {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-left: 4px solid #f59e0b;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+  }
+
+  .highlight-box p {
+    margin: 0;
+    color: #92400e;
+    font-weight: 500;
+  }
+
+  @media (max-width: 768px) {
+    .tolerance-page {
+      padding: 2rem 1rem;
+    }
+
+    .tolerance-header h1 {
+      font-size: 2rem;
+    }
+
+    .tolerance-content {
+      padding: 2rem 1.5rem;
+    }
+
+    .content-section h2 {
+      font-size: 1.5rem;
+    }
+
+    .tolerance-levels {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="tolerance-page">
+  <div class="container">
+    <div class="tolerance-wrapper">
+      <!-- Page Header -->
+      <div class="tolerance-header">
+        <h1>Tolerance Policy</h1>
+        <p>Our approach to plagiarism detection and similarity thresholds</p>
+      </div>
+
+      <!-- Main Content -->
+      <div class="tolerance-content">
+        <div class="content-section">
+          <h2>Overview</h2>
+          <p>
+            Scholar Indexing System (S.I.S) maintains a comprehensive tolerance policy for plagiarism detection that balances academic integrity with practical considerations. Our policy recognizes that some similarity is inevitable in academic writing, particularly in methodology sections, common phrases, and properly cited references.
+          </p>
+          <p>
+            We use advanced plagiarism detection tools, including Turnitin, to assess the originality of submitted work. Our tolerance levels are designed to identify genuine plagiarism while allowing for legitimate academic practices.
+          </p>
+        </div>
+
+        <div class="content-section">
+          <h2>Similarity Thresholds</h2>
+          <div class="tolerance-levels">
+            <div class="tolerance-card low">
+              <h3>Low Risk (0-15%)</h3>
+              <div class="percentage">0-15%</div>
+              <p>Acceptable similarity level. This range typically includes common phrases, methodology descriptions, and properly cited references. No action required.</p>
+            </div>
+            <div class="tolerance-card medium">
+              <h3>Medium Risk (16-30%)</h3>
+              <div class="percentage">16-30%</div>
+              <p>Requires review. May include legitimate similarities but should be examined to ensure proper citation and attribution. Minor revisions may be recommended.</p>
+            </div>
+            <div class="tolerance-card high">
+              <h3>High Risk (31%+)</h3>
+              <div class="percentage">31%+</div>
+              <p>Requires immediate attention. Significant similarity detected that may indicate plagiarism. Detailed review and potential rejection unless properly justified.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-section">
+          <h2>Exclusions from Similarity Check</h2>
+          <div class="policy-box">
+            <h3>Automatically Excluded</h3>
+            <ul>
+              <li><strong>Quotes:</strong> Properly formatted quotations with citations are excluded from similarity calculations.</li>
+              <li><strong>Bibliography/References:</strong> Reference lists and bibliographies are automatically excluded.</li>
+              <li><strong>Common Phrases:</strong> Standard academic phrases and terminology common to the field.</li>
+              <li><strong>Methodology Sections:</strong> Standard methodology descriptions may show similarity but are evaluated contextually.</li>
+              <li><strong>Small Matches:</strong> Matches of less than 5 consecutive words are typically ignored.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="content-section">
+          <h2>Contextual Evaluation</h2>
+          <p>
+            We recognize that similarity percentages alone do not tell the full story. Our review process considers:
+          </p>
+          <div class="policy-box">
+            <ul>
+              <li><strong>Source Attribution:</strong> Whether similar content is properly cited and attributed to original sources.</li>
+              <li><strong>Field-Specific Norms:</strong> Some fields have standard terminology and methodologies that naturally result in higher similarity.</li>
+              <li><strong>Self-Citation:</strong> Citations of the author's own previous work are evaluated differently from external sources.</li>
+              <li><strong>Common Knowledge:</strong> Widely accepted facts and common knowledge may show similarity without indicating plagiarism.</li>
+              <li><strong>Translation Issues:</strong> Works translated from other languages may show similarity to source materials, which is acceptable with proper attribution.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="content-section">
+          <h2>Action Guidelines</h2>
+          <div class="policy-box">
+            <h3>For Submissions with 0-15% Similarity</h3>
+            <p>No action required. Submissions are automatically accepted for indexing.</p>
+          </div>
+          <div class="policy-box">
+            <h3>For Submissions with 16-30% Similarity</h3>
+            <ul>
+              <li>Review team examines the similarity report</li>
+              <li>Verifies proper citation and attribution</li>
+              <li>May request minor revisions if citation issues are found</li>
+              <li>Submissions with proper attribution are typically accepted</li>
+            </ul>
+          </div>
+          <div class="policy-box">
+            <h3>For Submissions with 31%+ Similarity</h3>
+            <ul>
+              <li>Comprehensive review by senior editorial team</li>
+              <li>Detailed analysis of similarity sources</li>
+              <li>Requires justification and explanation from author</li>
+              <li>May require significant revisions or result in rejection</li>
+              <li>Repeated high similarity may result in account restrictions</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="content-section">
+          <h2>Appeals Process</h2>
+          <p>
+            If your submission is flagged for high similarity, you have the right to appeal the decision. To appeal:
+          </p>
+          <ul>
+            <li>Provide detailed explanation of the similarities</li>
+            <li>Submit evidence of proper attribution and citation</li>
+            <li>Explain any field-specific norms that may account for similarity</li>
+            <li>Request a manual review by our editorial team</li>
+          </ul>
+          <p>
+            Appeals are reviewed within 5-7 business days, and you will receive a detailed response explaining the final decision.
+          </p>
+        </div>
+
+        <div class="highlight-box">
+          <p>
+            <strong>Important:</strong> Our tolerance policy is designed to maintain academic integrity while being fair to researchers. We encourage all authors to ensure proper citation and attribution in their work. When in doubt, cite your sources.
+          </p>
+        </div>
+
+        <div class="content-section">
+          <h2>Zero Tolerance for</h2>
+          <div class="policy-box">
+            <ul>
+              <li><strong>Direct Copying:</strong> Verbatim copying of text without quotation marks and citation</li>
+              <li><strong>Paraphrasing Plagiarism:</strong> Rewording others' work without proper attribution</li>
+              <li><strong>Self-Plagiarism:</strong> Reusing substantial portions of your own previously published work without disclosure</li>
+              <li><strong>Fabrication:</strong> Creating false data or citations</li>
+              <li><strong>Multiple Submissions:</strong> Submitting the same work to multiple platforms without disclosure</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

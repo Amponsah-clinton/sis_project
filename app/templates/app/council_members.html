@@ -1,0 +1,426 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Council Members - ScholarIndex{% endblock %}
+
+{% block content %}
+<style>
+  .council-members-page {
+    padding: 3rem 1.5rem;
+    background-color: var(--background);
+    min-height: calc(100vh - 5rem);
+  }
+
+  .council-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .council-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .council-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--foreground);
+  }
+
+  .council-header p {
+    font-size: 1.125rem;
+    color: var(--muted-foreground);
+  }
+
+  .council-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  @media (max-width: 768px) {
+    .council-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+  }
+
+  .council-card {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 0;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    position: relative;
+  }
+
+  .council-card:hover {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    transform: translateY(-6px);
+    border-color: #d1d5db;
+  }
+
+  .council-image-wrapper {
+    width: 100%;
+    height: 320px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .council-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+
+  .council-card:hover .council-image-wrapper img {
+    transform: scale(1.05);
+  }
+
+  .council-image-wrapper span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3rem;
+    font-weight: 600;
+    color: #9ca3af;
+    z-index: 1;
+  }
+
+  .council-image-wrapper:has(img) span {
+    display: none;
+  }
+
+  .council-card-content {
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    background-color: #ffffff;
+  }
+
+  .council-name-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin-bottom: 0.375rem;
+    flex-wrap: wrap;
+  }
+
+  .council-name {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: #1e40af;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .verification-icon {
+    width: 22px;
+    height: 22px;
+    color: #3b82f6;
+    flex-shrink: 0;
+    filter: drop-shadow(0 1px 2px rgba(59, 130, 246, 0.3));
+  }
+
+  .council-title {
+    font-size: 0.9375rem;
+    color: #dc2626;
+    font-weight: 600;
+    margin-bottom: 0.625rem;
+    line-height: 1.4;
+  }
+
+  .council-institution {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .council-bio {
+    font-size: 0.875rem;
+    color: #4b5563;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .council-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 2px solid #f3f4f6;
+  }
+
+  .btn-view-profile {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+  }
+
+  .btn-view-profile:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+  }
+
+  .btn-contact {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    color: #3b82f6;
+    border: 2px solid #3b82f6;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn-contact:hover {
+    background-color: #3b82f6;
+    color: #ffffff;
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 640px) {
+    .council-members-page {
+      padding: 2rem 1rem;
+    }
+
+    .council-header h1 {
+      font-size: 2rem;
+    }
+
+    .council-header p {
+      font-size: 1rem;
+    }
+
+    .council-image-wrapper {
+      height: 280px;
+    }
+
+    .council-card-content {
+      padding: 1.5rem;
+    }
+
+    .council-name {
+      font-size: 1.25rem;
+    }
+
+    .council-actions {
+      flex-direction: column;
+    }
+  }
+</style>
+
+<div class="council-members-page">
+  <div class="container">
+    <div class="council-wrapper">
+      <!-- Page Header -->
+      <div class="council-header">
+        <h1>Council Members</h1>
+        <p>Meet our distinguished council members who guide and shape our organization</p>
+      </div>
+
+      <!-- Council Members Grid -->
+      <div class="council-grid">
+        <!-- Council Member 1 -->
+        <article class="council-card">
+          <div class="council-image-wrapper">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face" alt="Prof. John Anderson">
+            <span>JA</span>
+          </div>
+          <div class="council-card-content">
+            <div class="council-name-wrapper">
+              <h3 class="council-name">Prof. John Anderson</h3>
+              <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <p class="council-title">Chairman</p>
+            <p class="council-institution">Harvard University</p>
+            <p class="council-bio">Distinguished professor with over 30 years of experience in academic research and leadership. Leading expert in interdisciplinary studies.</p>
+            <div class="council-actions">
+              <a href="#" class="btn-view-profile">View Profile</a>
+              <a href="#" class="btn-contact">Contact</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Council Member 2 -->
+        <article class="council-card">
+          <div class="council-image-wrapper">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face" alt="Dr. Sarah Mitchell">
+            <span>SM</span>
+          </div>
+          <div class="council-card-content">
+            <div class="council-name-wrapper">
+              <h3 class="council-name">Dr. Sarah Mitchell</h3>
+              <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <p class="council-title">Vice Chairman</p>
+            <p class="council-institution">Stanford University</p>
+            <p class="council-bio">Renowned researcher in biomedical sciences with extensive contributions to global health initiatives and scientific policy.</p>
+            <div class="council-actions">
+              <a href="#" class="btn-view-profile">View Profile</a>
+              <a href="#" class="btn-contact">Contact</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Council Member 3 -->
+        <article class="council-card">
+          <div class="council-image-wrapper">
+            <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=face" alt="Prof. Michael Chen">
+            <span>MC</span>
+          </div>
+          <div class="council-card-content">
+            <div class="council-name-wrapper">
+              <h3 class="council-name">Prof. Michael Chen</h3>
+              <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <p class="council-title">Secretary</p>
+            <p class="council-institution">MIT</p>
+            <p class="council-bio">Expert in technology and innovation policy, with a focus on bridging the gap between academia and industry.</p>
+            <div class="council-actions">
+              <a href="#" class="btn-view-profile">View Profile</a>
+              <a href="#" class="btn-contact">Contact</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Council Member 4 -->
+        <article class="council-card">
+          <div class="council-image-wrapper">
+            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face" alt="Dr. Emily Rodriguez">
+            <span>ER</span>
+          </div>
+          <div class="council-card-content">
+            <div class="council-name-wrapper">
+              <h3 class="council-name">Dr. Emily Rodriguez</h3>
+              <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <p class="council-title">Treasurer</p>
+            <p class="council-institution">Oxford University</p>
+            <p class="council-bio">Financial strategist and academic administrator with expertise in research funding and institutional development.</p>
+            <div class="council-actions">
+              <a href="#" class="btn-view-profile">View Profile</a>
+              <a href="#" class="btn-contact">Contact</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Council Member 5 -->
+        <article class="council-card">
+          <div class="council-image-wrapper">
+            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face" alt="Prof. David Kim">
+            <span>DK</span>
+          </div>
+          <div class="council-card-content">
+            <div class="council-name-wrapper">
+              <h3 class="council-name">Prof. David Kim</h3>
+              <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <p class="council-title">Member</p>
+            <p class="council-institution">Cambridge University</p>
+            <p class="council-bio">Leading researcher in environmental sciences and sustainability, with a strong commitment to global research collaboration.</p>
+            <div class="council-actions">
+              <a href="#" class="btn-view-profile">View Profile</a>
+              <a href="#" class="btn-contact">Contact</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Council Member 6 -->
+        <article class="council-card">
+          <div class="council-image-wrapper">
+            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=face" alt="Dr. Rachel Thompson">
+            <span>RT</span>
+          </div>
+          <div class="council-card-content">
+            <div class="council-name-wrapper">
+              <h3 class="council-name">Dr. Rachel Thompson</h3>
+              <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <p class="council-title">Member</p>
+            <p class="council-institution">ETH Zurich</p>
+            <p class="council-bio">Expert in data science and computational research, promoting open science and research transparency initiatives.</p>
+            <div class="council-actions">
+              <a href="#" class="btn-view-profile">View Profile</a>
+              <a href="#" class="btn-contact">Contact</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Hide initials when images load
+  document.querySelectorAll('.council-image-wrapper img').forEach(img => {
+    img.addEventListener('load', function() {
+      const span = this.nextElementSibling;
+      if (span && span.tagName === 'SPAN') {
+        span.style.display = 'none';
+      }
+    });
+    img.addEventListener('error', function() {
+      const span = this.nextElementSibling;
+      if (span && span.tagName === 'SPAN') {
+        span.style.display = 'block';
+      }
+      this.style.display = 'none';
+    });
+  });
+</script>
+{% endblock %}
+

@@ -1,0 +1,493 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Sponsors - ScholarIndex{% endblock %}
+
+{% block content %}
+<style>
+  .sponsors-page {
+    padding: 3rem 1.5rem;
+    background-color: var(--background);
+    min-height: calc(100vh - 5rem);
+  }
+
+  .sponsors-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .sponsors-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .sponsors-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--foreground);
+  }
+
+  .sponsors-header p {
+    font-size: 1.125rem;
+    color: var(--muted-foreground);
+    margin-bottom: 2rem;
+  }
+
+  .sponsor-categories {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+  }
+
+  .category-btn {
+    padding: 0.75rem 1.5rem;
+    background-color: #ffffff;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    color: #6b7280;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .category-btn:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+    background-color: #eff6ff;
+  }
+
+  .category-btn.active {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border-color: #3b82f6;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+
+  .sponsors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  @media (max-width: 768px) {
+    .sponsors-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+  }
+
+  .sponsor-card {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    position: relative;
+    min-height: 280px;
+  }
+
+  .sponsor-card:hover {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    transform: translateY(-6px);
+    border-color: #d1d5db;
+  }
+
+  .sponsor-logo-wrapper {
+    width: 100%;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .sponsor-card:hover .sponsor-logo-wrapper {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  }
+
+  .sponsor-logo {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: grayscale(100%);
+    opacity: 0.7;
+    transition: all 0.3s ease;
+  }
+
+  .sponsor-card:hover .sponsor-logo {
+    filter: grayscale(0%);
+    opacity: 1;
+    transform: scale(1.05);
+  }
+
+  .sponsor-logo-placeholder {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .sponsor-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e40af;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+  }
+
+  .sponsor-type {
+    font-size: 0.875rem;
+    color: #dc2626;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .sponsor-description {
+    font-size: 0.875rem;
+    color: #6b7280;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .sponsor-link {
+    margin-top: auto;
+    padding: 0.625rem 1.25rem;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+  }
+
+  .sponsor-link:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  }
+
+  .sponsor-link svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .become-sponsor-section {
+    background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+    border-radius: 16px;
+    padding: 3rem 2rem;
+    text-align: center;
+    color: #ffffff;
+    margin-top: 4rem;
+  }
+
+  .become-sponsor-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #ffffff;
+  }
+
+  .become-sponsor-section p {
+    font-size: 1.125rem;
+    margin-bottom: 2rem;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .btn-become-sponsor {
+    padding: 1rem 2.5rem;
+    background-color: #ffffff;
+    color: #1e40af;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-become-sponsor:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    background-color: #f3f4f6;
+  }
+
+  .btn-become-sponsor svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  @media (max-width: 640px) {
+    .sponsors-page {
+      padding: 2rem 1rem;
+    }
+
+    .sponsors-header h1 {
+      font-size: 2rem;
+    }
+
+    .sponsors-header p {
+      font-size: 1rem;
+    }
+
+    .sponsor-card {
+      padding: 1.5rem;
+      min-height: 260px;
+    }
+
+    .sponsor-logo-wrapper {
+      height: 140px;
+      padding: 1rem;
+    }
+
+    .become-sponsor-section {
+      padding: 2rem 1.5rem;
+    }
+
+    .become-sponsor-section h2 {
+      font-size: 1.75rem;
+    }
+
+    .become-sponsor-section p {
+      font-size: 1rem;
+    }
+  }
+</style>
+
+<div class="sponsors-page">
+  <div class="container">
+    <div class="sponsors-wrapper">
+      <!-- Page Header -->
+      <div class="sponsors-header">
+        <h1>Our Sponsors</h1>
+        <p>We are grateful to our sponsors who support our mission to advance scientific research and knowledge sharing</p>
+        
+        <!-- Category Filter -->
+        <div class="sponsor-categories">
+          <button class="category-btn active" data-category="all" onclick="filterSponsors('all')">All Sponsors</button>
+          <button class="category-btn" data-category="platinum" onclick="filterSponsors('platinum')">Platinum</button>
+          <button class="category-btn" data-category="gold" onclick="filterSponsors('gold')">Gold</button>
+          <button class="category-btn" data-category="silver" onclick="filterSponsors('silver')">Silver</button>
+          <button class="category-btn" data-category="bronze" onclick="filterSponsors('bronze')">Bronze</button>
+        </div>
+      </div>
+
+      <!-- Sponsors Grid -->
+      <div class="sponsors-grid" id="sponsorsContainer">
+        <!-- Sponsor 1 - Platinum -->
+        <article class="sponsor-card" data-category="platinum">
+          <div class="sponsor-logo-wrapper">
+            <div class="sponsor-logo-placeholder">LOGO</div>
+          </div>
+          <h3 class="sponsor-name">Tech Innovation Foundation</h3>
+          <p class="sponsor-type">Platinum Sponsor</p>
+          <p class="sponsor-description">Leading technology foundation supporting innovative research and development initiatives worldwide.</p>
+          <a href="#" class="sponsor-link">
+            Visit Website
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+            </svg>
+          </a>
+        </article>
+
+        <!-- Sponsor 2 - Platinum -->
+        <article class="sponsor-card" data-category="platinum">
+          <div class="sponsor-logo-wrapper">
+            <div class="sponsor-logo-placeholder">LOGO</div>
+          </div>
+          <h3 class="sponsor-name">Global Research Consortium</h3>
+          <p class="sponsor-type">Platinum Sponsor</p>
+          <p class="sponsor-description">International organization dedicated to advancing scientific collaboration and research excellence.</p>
+          <a href="#" class="sponsor-link">
+            Visit Website
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+            </svg>
+          </a>
+        </article>
+
+        <!-- Sponsor 3 - Gold -->
+        <article class="sponsor-card" data-category="gold">
+          <div class="sponsor-logo-wrapper">
+            <div class="sponsor-logo-placeholder">LOGO</div>
+          </div>
+          <h3 class="sponsor-name">Academic Excellence Fund</h3>
+          <p class="sponsor-type">Gold Sponsor</p>
+          <p class="sponsor-description">Supporting academic institutions and researchers in their pursuit of knowledge and innovation.</p>
+          <a href="#" class="sponsor-link">
+            Visit Website
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+            </svg>
+          </a>
+        </article>
+
+        <!-- Sponsor 4 - Gold -->
+        <article class="sponsor-card" data-category="gold">
+          <div class="sponsor-logo-wrapper">
+            <div class="sponsor-logo-placeholder">LOGO</div>
+          </div>
+          <h3 class="sponsor-name">Science & Innovation Hub</h3>
+          <p class="sponsor-type">Gold Sponsor</p>
+          <p class="sponsor-description">Promoting scientific discovery and technological advancement through strategic partnerships.</p>
+          <a href="#" class="sponsor-link">
+            Visit Website
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+            </svg>
+          </a>
+        </article>
+
+        <!-- Sponsor 5 - Silver -->
+        <article class="sponsor-card" data-category="silver">
+          <div class="sponsor-logo-wrapper">
+            <div class="sponsor-logo-placeholder">LOGO</div>
+          </div>
+          <h3 class="sponsor-name">Research Development Institute</h3>
+          <p class="sponsor-type">Silver Sponsor</p>
+          <p class="sponsor-description">Fostering research excellence and supporting the next generation of scientists and researchers.</p>
+          <a href="#" class="sponsor-link">
+            Visit Website
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+            </svg>
+          </a>
+        </article>
+
+        <!-- Sponsor 6 - Silver -->
+        <article class="sponsor-card" data-category="silver">
+          <div class="sponsor-logo-wrapper">
+            <div class="sponsor-logo-placeholder">LOGO</div>
+          </div>
+          <h3 class="sponsor-name">Knowledge Sharing Network</h3>
+          <p class="sponsor-type">Silver Sponsor</p>
+          <p class="sponsor-description">Connecting researchers and institutions to accelerate scientific progress and collaboration.</p>
+          <a href="#" class="sponsor-link">
+            Visit Website
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+            </svg>
+          </a>
+        </article>
+
+        <!-- Sponsor 7 - Bronze -->
+        <article class="sponsor-card" data-category="bronze">
+          <div class="sponsor-logo-wrapper">
+            <div class="sponsor-logo-placeholder">LOGO</div>
+          </div>
+          <h3 class="sponsor-name">Innovation Catalyst Group</h3>
+          <p class="sponsor-type">Bronze Sponsor</p>
+          <p class="sponsor-description">Supporting innovative research projects and emerging technologies in various scientific fields.</p>
+          <a href="#" class="sponsor-link">
+            Visit Website
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+            </svg>
+          </a>
+        </article>
+
+        <!-- Sponsor 8 - Bronze -->
+        <article class="sponsor-card" data-category="bronze">
+          <div class="sponsor-logo-wrapper">
+            <div class="sponsor-logo-placeholder">LOGO</div>
+          </div>
+          <h3 class="sponsor-name">Academic Partnership Alliance</h3>
+          <p class="sponsor-type">Bronze Sponsor</p>
+          <p class="sponsor-description">Building bridges between academic institutions and industry to drive research innovation.</p>
+          <a href="#" class="sponsor-link">
+            Visit Website
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+            </svg>
+          </a>
+        </article>
+      </div>
+
+      <!-- Become a Sponsor Section -->
+      <div class="become-sponsor-section">
+        <h2>Become a Sponsor</h2>
+        <p>Join our community of sponsors and help us advance scientific research, support researchers, and make knowledge more accessible to everyone.</p>
+        <button class="btn-become-sponsor">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          Become a Sponsor
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function filterSponsors(category) {
+    const cards = document.querySelectorAll('.sponsor-card');
+    const buttons = document.querySelectorAll('.category-btn');
+    
+    // Update active button
+    buttons.forEach(btn => {
+      if (btn.dataset.category === category) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+    
+    // Filter cards
+    cards.forEach(card => {
+      if (category === 'all' || card.dataset.category === category) {
+        card.style.display = 'flex';
+        setTimeout(() => {
+          card.style.opacity = '1';
+          card.style.transform = 'scale(1)';
+        }, 10);
+      } else {
+        card.style.opacity = '0';
+        card.style.transform = 'scale(0.9)';
+        setTimeout(() => {
+          card.style.display = 'none';
+        }, 300);
+      }
+    });
+  }
+</script>
+{% endblock %}
+

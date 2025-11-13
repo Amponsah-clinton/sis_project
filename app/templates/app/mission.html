@@ -1,0 +1,240 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Mission - ScholarIndex{% endblock %}
+
+{% block content %}
+<style>
+  .mission-page {
+    padding: 3rem 1.5rem;
+    background-color: var(--background);
+    min-height: calc(100vh - 5rem);
+  }
+
+  .mission-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .mission-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .mission-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--foreground);
+  }
+
+  .mission-header p {
+    font-size: 1.125rem;
+    color: var(--muted-foreground);
+  }
+
+  .mission-content {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 3rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .mission-statement {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border-left: 4px solid #3b82f6;
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+
+  .mission-statement h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin-bottom: 1rem;
+  }
+
+  .mission-statement p {
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: #1e3a8a;
+    margin: 0;
+  }
+
+  .content-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .content-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .content-section h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--foreground);
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .content-section p {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--foreground);
+    margin-bottom: 1rem;
+  }
+
+  .content-section ul {
+    margin-left: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .content-section li {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--foreground);
+    margin-bottom: 0.5rem;
+  }
+
+  .goals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .goal-card {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .goal-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    border-color: #3b82f6;
+  }
+
+  .goal-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e40af;
+    margin-bottom: 0.75rem;
+  }
+
+  .goal-card p {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--foreground);
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .mission-page {
+      padding: 2rem 1rem;
+    }
+
+    .mission-header h1 {
+      font-size: 2rem;
+    }
+
+    .mission-content {
+      padding: 2rem 1.5rem;
+    }
+
+    .mission-statement {
+      padding: 1.5rem;
+    }
+
+    .content-section h2 {
+      font-size: 1.5rem;
+    }
+
+    .goals-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="mission-page">
+  <div class="container">
+    <div class="mission-wrapper">
+      <!-- Page Header -->
+      <div class="mission-header">
+        <h1>Our Mission</h1>
+        <p>Empowering researchers and advancing global knowledge</p>
+      </div>
+
+      <!-- Main Content -->
+      <div class="mission-content">
+        <div class="mission-statement">
+          <h2>Our Mission Statement</h2>
+          <p>
+            To democratize access to scholarly research, promote academic integrity, and facilitate global collaboration among researchers, institutions, and knowledge seekers. We are committed to building a comprehensive, transparent, and accessible platform that serves as the foundation for scientific discovery and innovation.
+          </p>
+        </div>
+
+        <div class="content-section">
+          <h2>Core Objectives</h2>
+          <p>Our mission is built on several key objectives that guide everything we do:</p>
+          <ul>
+            <li><strong>Accessibility:</strong> Make research accessible to researchers, students, and institutions worldwide, regardless of geographical or financial barriers.</li>
+            <li><strong>Quality Assurance:</strong> Maintain the highest standards of academic integrity through rigorous indexing, plagiarism detection, and quality control processes.</li>
+            <li><strong>Innovation:</strong> Continuously develop and improve tools and services that address the evolving needs of the research community.</li>
+            <li><strong>Collaboration:</strong> Foster connections and partnerships between researchers, institutions, and organizations to advance collective knowledge.</li>
+            <li><strong>Transparency:</strong> Operate with complete transparency in our processes, policies, and decision-making.</li>
+            <li><strong>Support:</strong> Provide comprehensive support services that help researchers maximize the impact and reach of their work.</li>
+          </ul>
+        </div>
+
+        <div class="content-section">
+          <h2>Our Goals</h2>
+          <div class="goals-grid">
+            <div class="goal-card">
+              <h3>Global Reach</h3>
+              <p>Index and archive research from institutions and researchers across all continents, ensuring global representation in our database.</p>
+            </div>
+            <div class="goal-card">
+              <h3>Academic Excellence</h3>
+              <p>Promote and recognize excellence in research through our Hall of Fame, directory, and recognition programs.</p>
+            </div>
+            <div class="goal-card">
+              <h3>Research Impact</h3>
+              <p>Help researchers increase the visibility and impact of their work through effective indexing and promotion strategies.</p>
+            </div>
+            <div class="goal-card">
+              <h3>Integrity First</h3>
+              <p>Maintain the highest standards of academic integrity through comprehensive plagiarism detection and quality assurance.</p>
+            </div>
+            <div class="goal-card">
+              <h3>Community Building</h3>
+              <p>Build a vibrant, engaged community of researchers, scholars, and academic professionals who collaborate and share knowledge.</p>
+            </div>
+            <div class="goal-card">
+              <h3>Innovation</h3>
+              <p>Lead innovation in research services, developing new tools and methodologies that advance the field of scholarly communication.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-section">
+          <h2>How We Achieve Our Mission</h2>
+          <p>
+            We achieve our mission through a combination of cutting-edge technology, comprehensive services, and a deep commitment to serving the research community. Our platform integrates advanced indexing systems, plagiarism detection tools, and research transformation services to provide a complete solution for researchers at all stages of their careers.
+          </p>
+          <p>
+            We work closely with academic institutions, research organizations, and individual researchers to understand their needs and continuously improve our services. Through partnerships, sponsorships, and community engagement, we build a sustainable ecosystem that supports research excellence worldwide.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

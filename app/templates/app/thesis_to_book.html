@@ -1,0 +1,421 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Thesis To Book - ScholarIndex{% endblock %}
+
+{% block content %}
+<style>
+  .thesis-book-page {
+    padding: 3rem 1.5rem;
+    background-color: var(--background);
+    min-height: calc(100vh - 5rem);
+  }
+
+  .thesis-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .thesis-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .thesis-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--foreground);
+  }
+
+  .thesis-header p {
+    font-size: 1.125rem;
+    color: var(--muted-foreground);
+  }
+
+  .thesis-form {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .form-section {
+    margin-bottom: 2rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--foreground);
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .form-group label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--foreground);
+  }
+
+  .form-group label .required {
+    color: #dc2626;
+    margin-left: 0.25rem;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    color: var(--foreground);
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .form-hint {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+  }
+
+  .file-upload-area {
+    border: 2px dashed #e5e7eb;
+    border-radius: 8px;
+    padding: 3rem 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background-color: #f9fafb;
+    position: relative;
+  }
+
+  .file-upload-area:hover {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+  }
+
+  .file-upload-area.drag-over {
+    border-color: #3b82f6;
+    background-color: #dbeafe;
+  }
+
+  .file-upload-area.has-file {
+    border-color: #10b981;
+    background-color: #f0fdf4;
+  }
+
+  .file-input {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+  }
+
+  .file-upload-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .file-upload-content svg {
+    color: #6b7280;
+  }
+
+  .file-upload-text {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--foreground);
+    margin: 0;
+  }
+
+  .file-upload-hint {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0;
+  }
+
+  .file-name {
+    font-size: 0.875rem;
+    color: #10b981;
+    font-weight: 500;
+    margin-top: 0.5rem;
+    word-break: break-all;
+  }
+
+  .checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    cursor: pointer;
+    color: var(--foreground);
+    font-size: 0.875rem;
+  }
+
+  .checkbox-label input[type="checkbox"] {
+    width: auto;
+    cursor: pointer;
+    margin-top: 0.125rem;
+    flex-shrink: 0;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding-top: 1.5rem;
+    border-top: 2px solid #e5e7eb;
+    margin-top: 2rem;
+  }
+
+  .btn-cancel,
+  .btn-submit {
+    padding: 0.875rem 2rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+  }
+
+  .btn-cancel {
+    background-color: #f3f4f6;
+    color: var(--foreground);
+    border: 1px solid #e5e7eb;
+  }
+
+  .btn-cancel:hover {
+    background-color: #e5e7eb;
+  }
+
+  .btn-submit {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+
+  .btn-submit:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+  }
+
+  @media (max-width: 768px) {
+    .thesis-book-page {
+      padding: 2rem 1rem;
+    }
+
+    .thesis-header h1 {
+      font-size: 2rem;
+    }
+
+    .thesis-form {
+      padding: 1.5rem;
+    }
+
+    .file-upload-area {
+      padding: 2rem 1.5rem;
+    }
+
+    .form-actions {
+      flex-direction: column;
+    }
+
+    .btn-cancel,
+    .btn-submit {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="thesis-book-page">
+  <div class="container">
+    <div class="thesis-wrapper">
+      <!-- Page Header -->
+      <div class="thesis-header">
+        <h1>Thesis To Book</h1>
+        <p>Transform your thesis into a comprehensive book with professional editing and formatting</p>
+      </div>
+
+      <form class="thesis-form" method="post" action="{% url 'app:thesis_to_book' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Thesis Upload Section -->
+        <div class="form-section">
+          <h2 class="section-title">Thesis Document</h2>
+          
+          <div class="form-group">
+            <label for="thesis_file">Upload Thesis <span class="required">*</span></label>
+            <div class="file-upload-area" id="thesisUploadArea" onclick="document.getElementById('thesis_file').click()">
+              <input type="file" id="thesis_file" name="thesis_file" accept=".pdf,.doc,.docx" required class="file-input" onchange="handleFileSelect(event, 'thesis')">
+              <div class="file-upload-content">
+                <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                <p class="file-upload-text">Click to upload or drag and drop</p>
+                <p class="file-upload-hint">PDF, DOC, DOCX files (Max size: 50MB)</p>
+                <div class="file-name" id="thesisFileName"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Book Requirements Section -->
+        <div class="form-section">
+          <h2 class="section-title">Book Requirements</h2>
+          
+          <div class="form-group">
+            <label for="book_title">Proposed Book Title</label>
+            <input type="text" id="book_title" name="book_title" placeholder="Enter proposed book title (optional)">
+          </div>
+
+          <div class="form-group">
+            <label for="book_type">Book Type <span class="required">*</span></label>
+            <select id="book_type" name="book_type" required>
+              <option value="">Select book type</option>
+              <option value="monograph">Monograph</option>
+              <option value="textbook">Textbook</option>
+              <option value="edited-volume">Edited Volume</option>
+              <option value="reference-book">Reference Book</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="target_audience">Target Audience</label>
+            <input type="text" id="target_audience" name="target_audience" placeholder="e.g., Researchers, Students, Professionals">
+            <div class="form-hint">Describe the intended readership for the book</div>
+          </div>
+
+          <div class="form-group">
+            <label for="chapter_structure">Preferred Chapter Structure</label>
+            <textarea id="chapter_structure" name="chapter_structure" placeholder="Describe how you'd like the thesis content organized into chapters"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="special_requirements">Special Requirements</label>
+            <textarea id="special_requirements" name="special_requirements" placeholder="Any specific formatting, style, or content requirements"></textarea>
+          </div>
+        </div>
+
+        <!-- Contact Information Section -->
+        <div class="form-section">
+          <h2 class="section-title">Contact Information</h2>
+          
+          <div class="form-group">
+            <label for="email">Email Address <span class="required">*</span></label>
+            <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+          </div>
+
+          <div class="form-group">
+            <label for="name">Your Name <span class="required">*</span></label>
+            <input type="text" id="name" name="name" required placeholder="Enter your name">
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" placeholder="+1234567890">
+          </div>
+        </div>
+
+        <!-- Terms and Conditions -->
+        <div class="form-section">
+          <div class="checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" name="terms" required>
+              <span>I agree to the <a href="#">Terms of Service</a> and understand the book conversion process <span class="required">*</span></span>
+            </label>
+
+            <label class="checkbox-label">
+              <input type="checkbox" name="privacy" required>
+              <span>I agree to the <a href="#">Privacy Policy</a> <span class="required">*</span></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" onclick="window.history.back()">Cancel</button>
+          <button type="submit" class="btn-submit">Submit for Conversion</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function handleFileSelect(event, type) {
+    const file = event.target.files[0];
+    const fileName = document.getElementById(type === 'thesis' ? 'thesisFileName' : 'fileName');
+    const uploadArea = document.getElementById(type === 'thesis' ? 'thesisUploadArea' : 'uploadArea');
+    
+    if (file) {
+      fileName.textContent = file.name;
+      uploadArea.classList.add('has-file');
+    } else {
+      fileName.textContent = '';
+      uploadArea.classList.remove('has-file');
+    }
+  }
+
+  // Drag and drop functionality
+  const thesisUploadArea = document.getElementById('thesisUploadArea');
+  const thesisInput = document.getElementById('thesis_file');
+
+  thesisUploadArea.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    thesisUploadArea.classList.add('drag-over');
+  });
+
+  thesisUploadArea.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    thesisUploadArea.classList.remove('drag-over');
+  });
+
+  thesisUploadArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    thesisUploadArea.classList.remove('drag-over');
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      thesisInput.files = files;
+      handleFileSelect({ target: thesisInput }, 'thesis');
+    }
+  });
+</script>
+{% endblock %}
+

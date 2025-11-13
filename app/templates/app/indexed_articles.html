@@ -1,0 +1,402 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Indexed Articles - ScholarIndex{% endblock %}
+
+{% block content %}
+<div class="indexed-articles-page">
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1>Indexed Articles</h1>
+      <p>Browse through our comprehensive collection of indexed research articles</p>
+    </div>
+
+    <div class="articles-layout">
+      <!-- Sidebar Filters -->
+      <aside class="articles-sidebar">
+        <div class="filter-section collapsed" id="filterSection">
+          <div class="filter-section-header">
+            <h3>Filters</h3>
+            <button class="filter-toggle-btn" onclick="toggleFilters()">
+              <span>Show Filters</span>
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="filter-content">
+            <!-- Search Filter -->
+            <div class="filter-group">
+            <label>Search Articles</label>
+            <input type="text" class="filter-input" placeholder="Search by title, author..." id="articleSearch">
+          </div>
+
+          <!-- Discipline Filter -->
+          <div class="filter-group">
+            <label>Discipline</label>
+            <select class="filter-select" id="disciplineFilter">
+              <option value="">All Disciplines</option>
+              <option value="computer-science">Computer Science</option>
+              <option value="mathematics">Mathematics</option>
+              <option value="physics">Physics</option>
+              <option value="chemistry">Chemistry</option>
+              <option value="biology">Biology</option>
+              <option value="medicine">Medicine</option>
+              <option value="engineering">Engineering</option>
+              <option value="social-sciences">Social Sciences</option>
+              <option value="humanities">Humanities</option>
+            </select>
+          </div>
+
+          <!-- Year Filter -->
+          <div class="filter-group">
+            <label>Publication Year</label>
+            <select class="filter-select" id="yearFilter">
+              <option value="">All Years</option>
+              <option value="2024">2024</option>
+              <option value="2023">2023</option>
+              <option value="2022">2022</option>
+              <option value="2021">2021</option>
+              <option value="2020">2020</option>
+              <option value="2019">2019</option>
+              <option value="2018">2018</option>
+            </select>
+          </div>
+
+          <!-- Sort By -->
+          <div class="filter-group">
+            <label>Sort By</label>
+            <select class="filter-select" id="sortFilter">
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="title">Title (A-Z)</option>
+              <option value="citations">Most Cited</option>
+            </select>
+          </div>
+
+          <!-- Clear Filters -->
+          <button class="btn-filter-clear" onclick="clearFilters()">Clear All Filters</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="articles-main">
+        <!-- Results Header -->
+        <div class="results-header">
+          <div class="results-count">
+            <span id="resultsCount">1,234</span> articles found
+          </div>
+          <div class="view-toggle">
+            <button class="view-btn active" data-view="grid" onclick="toggleView('grid')">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+              </svg>
+            </button>
+            <button class="view-btn" data-view="list" onclick="toggleView('list')">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Articles Grid -->
+        <div class="articles-grid" id="articlesContainer">
+          <!-- Article Card 1 -->
+          <article class="article-card-indexed">
+            <div class="article-header">
+              <span class="article-badge">Computer Science</span>
+              <span class="article-year">2024</span>
+            </div>
+            <h3 class="article-title">
+              <a href="#">Machine Learning Applications in Natural Language Processing: A Comprehensive Survey</a>
+            </h3>
+            <p class="article-authors">
+              <strong>Authors:</strong> John Smith, Sarah Johnson, Michael Chen
+            </p>
+            <p class="article-abstract">
+              This paper presents a comprehensive survey of machine learning applications in natural language processing, covering recent advances in transformer architectures, attention mechanisms, and their practical implementations...
+            </p>
+            <div class="article-meta">
+              <span class="meta-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+                45 Citations
+              </span>
+              <span class="meta-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Published: Jan 15, 2024
+              </span>
+            </div>
+            <div class="article-actions">
+              <a href="#" class="btn-download">Download PDF</a>
+              <a href="#" class="btn-view">View Details</a>
+            </div>
+          </article>
+
+          <!-- Article Card 2 -->
+          <article class="article-card-indexed">
+            <div class="article-header">
+              <span class="article-badge">Physics</span>
+              <span class="article-year">2024</span>
+            </div>
+            <h3 class="article-title">
+              <a href="#">Quantum Computing: Recent Breakthroughs and Future Prospects</a>
+            </h3>
+            <p class="article-authors">
+              <strong>Authors:</strong> Dr. Emily Watson, Prof. Robert Lee
+            </p>
+            <p class="article-abstract">
+              We explore the latest developments in quantum computing, including advances in qubit stability, error correction methods, and potential applications in cryptography and drug discovery...
+            </p>
+            <div class="article-meta">
+              <span class="meta-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+                128 Citations
+              </span>
+              <span class="meta-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Published: Feb 3, 2024
+              </span>
+            </div>
+            <div class="article-actions">
+              <a href="#" class="btn-download">Download PDF</a>
+              <a href="#" class="btn-view">View Details</a>
+            </div>
+          </article>
+
+          <!-- Article Card 3 -->
+          <article class="article-card-indexed">
+            <div class="article-header">
+              <span class="article-badge">Medicine</span>
+              <span class="article-year">2024</span>
+            </div>
+            <h3 class="article-title">
+              <a href="#">AI-Powered Diagnostic Tools: Revolutionizing Medical Imaging</a>
+            </h3>
+            <p class="article-authors">
+              <strong>Authors:</strong> Dr. Maria Garcia, Dr. James Wilson, Dr. Lisa Anderson
+            </p>
+            <p class="article-abstract">
+              This study examines the integration of artificial intelligence in medical imaging, focusing on improved accuracy in disease detection and the potential for early diagnosis of various conditions...
+            </p>
+            <div class="article-meta">
+              <span class="meta-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+                89 Citations
+              </span>
+              <span class="meta-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Published: Mar 10, 2024
+              </span>
+            </div>
+            <div class="article-actions">
+              <a href="#" class="btn-download">Download PDF</a>
+              <a href="#" class="btn-view">View Details</a>
+            </div>
+          </article>
+
+          <!-- Article Card 4 -->
+          <article class="article-card-indexed">
+            <div class="article-header">
+              <span class="article-badge">Engineering</span>
+              <span class="article-year">2023</span>
+            </div>
+            <h3 class="article-title">
+              <a href="#">Sustainable Energy Solutions: Solar Panel Efficiency Improvements</a>
+            </h3>
+            <p class="article-authors">
+              <strong>Authors:</strong> Prof. David Kim, Dr. Jennifer Brown
+            </p>
+            <p class="article-abstract">
+              We present novel approaches to improving solar panel efficiency through advanced materials science and innovative cell designs, with potential to reduce costs and increase adoption...
+            </p>
+            <div class="article-meta">
+              <span class="meta-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+                67 Citations
+              </span>
+              <span class="meta-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Published: Dec 20, 2023
+              </span>
+            </div>
+            <div class="article-actions">
+              <a href="#" class="btn-download">Download PDF</a>
+              <a href="#" class="btn-view">View Details</a>
+            </div>
+          </article>
+
+          <!-- Article Card 5 -->
+          <article class="article-card-indexed">
+            <div class="article-header">
+              <span class="article-badge">Biology</span>
+              <span class="article-year">2024</span>
+            </div>
+            <h3 class="article-title">
+              <a href="#">CRISPR Gene Editing: Ethical Considerations and Clinical Applications</a>
+            </h3>
+            <p class="article-authors">
+              <strong>Authors:</strong> Dr. Thomas Miller, Dr. Rachel Green, Dr. Kevin Park
+            </p>
+            <p class="article-abstract">
+              This comprehensive review discusses the ethical implications of CRISPR technology while exploring its potential applications in treating genetic disorders and advancing personalized medicine...
+            </p>
+            <div class="article-meta">
+              <span class="meta-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+                156 Citations
+              </span>
+              <span class="meta-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Published: Apr 5, 2024
+              </span>
+            </div>
+            <div class="article-actions">
+              <a href="#" class="btn-download">Download PDF</a>
+              <a href="#" class="btn-view">View Details</a>
+            </div>
+          </article>
+
+          <!-- Article Card 6 -->
+          <article class="article-card-indexed">
+            <div class="article-header">
+              <span class="article-badge">Mathematics</span>
+              <span class="article-year">2024</span>
+            </div>
+            <h3 class="article-title">
+              <a href="#">Advanced Algorithms for Large-Scale Data Processing</a>
+            </h3>
+            <p class="article-authors">
+              <strong>Authors:</strong> Prof. Anna Martinez, Dr. Christopher Taylor
+            </p>
+            <p class="article-abstract">
+              We introduce new algorithmic approaches for processing massive datasets, with applications in machine learning, data mining, and real-time analytics systems...
+            </p>
+            <div class="article-meta">
+              <span class="meta-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+                34 Citations
+              </span>
+              <span class="meta-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Published: May 12, 2024
+              </span>
+            </div>
+            <div class="article-actions">
+              <a href="#" class="btn-download">Download PDF</a>
+              <a href="#" class="btn-view">View Details</a>
+            </div>
+          </article>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+          <button class="pagination-btn" disabled>
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Previous
+          </button>
+          <div class="pagination-numbers">
+            <button class="pagination-number active">1</button>
+            <button class="pagination-number">2</button>
+            <button class="pagination-number">3</button>
+            <button class="pagination-number">4</button>
+            <button class="pagination-number">5</button>
+            <span class="pagination-ellipsis">...</span>
+            <button class="pagination-number">24</button>
+          </div>
+          <button class="pagination-btn">
+            Next
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleView(view) {
+    const container = document.getElementById('articlesContainer');
+    const buttons = document.querySelectorAll('.view-btn');
+    
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.closest('.view-btn').classList.add('active');
+    
+    if (view === 'list') {
+      container.classList.add('list-view');
+    } else {
+      container.classList.remove('list-view');
+    }
+  }
+
+  function toggleFilters() {
+    const filterSection = document.getElementById('filterSection');
+    const toggleBtn = filterSection.querySelector('.filter-toggle-btn span');
+    
+    filterSection.classList.toggle('collapsed');
+    
+    if (filterSection.classList.contains('collapsed')) {
+      toggleBtn.textContent = 'Show Filters';
+    } else {
+      toggleBtn.textContent = 'Hide Filters';
+    }
+  }
+
+  function clearFilters() {
+    document.getElementById('articleSearch').value = '';
+    document.getElementById('disciplineFilter').value = '';
+    document.getElementById('yearFilter').value = '';
+    document.getElementById('sortFilter').value = 'newest';
+  }
+
+  // Filter functionality
+  document.getElementById('articleSearch')?.addEventListener('input', function(e) {
+    filterArticles();
+  });
+
+  document.getElementById('disciplineFilter')?.addEventListener('change', function(e) {
+    filterArticles();
+  });
+
+  document.getElementById('yearFilter')?.addEventListener('change', function(e) {
+    filterArticles();
+  });
+
+  function filterArticles() {
+    // Filter logic would go here
+    console.log('Filtering articles...');
+  }
+</script>
+{% endblock %}
+

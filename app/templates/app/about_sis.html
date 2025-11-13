@@ -1,0 +1,175 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}About S.I.S - ScholarIndex{% endblock %}
+
+{% block content %}
+<style>
+  .about-sis-page {
+    padding: 3rem 1.5rem;
+    background-color: var(--background);
+    min-height: calc(100vh - 5rem);
+  }
+
+  .about-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .about-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .about-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--foreground);
+  }
+
+  .about-header p {
+    font-size: 1.125rem;
+    color: var(--muted-foreground);
+  }
+
+  .about-content {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 3rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .content-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .content-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .content-section h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--foreground);
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .content-section p {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--foreground);
+    margin-bottom: 1rem;
+  }
+
+  .content-section ul,
+  .content-section ol {
+    margin-left: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .content-section li {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--foreground);
+    margin-bottom: 0.5rem;
+  }
+
+  .highlight-box {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border-left: 4px solid #3b82f6;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .highlight-box p {
+    margin: 0;
+    color: #1e3a8a;
+    font-weight: 500;
+  }
+
+  @media (max-width: 768px) {
+    .about-sis-page {
+      padding: 2rem 1rem;
+    }
+
+    .about-header h1 {
+      font-size: 2rem;
+    }
+
+    .about-content {
+      padding: 2rem 1.5rem;
+    }
+
+    .content-section h2 {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+
+<div class="about-sis-page">
+  <div class="container">
+    <div class="about-wrapper">
+      <!-- Page Header -->
+      <div class="about-header">
+        <h1>About S.I.S</h1>
+        <p>Scholar Indexing System - Advancing Global Research</p>
+      </div>
+
+      <!-- Main Content -->
+      <div class="about-content">
+        <div class="content-section">
+          <h2>Who We Are</h2>
+          <p>
+            Scholar Indexing System (S.I.S) is a comprehensive platform dedicated to indexing, archiving, and promoting scholarly research across all academic disciplines. We serve as a bridge between researchers, institutions, and the global academic community, facilitating knowledge sharing and scientific advancement.
+          </p>
+          <p>
+            Our mission is to make research more accessible, discoverable, and impactful by providing robust indexing services, plagiarism detection tools, and research transformation services that help researchers maximize the reach and impact of their work.
+          </p>
+        </div>
+
+        <div class="content-section">
+          <h2>Our Vision</h2>
+          <p>
+            To become the world's leading scholarly indexing platform, recognized for excellence in research discovery, academic integrity, and innovation in research services. We envision a future where every researcher has equal access to tools and resources that enable them to contribute meaningfully to their fields.
+          </p>
+        </div>
+
+        <div class="content-section">
+          <h2>What We Do</h2>
+          <p>S.I.S provides a comprehensive suite of services designed to support researchers throughout their academic journey:</p>
+          <ul>
+            <li><strong>Research Indexing:</strong> We index articles, journals, and research projects, making them easily discoverable by the global research community.</li>
+            <li><strong>Plagiarism Detection:</strong> Our advanced Turnitin integration helps maintain academic integrity and originality in research.</li>
+            <li><strong>Thesis Services:</strong> We assist researchers in transforming their theses into articles, books, chapters, and presentations.</li>
+            <li><strong>Research Directory:</strong> We maintain a comprehensive directory of researchers, facilitating collaboration and networking.</li>
+            <li><strong>Community Building:</strong> We foster connections between researchers, institutions, and sponsors worldwide.</li>
+          </ul>
+        </div>
+
+        <div class="content-section">
+          <h2>Our Values</h2>
+          <ul>
+            <li><strong>Integrity:</strong> We maintain the highest standards of academic integrity and ethical practices.</li>
+            <li><strong>Accessibility:</strong> We believe research should be accessible to all, regardless of geographical or institutional boundaries.</li>
+            <li><strong>Innovation:</strong> We continuously innovate to provide cutting-edge tools and services for researchers.</li>
+            <li><strong>Collaboration:</strong> We promote collaboration and knowledge sharing within the global research community.</li>
+            <li><strong>Excellence:</strong> We strive for excellence in all our services and interactions.</li>
+          </ul>
+        </div>
+
+        <div class="highlight-box">
+          <p>
+            <strong>Join Us:</strong> Whether you're a researcher, institution, or sponsor, S.I.S offers opportunities to be part of a global movement advancing scientific knowledge and discovery.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

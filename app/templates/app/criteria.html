@@ -1,0 +1,296 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Criteria - ScholarIndex{% endblock %}
+
+{% block content %}
+<style>
+  .criteria-page {
+    padding: 3rem 1.5rem;
+    background-color: var(--background);
+    min-height: calc(100vh - 5rem);
+  }
+
+  .criteria-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .criteria-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .criteria-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--foreground);
+  }
+
+  .criteria-header p {
+    font-size: 1.125rem;
+    color: var(--muted-foreground);
+  }
+
+  .criteria-content {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 3rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .content-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .content-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .content-section h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--foreground);
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .content-section p {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--foreground);
+    margin-bottom: 1rem;
+  }
+
+  .criteria-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .criteria-item {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .criteria-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #3b82f6;
+  }
+
+  .criteria-item h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e40af;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .criteria-item h3::before {
+    content: '✓';
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .criteria-item p {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--foreground);
+    margin: 0;
+  }
+
+  .criteria-item ul {
+    margin: 0.75rem 0 0 1.5rem;
+    padding: 0;
+  }
+
+  .criteria-item li {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--foreground);
+    margin-bottom: 0.5rem;
+  }
+
+  .highlight-box {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-left: 4px solid #f59e0b;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+  }
+
+  .highlight-box p {
+    margin: 0;
+    color: #92400e;
+    font-weight: 500;
+  }
+
+  @media (max-width: 768px) {
+    .criteria-page {
+      padding: 2rem 1rem;
+    }
+
+    .criteria-header h1 {
+      font-size: 2rem;
+    }
+
+    .criteria-content {
+      padding: 2rem 1.5rem;
+    }
+
+    .content-section h2 {
+      font-size: 1.5rem;
+    }
+
+    .criteria-item {
+      padding: 1.25rem;
+    }
+
+    .criteria-item h3 {
+      font-size: 1.125rem;
+    }
+  }
+</style>
+
+<div class="criteria-page">
+  <div class="container">
+    <div class="criteria-wrapper">
+      <!-- Page Header -->
+      <div class="criteria-header">
+        <h1>Indexing Criteria</h1>
+        <p>Standards and requirements for research indexing and inclusion</p>
+      </div>
+
+      <!-- Main Content -->
+      <div class="criteria-content">
+        <div class="content-section">
+          <h2>General Criteria</h2>
+          <p>
+            Scholar Indexing System (S.I.S) maintains rigorous standards to ensure the quality and integrity of all indexed research. The following criteria apply to all submissions:
+          </p>
+        </div>
+
+        <div class="content-section">
+          <h2>Article Indexing Criteria</h2>
+          <ul class="criteria-list">
+            <li class="criteria-item">
+              <h3>Originality and Quality</h3>
+              <p>Articles must be original research, reviews, or scholarly contributions that have not been previously published elsewhere. The research should demonstrate academic rigor, methodological soundness, and contribute meaningfully to the field.</p>
+            </li>
+            <li class="criteria-item">
+              <h3>Peer Review</h3>
+              <p>Articles should have undergone peer review or be submitted from reputable academic sources. We prioritize research that has been vetted by academic peers or editorial boards.</p>
+            </li>
+            <li class="criteria-item">
+              <h3>Academic Standards</h3>
+              <p>All submissions must meet high academic standards, including proper citation, methodology transparency, and adherence to ethical research practices.</p>
+            </li>
+            <li class="criteria-item">
+              <h3>Plagiarism Threshold</h3>
+              <p>Articles must have a plagiarism similarity score below 15% (excluding quotes and references). Higher similarity may be acceptable with proper attribution and justification.</p>
+            </li>
+            <li class="criteria-item">
+              <h3>Language and Formatting</h3>
+              <p>Articles should be written in clear, academic English (or other accepted languages) and follow standard academic formatting guidelines. Proper grammar, spelling, and structure are essential.</p>
+            </li>
+          </ul>
+        </div>
+
+        <div class="content-section">
+          <h2>Journal Indexing Criteria</h2>
+          <ul class="criteria-list">
+            <li class="criteria-item">
+              <h3>Publication Standards</h3>
+              <p>Journals must demonstrate regular publication schedules, established editorial processes, and a commitment to academic quality. We consider factors such as impact factor, peer review processes, and editorial board composition.</p>
+            </li>
+            <li class="criteria-item">
+              <h3>Editorial Quality</h3>
+              <p>Journals should have a qualified editorial board with recognized experts in relevant fields. The editorial process should be transparent and rigorous.</p>
+            </li>
+            <li class="criteria-item">
+              <h3>Scope and Coverage</h3>
+              <p>Journals should have a clearly defined scope and contribute to their respective academic disciplines. We index journals across all major academic fields.</p>
+            </li>
+            <li class="criteria-item">
+              <h3>Open Access Policy</h3>
+              <p>While not mandatory, we encourage open access publishing. Journals with open access policies may receive priority consideration.</p>
+            </li>
+          </ul>
+        </div>
+
+        <div class="content-section">
+          <h2>Researcher Directory Criteria</h2>
+          <ul class="criteria-list">
+            <li class="criteria-item">
+              <h3>Academic Qualifications</h3>
+              <p>Researchers should hold relevant academic qualifications (PhD, Master's, or equivalent) and be actively engaged in research activities.</p>
+            </li>
+            <li class="criteria-item">
+              <h3>Research Activity</h3>
+              <p>Applicants should demonstrate active research engagement through publications, ongoing projects, or significant contributions to their field.</p>
+            </li>
+            <li class="criteria-item">
+              <h3>Institutional Affiliation</h3>
+              <p>Researchers should be affiliated with recognized academic institutions, research organizations, or have independent research credentials.</p>
+            </li>
+            <li class="criteria-item">
+              <h3>Professional Standing</h3>
+              <p>We consider factors such as publication record, citations, awards, and recognition within the academic community.</p>
+            </li>
+          </ul>
+        </div>
+
+        <div class="content-section">
+          <h2>Project Archive Criteria</h2>
+          <ul class="criteria-list">
+            <li class="criteria-item">
+              <h3>Project Completeness</h3>
+              <p>Projects should be well-documented with clear objectives, methodology, results, and conclusions. Incomplete or ongoing projects may be accepted with appropriate documentation.</p>
+            </li>
+            <li class="criteria-item">
+              <h3>Research Significance</h3>
+              <p>Projects should demonstrate research significance, methodological rigor, and potential impact on their field or society.</p>
+            </li>
+            <li class="criteria-item">
+              <h3>Documentation Quality</h3>
+              <p>All project documentation must be clear, comprehensive, and professionally presented. Required documents include project proposals, progress reports, and final outcomes.</p>
+            </li>
+          </ul>
+        </div>
+
+        <div class="highlight-box">
+          <p>
+            <strong>Note:</strong> All criteria are subject to review and may be updated periodically to reflect evolving academic standards and best practices. We reserve the right to reject submissions that do not meet our quality standards, even if they meet the minimum criteria listed above.
+          </p>
+        </div>
+
+        <div class="content-section">
+          <h2>Appeals Process</h2>
+          <p>
+            If your submission is rejected, you may appeal the decision by providing additional information or clarification. Our review team will reconsider your submission based on the new information provided. Appeals should be submitted within 30 days of the initial decision.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

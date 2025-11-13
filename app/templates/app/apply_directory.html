@@ -1,0 +1,680 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Apply For Directory of Researcher - ScholarIndex{% endblock %}
+
+{% block content %}
+<style>
+  .apply-directory-page {
+    padding: 3rem 1.5rem;
+    background-color: var(--background);
+    min-height: calc(100vh - 5rem);
+  }
+
+  .apply-form-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .apply-page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .apply-page-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--foreground);
+  }
+
+  .apply-page-header p {
+    font-size: 1.125rem;
+    color: var(--muted-foreground);
+  }
+
+  .apply-directory-form {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .form-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--foreground);
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-group.full-width {
+    grid-column: 1 / -1;
+  }
+
+  .form-group label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--foreground);
+  }
+
+  .form-group label .required {
+    color: #dc2626;
+    margin-left: 0.25rem;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    color: var(--foreground);
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .form-group input::placeholder,
+  .form-group textarea::placeholder {
+    color: #9ca3af;
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .form-hint {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+  }
+
+  .char-count {
+    font-size: 0.75rem;
+    color: #6b7280;
+    text-align: right;
+    margin-top: 0.25rem;
+  }
+
+  .file-upload-area {
+    border: 2px dashed #e5e7eb;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background-color: #f9fafb;
+    position: relative;
+  }
+
+  .file-upload-area:hover {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+  }
+
+  .file-upload-area.drag-over {
+    border-color: #3b82f6;
+    background-color: #dbeafe;
+  }
+
+  .file-upload-area.has-file {
+    border-color: #10b981;
+    background-color: #f0fdf4;
+  }
+
+  .file-input {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+  }
+
+  .file-upload-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .file-upload-content svg {
+    color: #6b7280;
+  }
+
+  .file-upload-text {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--foreground);
+    margin: 0;
+  }
+
+  .file-upload-hint {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0;
+  }
+
+  .file-name {
+    font-size: 0.875rem;
+    color: #10b981;
+    font-weight: 500;
+    margin-top: 0.5rem;
+    word-break: break-all;
+  }
+
+  .profile-photo-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .profile-photo-preview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #e5e7eb;
+    display: none;
+  }
+
+  .profile-photo-preview.show {
+    display: block;
+  }
+
+  .checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    cursor: pointer;
+    color: var(--foreground);
+    font-size: 0.875rem;
+  }
+
+  .checkbox-label input[type="checkbox"] {
+    width: auto;
+    cursor: pointer;
+    margin-top: 0.125rem;
+    flex-shrink: 0;
+  }
+
+  .checkbox-label a {
+    color: #3b82f6;
+    text-decoration: none;
+  }
+
+  .checkbox-label a:hover {
+    text-decoration: underline;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding-top: 1.5rem;
+    border-top: 2px solid #e5e7eb;
+    margin-top: 2rem;
+  }
+
+  .btn-cancel,
+  .btn-submit {
+    padding: 0.875rem 2rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+  }
+
+  .btn-cancel {
+    background-color: #f3f4f6;
+    color: var(--foreground);
+    border: 1px solid #e5e7eb;
+  }
+
+  .btn-cancel:hover {
+    background-color: #e5e7eb;
+  }
+
+  .btn-submit {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+
+  .btn-submit:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+  }
+
+  @media (max-width: 768px) {
+    .apply-directory-page {
+      padding: 2rem 1rem;
+    }
+
+    .apply-page-header h1 {
+      font-size: 2rem;
+    }
+
+    .apply-directory-form {
+      padding: 1.5rem;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .file-upload-area {
+      padding: 1.5rem;
+    }
+
+    .form-actions {
+      flex-direction: column;
+    }
+
+    .btn-cancel,
+    .btn-submit {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="apply-directory-page">
+  <div class="container">
+    <div class="apply-form-wrapper">
+      <!-- Page Header -->
+      <div class="apply-page-header">
+        <h1>Apply For Directory of Researcher</h1>
+        <p>Join our directory of distinguished researchers and scholars. Showcase your work and connect with the global research community.</p>
+      </div>
+
+      <form class="apply-directory-form" method="post" action="{% url 'app:apply_directory' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Personal Information Section -->
+        <div class="form-section">
+          <h2 class="section-title">Personal Information</h2>
+          
+          <div class="form-group full-width">
+            <label>Profile Photo</label>
+            <div class="profile-photo-upload">
+              <img id="photoPreview" class="profile-photo-preview" alt="Profile preview">
+              <div class="file-upload-area" id="photoUploadArea" onclick="document.getElementById('profile_photo').click()">
+                <input type="file" id="profile_photo" name="profile_photo" accept="image/*" class="file-input" onchange="handlePhotoSelect(event)">
+                <div class="file-upload-content">
+                  <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                  <p class="file-upload-text">Click to upload profile photo</p>
+                  <p class="file-upload-hint">JPG, PNG files (Max size: 5MB, Recommended: 400x400px)</p>
+                  <div class="file-name" id="photoFileName"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="first_name">First Name <span class="required">*</span></label>
+              <input type="text" id="first_name" name="first_name" required placeholder="Enter your first name">
+            </div>
+
+            <div class="form-group">
+              <label for="last_name">Last Name <span class="required">*</span></label>
+              <input type="text" id="last_name" name="last_name" required placeholder="Enter your last name">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="email">Email Address <span class="required">*</span></label>
+              <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input type="tel" id="phone" name="phone" placeholder="+1234567890">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="country">Country <span class="required">*</span></label>
+              <select id="country" name="country" required>
+                <option value="">Select country</option>
+                <option value="US">United States</option>
+                <option value="UK">United Kingdom</option>
+                <option value="CA">Canada</option>
+                <option value="AU">Australia</option>
+                <option value="DE">Germany</option>
+                <option value="FR">France</option>
+                <option value="IT">Italy</option>
+                <option value="ES">Spain</option>
+                <option value="NL">Netherlands</option>
+                <option value="CH">Switzerland</option>
+                <option value="ZA">South Africa</option>
+                <option value="NG">Nigeria</option>
+                <option value="KE">Kenya</option>
+                <option value="GH">Ghana</option>
+                <option value="EG">Egypt</option>
+                <option value="ET">Ethiopia</option>
+                <option value="MA">Morocco</option>
+                <option value="TZ">Tanzania</option>
+                <option value="UG">Uganda</option>
+                <option value="ZW">Zimbabwe</option>
+                <option value="BW">Botswana</option>
+                <option value="NA">Namibia</option>
+                <option value="MW">Malawi</option>
+                <option value="RW">Rwanda</option>
+                <option value="ZM">Zambia</option>
+                <option value="MZ">Mozambique</option>
+                <option value="AO">Angola</option>
+                <option value="CM">Cameroon</option>
+                <option value="SN">Senegal</option>
+                <option value="CI">Ivory Coast</option>
+                <option value="BF">Burkina Faso</option>
+                <option value="ML">Mali</option>
+                <option value="NE">Niger</option>
+                <option value="TD">Chad</option>
+                <option value="CD">Democratic Republic of the Congo</option>
+                <option value="CG">Republic of the Congo</option>
+                <option value="GA">Gabon</option>
+                <option value="GN">Guinea</option>
+                <option value="SL">Sierra Leone</option>
+                <option value="LR">Liberia</option>
+                <option value="TG">Togo</option>
+                <option value="BJ">Benin</option>
+                <option value="GM">Gambia</option>
+                <option value="MU">Mauritius</option>
+                <option value="SC">Seychelles</option>
+                <option value="KM">Comoros</option>
+                <option value="MG">Madagascar</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="city">City</label>
+              <input type="text" id="city" name="city" placeholder="Enter your city">
+            </div>
+          </div>
+        </div>
+
+        <!-- Professional Information Section -->
+        <div class="form-section">
+          <h2 class="section-title">Professional Information</h2>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="title">Academic Title <span class="required">*</span></label>
+              <input type="text" id="title" name="title" required placeholder="e.g., Professor, Dr., PhD">
+            </div>
+
+            <div class="form-group">
+              <label for="position">Position <span class="required">*</span></label>
+              <input type="text" id="position" name="position" required placeholder="e.g., Senior Researcher">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="institution">Institution <span class="required">*</span></label>
+              <input type="text" id="institution" name="institution" required placeholder="Your institution name">
+            </div>
+
+            <div class="form-group">
+              <label for="department">Department</label>
+              <input type="text" id="department" name="department" placeholder="Department name">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="discipline">Primary Discipline <span class="required">*</span></label>
+              <select id="discipline" name="discipline" required>
+                <option value="">Select discipline</option>
+                <option value="computer-science">Computer Science</option>
+                <option value="mathematics">Mathematics</option>
+                <option value="physics">Physics</option>
+                <option value="chemistry">Chemistry</option>
+                <option value="biology">Biology</option>
+                <option value="medicine">Medicine</option>
+                <option value="engineering">Engineering</option>
+                <option value="social-sciences">Social Sciences</option>
+                <option value="humanities">Humanities</option>
+                <option value="environmental">Environmental Science</option>
+                <option value="agriculture">Agriculture</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="years_experience">Years of Research Experience</label>
+              <input type="number" id="years_experience" name="years_experience" min="0" placeholder="Years">
+            </div>
+          </div>
+        </div>
+
+        <!-- Research Profile Section -->
+        <div class="form-section">
+          <h2 class="section-title">Research Profile</h2>
+          
+          <div class="form-group full-width">
+            <label for="research_interests">Research Interests <span class="required">*</span></label>
+            <textarea id="research_interests" name="research_interests" required placeholder="List your main research interests and areas of expertise" rows="3"></textarea>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="bio">Biography <span class="required">*</span></label>
+            <textarea id="bio" name="bio" required placeholder="Provide a brief biography highlighting your academic background, achievements, and research contributions" rows="5" maxlength="1000"></textarea>
+            <div class="char-count"><span id="bioCount">0</span> / 1000 characters</div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="google_scholar">Google Scholar Profile URL</label>
+              <input type="url" id="google_scholar" name="google_scholar" placeholder="https://scholar.google.com/...">
+            </div>
+
+            <div class="form-group">
+              <label for="orcid">ORCID ID</label>
+              <input type="text" id="orcid" name="orcid" placeholder="0000-0000-0000-0000">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="publications_count">Number of Publications</label>
+              <input type="number" id="publications_count" name="publications_count" min="0" placeholder="0">
+            </div>
+
+            <div class="form-group">
+              <label for="citations_count">Total Citations</label>
+              <input type="number" id="citations_count" name="citations_count" min="0" placeholder="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- Documents Section -->
+        <div class="form-section">
+          <h2 class="section-title">Documents</h2>
+          
+          <div class="form-group full-width">
+            <label for="cv_resume">Upload CV/Resume <span class="required">*</span></label>
+            <div class="file-upload-area" id="cvUploadArea" onclick="document.getElementById('cv_resume').click()">
+              <input type="file" id="cv_resume" name="cv_resume" accept=".pdf,.doc,.docx" required class="file-input" onchange="handleFileSelect(event, 'cv')">
+              <div class="file-upload-content">
+                <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                <p class="file-upload-text">Click to upload or drag and drop</p>
+                <p class="file-upload-hint">PDF, DOC, DOCX files (Max size: 10MB)</p>
+                <div class="file-name" id="cvFileName"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Terms and Conditions -->
+        <div class="form-section">
+          <div class="checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" name="terms" required>
+              <span>I confirm that all information provided is accurate and I meet the requirements for directory inclusion <span class="required">*</span></span>
+            </label>
+
+            <label class="checkbox-label">
+              <input type="checkbox" name="privacy" required>
+              <span>I agree to the <a href="#">Terms and Conditions</a> and <a href="#">Privacy Policy</a> <span class="required">*</span></span>
+            </label>
+
+            <label class="checkbox-label">
+              <input type="checkbox" name="public_profile">
+              <span>I consent to having my profile publicly displayed in the directory</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" onclick="window.history.back()">Cancel</button>
+          <button type="submit" class="btn-submit">Submit Application</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function handlePhotoSelect(event) {
+    const file = event.target.files[0];
+    const preview = document.getElementById('photoPreview');
+    const fileName = document.getElementById('photoFileName');
+    const uploadArea = document.getElementById('photoUploadArea');
+    
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+        preview.classList.add('show');
+      };
+      reader.readAsDataURL(file);
+      fileName.textContent = file.name;
+      uploadArea.classList.add('has-file');
+    } else {
+      preview.classList.remove('show');
+      fileName.textContent = '';
+      uploadArea.classList.remove('has-file');
+    }
+  }
+
+  function handleFileSelect(event, type) {
+    const file = event.target.files[0];
+    const fileName = document.getElementById(type === 'cv' ? 'cvFileName' : 'fileName');
+    const uploadArea = document.getElementById(type === 'cv' ? 'cvUploadArea' : 'uploadArea');
+    
+    if (file) {
+      fileName.textContent = file.name;
+      uploadArea.classList.add('has-file');
+    } else {
+      fileName.textContent = '';
+      uploadArea.classList.remove('has-file');
+    }
+  }
+
+  // Character counter for bio
+  document.getElementById('bio')?.addEventListener('input', function(e) {
+    const count = e.target.value.length;
+    document.getElementById('bioCount').textContent = count;
+  });
+
+  // Drag and drop functionality for photo
+  const photoUploadArea = document.getElementById('photoUploadArea');
+  const photoInput = document.getElementById('profile_photo');
+
+  photoUploadArea.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    photoUploadArea.classList.add('drag-over');
+  });
+
+  photoUploadArea.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    photoUploadArea.classList.remove('drag-over');
+  });
+
+  photoUploadArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    photoUploadArea.classList.remove('drag-over');
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      photoInput.files = files;
+      handlePhotoSelect({ target: photoInput });
+    }
+  });
+
+  // Drag and drop functionality for CV
+  const cvUploadArea = document.getElementById('cvUploadArea');
+  const cvInput = document.getElementById('cv_resume');
+
+  cvUploadArea.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    cvUploadArea.classList.add('drag-over');
+  });
+
+  cvUploadArea.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    cvUploadArea.classList.remove('drag-over');
+  });
+
+  cvUploadArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    cvUploadArea.classList.remove('drag-over');
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      cvInput.files = files;
+      handleFileSelect({ target: cvInput }, 'cv');
+    }
+  });
+</script>
+{% endblock %}
+
