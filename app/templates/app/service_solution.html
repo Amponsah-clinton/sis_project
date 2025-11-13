@@ -1,0 +1,364 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Service & Solution - ScholarIndex{% endblock %}
+
+{% block content %}
+<style>
+  .service-page {
+    padding: 3rem 1.5rem;
+    background-color: var(--background);
+    min-height: calc(100vh - 5rem);
+  }
+
+  .service-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .service-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .service-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--foreground);
+  }
+
+  .service-header p {
+    font-size: 1.125rem;
+    color: var(--muted-foreground);
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .service-card {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .service-card:hover {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    transform: translateY(-6px);
+    border-color: #3b82f6;
+  }
+
+  .service-icon {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    color: #ffffff;
+  }
+
+  .service-icon svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .service-card h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1e40af;
+    margin-bottom: 1rem;
+  }
+
+  .service-card p {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--foreground);
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+  }
+
+  .service-features {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .service-features li {
+    font-size: 0.875rem;
+    line-height: 1.7;
+    color: var(--foreground);
+    margin-bottom: 0.5rem;
+    padding-left: 1.5rem;
+    position: relative;
+  }
+
+  .service-features li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #10b981;
+    font-weight: 700;
+  }
+
+  .service-link {
+    margin-top: auto;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    text-align: center;
+    display: inline-block;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+  }
+
+  .service-link:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+  }
+
+  .solutions-section {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 3rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-top: 3rem;
+  }
+
+  .solutions-section h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    color: var(--foreground);
+    text-align: center;
+  }
+
+  .solution-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .solution-item {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .solution-item:hover {
+    background-color: #f3f4f6;
+    border-color: #3b82f6;
+  }
+
+  .solution-item h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1e40af;
+    margin-bottom: 0.5rem;
+  }
+
+  .solution-item p {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--foreground);
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .service-page {
+      padding: 2rem 1rem;
+    }
+
+    .service-header h1 {
+      font-size: 2rem;
+    }
+
+    .services-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .solutions-section {
+      padding: 2rem 1.5rem;
+    }
+
+    .solution-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="service-page">
+  <div class="container">
+    <div class="service-wrapper">
+      <!-- Page Header -->
+      <div class="service-header">
+        <h1>Services & Solutions</h1>
+        <p>Comprehensive research services to support your academic journey</p>
+      </div>
+
+      <!-- Services Grid -->
+      <div class="services-grid">
+        <!-- Service 1 -->
+        <div class="service-card">
+          <div class="service-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+          </div>
+          <h3>Research Indexing</h3>
+          <p>Comprehensive indexing services for articles, journals, and research projects to maximize visibility and discoverability.</p>
+          <ul class="service-features">
+            <li>Article indexing and archiving</li>
+            <li>Journal registration and indexing</li>
+            <li>Project archive services</li>
+            <li>Metadata optimization</li>
+            <li>Search engine optimization</li>
+          </ul>
+          <a href="{% url 'app:indexed_articles' %}" class="service-link">Learn More</a>
+        </div>
+
+        <!-- Service 2 -->
+        <div class="service-card">
+          <div class="service-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+            </svg>
+          </div>
+          <h3>Plagiarism Detection</h3>
+          <p>Advanced plagiarism detection using Turnitin and other tools to ensure academic integrity and originality.</p>
+          <ul class="service-features">
+            <li>Turnitin plagiarism checking</li>
+            <li>Comprehensive similarity reports</li>
+            <li>Plagiarism remediation services</li>
+            <li>Citation verification</li>
+            <li>Originality enhancement</li>
+          </ul>
+          <a href="{% url 'app:check_turnitin' %}" class="service-link">Check Now</a>
+        </div>
+
+        <!-- Service 3 -->
+        <div class="service-card">
+          <div class="service-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            </svg>
+          </div>
+          <h3>Thesis Transformation</h3>
+          <p>Convert your thesis into various formats including articles, books, chapters, and presentations.</p>
+          <ul class="service-features">
+            <li>Thesis to article conversion</li>
+            <li>Thesis to book transformation</li>
+            <li>Book chapter preparation</li>
+            <li>PowerPoint presentation creation</li>
+            <li>Professional formatting</li>
+          </ul>
+          <a href="{% url 'app:thesis_to_article' %}" class="service-link">Get Started</a>
+        </div>
+
+        <!-- Service 4 -->
+        <div class="service-card">
+          <div class="service-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+          </div>
+          <h3>Researcher Directory</h3>
+          <p>Connect with researchers worldwide through our comprehensive directory and networking platform.</p>
+          <ul class="service-features">
+            <li>Researcher profiles and listings</li>
+            <li>Academic networking</li>
+            <li>Collaboration opportunities</li>
+            <li>Research statistics tracking</li>
+            <li>Professional visibility</li>
+          </ul>
+          <a href="{% url 'app:directory_researchers' %}" class="service-link">Browse Directory</a>
+        </div>
+
+        <!-- Service 5 -->
+        <div class="service-card">
+          <div class="service-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            </svg>
+          </div>
+          <h3>Community Services</h3>
+          <p>Join our vibrant community of researchers, scholars, and academic professionals.</p>
+          <ul class="service-features">
+            <li>Membership programs</li>
+            <li>Council and team networks</li>
+            <li>Sponsorship opportunities</li>
+            <li>Hall of Fame recognition</li>
+            <li>Community events</li>
+          </ul>
+          <a href="{% url 'app:request_membership' %}" class="service-link">Join Community</a>
+        </div>
+
+        <!-- Service 6 -->
+        <div class="service-card">
+          <div class="service-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+          </div>
+          <h3>Analytics & Insights</h3>
+          <p>Track your research impact with comprehensive analytics and reporting tools.</p>
+          <ul class="service-features">
+            <li>Citation tracking</li>
+            <li>Publication analytics</li>
+            <li>Impact metrics</li>
+            <li>Research performance reports</li>
+            <li>Trend analysis</li>
+          </ul>
+          <a href="#" class="service-link">View Analytics</a>
+        </div>
+      </div>
+
+      <!-- Solutions Section -->
+      <div class="solutions-section">
+        <h2>Our Solutions</h2>
+        <div class="solution-grid">
+          <div class="solution-item">
+            <h4>For Researchers</h4>
+            <p>Comprehensive tools and services to help you publish, index, and promote your research effectively.</p>
+          </div>
+          <div class="solution-item">
+            <h4>For Institutions</h4>
+            <p>Institutional indexing services and support for research management and visibility.</p>
+          </div>
+          <div class="solution-item">
+            <h4>For Publishers</h4>
+            <p>Journal indexing, metadata management, and distribution services for academic publishers.</p>
+          </div>
+          <div class="solution-item">
+            <h4>For Students</h4>
+            <p>Plagiarism checking, thesis services, and academic writing support for students.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

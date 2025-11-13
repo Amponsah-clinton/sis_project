@@ -29,5 +29,11 @@ urlpatterns = [
     path('thesis_to_book/', views.thesis_to_book, name='thesis_to_book'),
     path('thesis_to_book_chapter/', views.thesis_to_book_chapter, name='thesis_to_book_chapter'),
     path('powerpoint_preparation/', views.powerpoint_preparation, name='powerpoint_preparation'),
+    path('about_sis/', views.about_sis, name='about_sis'),
+    path('mission/', views.mission, name='mission'),
+    path('criteria/', views.criteria, name='criteria'),
+    path('tolerance_policy/', views.tolerance_policy, name='tolerance_policy'),
+    path('service_solution/', views.service_solution, name='service_solution'),
+    path('policy_terms/', views.policy_terms, name='policy_terms'),
 ]
 
