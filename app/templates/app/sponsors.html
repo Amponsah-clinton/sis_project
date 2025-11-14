@@ -6,14 +6,72 @@
 {% block extra_css %}
 <style>
   .sponsor-page {
-    padding: 2rem 1.5rem;
+    padding: 1.5rem 1.5rem;
     background-color: var(--background);
     min-height: calc(100vh - 5rem);
   }
 
   .sponsor-container {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
+  }
+
+  .sponsor-layout {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .sponsor-text-section {
+    position: sticky;
+    top: 2rem;
+  }
+
+  .sponsor-text-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--foreground);
+    margin-bottom: 1rem;
+    font-family: 'Playfair Display', serif;
+    line-height: 1.2;
+  }
+
+  .sponsor-text-content {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--foreground);
+    margin-bottom: 1rem;
+  }
+
+  .sponsor-text-content p {
+    margin-bottom: 1rem;
+  }
+
+  .sponsor-text-content p:last-child {
+    margin-bottom: 0;
+  }
+
+  .donate-link {
+    display: inline-block;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-decoration: underline;
+    text-transform: uppercase;
+    margin-top: 1rem;
+    transition: color 0.2s ease;
+  }
+
+  .donate-link:hover {
+    color: hsl(215, 85%, 30%);
+  }
+
+  .sponsor-form-section {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
   }
 
   .form-section-title {
@@ -326,9 +384,40 @@
   }
 
   /* Responsive */
+  @media (max-width: 968px) {
+    .sponsor-layout {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .sponsor-text-section {
+      position: static;
+    }
+
+    .sponsor-text-title {
+      font-size: 1.75rem;
+    }
+  }
+
   @media (max-width: 768px) {
     .sponsor-page {
       padding: 1.5rem 1rem;
+    }
+
+    .sponsor-layout {
+      gap: 1.5rem;
+    }
+
+    .sponsor-form-section {
+      padding: 1.5rem;
+    }
+
+    .sponsor-text-title {
+      font-size: 1.5rem;
+    }
+
+    .sponsor-text-content {
+      font-size: 0.875rem;
     }
 
     .payment-summary {
@@ -348,7 +437,28 @@
     <div class="error-message" id="errorMessage"></div>
     <div class="success-message" id="successMessage"></div>
 
-    <form id="donationForm" enctype="multipart/form-data">
+    <div class="sponsor-layout">
+      <!-- Text Section -->
+      <div class="sponsor-text-section">
+        <h1 class="sponsor-text-title">Support us Financially</h1>
+        <div class="sponsor-text-content">
+          <p>
+            Scholar Indexing Society is growing and needs your help. We build our own systems, 
+            we don't charge for access, we don't sell your data, and we don't run ads. We rely 
+            on donations to keep our infrastructure running and to continue providing free access 
+            to knowledge. We're grateful for any support you can provide.
+          </p>
+          <p>
+            We know that not everyone can donate, and that's okay. But if you can, your 
+            contribution will be put to good use. We believe that access to knowledge should 
+            be free and open to everyone, and your support helps us make that possible.
+          </p>
+        </div>
+      </div>
+
+      <!-- Form Section -->
+      <div class="sponsor-form-section">
+        <form id="donationForm" enctype="multipart/form-data">
       {% csrf_token %}
 
       <!-- Contribute Section -->
@@ -477,6 +587,8 @@
         </button>
       </div>
     </form>
+      </div>
+    </div>
   </div>
 </div>
 

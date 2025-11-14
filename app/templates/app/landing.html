@@ -525,6 +525,52 @@
       gap: 1.5rem;
     }
   }
+
+  /* Section Footer */
+  .section-footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 2rem;
+  }
+
+  /* View All Button */
+  .view-all-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 2rem;
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border: 2px solid var(--primary);
+    border-radius: 10px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+    cursor: pointer;
+  }
+
+  .view-all-btn:hover {
+    background-color: hsl(215, 85%, 30%);
+    border-color: hsl(215, 85%, 30%);
+    color: var(--primary-foreground);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+    text-decoration: none;
+  }
+
+  .view-all-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    .view-all-btn {
+      padding: 0.625rem 1.5rem;
+      font-size: 0.875rem;
+    }
+  }
 </style>
 
 <script>
@@ -710,6 +756,49 @@
             </p>
           </div>
         </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Image Text Section -->
+  <section class="image-text-section">
+    <div class="container">
+      <div class="image-text-wrapper">
+        <div class="image-text-image">
+          <div class="image-wrapper">
+            <img src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=1200&h=800&fit=crop" alt="Research Collaboration" class="section-image" />
+            <div class="image-overlay"></div>
+          </div>
+        </div>
+        <div class="image-text-content">
+          <div class="content-inner">
+            <h2 class="content-title">Scholar Indexing Society - Your Research Partner</h2>
+            <p class="content-description">
+              Scholar Indexing Society (S.I.S) is dedicated to indexing, archiving, and promoting scholarly research across all academic disciplines. We provide comprehensive services including research indexing, plagiarism detection, thesis transformation, and research directory services to support researchers worldwide.
+            </p>
+            <div class="content-features">
+              <div class="feature-item">
+                <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Research Indexing Services</span>
+              </div>
+              <div class="feature-item">
+                <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Plagiarism Detection</span>
+              </div>
+              <div class="feature-item">
+                <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Thesis Transformation Services</span>
+              </div>
+            </div>
+            <a href="{% url 'app:about_sis' %}" class="content-button">Learn More About S.I.S</a>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -1183,49 +1272,6 @@
       
       <div class="section-footer">
         <a href="{% url 'app:council_members' %}" class="view-all-btn">View All Council Members</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Image Text Section -->
-  <section class="image-text-section">
-    <div class="container">
-      <div class="image-text-wrapper">
-        <div class="image-text-image">
-          <div class="image-wrapper">
-            <img src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=1200&h=800&fit=crop" alt="Research Collaboration" class="section-image" />
-            <div class="image-overlay"></div>
-          </div>
-        </div>
-        <div class="image-text-content">
-          <div class="content-inner">
-            <h2 class="content-title">Scholar Indexing Society - Your Research Partner</h2>
-            <p class="content-description">
-              Scholar Indexing Society (S.I.S) is dedicated to indexing, archiving, and promoting scholarly research across all academic disciplines. We provide comprehensive services including research indexing, plagiarism detection, thesis transformation, and research directory services to support researchers worldwide.
-            </p>
-            <div class="content-features">
-              <div class="feature-item">
-                <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-                <span>Research Indexing Services</span>
-              </div>
-              <div class="feature-item">
-                <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-                <span>Plagiarism Detection</span>
-              </div>
-              <div class="feature-item">
-                <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-                <span>Thesis Transformation Services</span>
-              </div>
-            </div>
-            <a href="{% url 'app:about_sis' %}" class="content-button">Learn More About S.I.S</a>
-          </div>
-        </div>
       </div>
     </div>
   </section>
