@@ -445,6 +445,13 @@
         <div class="charge-info">
           <div class="charge-info-text">You will be charged</div>
           <div class="charge-amount" id="summaryAmount">$0 USD</div>
+          <div class="charge-info-text" style="margin-top: 0.75rem;">
+            <span style="font-weight: 600;">Ghanaian Cedis (GHS) Equivalent:</span>
+            <div class="charge-amount" id="summaryAmountGHS" style="font-size: 1.5rem; margin-top: 0.25rem;">₵0.00 GHS</div>
+            <div style="font-size: 0.75rem; color: var(--muted-foreground); margin-top: 0.25rem;">
+              (Exchange rate: 1 USD = <span id="exchangeRate">13.5</span> GHS)
+            </div>
+          </div>
         </div>
 
         <div class="note-text">Note!</div>
@@ -541,6 +548,23 @@
     }
   });
 
+  // Currency conversion algorithm: USD to GHS (Ghanaian Cedis)
+  // Exchange rate: 1 USD = 13.5 GHS (can be updated based on current rates)
+  const USD_TO_GHS_RATE = 13.5;
+  
+  function convertUSDToGHS(usdAmount) {
+    if (!usdAmount || isNaN(usdAmount) || usdAmount <= 0) {
+      return 0;
+    }
+    // Convert and round to 2 decimal places
+    const ghsAmount = parseFloat(usdAmount) * USD_TO_GHS_RATE;
+    return Math.round(ghsAmount * 100) / 100; // Round to 2 decimal places
+  }
+  
+  function formatGHS(amount) {
+    return `₵${amount.toLocaleString('en-GH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} GHS`;
+  }
+
   // Update payment summary
   function updateSummary() {
     const amount = document.getElementById('amount').value;
@@ -552,8 +576,13 @@
     
     if (amount) {
       document.getElementById('summaryAmount').textContent = `$${amount} USD`;
+      
+      // Convert and display GHS equivalent
+      const ghsAmount = convertUSDToGHS(amount);
+      document.getElementById('summaryAmountGHS').textContent = formatGHS(ghsAmount);
     } else {
       document.getElementById('summaryAmount').textContent = '$0 USD';
+      document.getElementById('summaryAmountGHS').textContent = '₵0.00 GHS';
     }
   }
 
@@ -634,14 +663,14 @@
       }
 
       // Initialize Paystack payment
-      // Convert USD to NGN: 1 USD = 1500 NGN, then convert to kobo
-      const amountInNGN = (parseFloat(amount) * 1500) * 100; // Convert USD to NGN kobo
+      // Convert USD to GHS: 1 USD = 13.5 GHS, then convert to pesewas
+      const amountInGHS = (parseFloat(amount) * USD_TO_GHS_RATE) * 100; // Convert USD to GHS pesewas
       
       const handler = PaystackPop.setup({
         key: PAYSTACK_PUBLIC_KEY,
         email: email,
-        amount: Math.round(amountInNGN), // Amount in kobo (NGN)
-        currency: 'NGN',
+        amount: Math.round(amountInGHS), // Amount in pesewas (GHS)
+        currency: 'GHS',
         ref: data.reference,
         metadata: {
           custom_fields: [
@@ -667,6 +696,7 @@
             removeCoverImage();
             document.getElementById('summaryName').textContent = 'Contributor Name';
             document.getElementById('summaryAmount').textContent = '$0 USD';
+            document.getElementById('summaryAmountGHS').textContent = '₵0.00 GHS';
             document.querySelectorAll('.field-status').forEach(el => el.style.display = 'none');
           }, 2000);
         },

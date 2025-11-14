@@ -4,7 +4,11 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.contrib.auth.models import User
+from django.http import HttpResponse, JsonResponse
+from django.template.loader import render_to_string
 import time
+import csv
+import io
 from .forms import (
     SearchForm, ContactForm, UserRegistrationForm, ArticleForm, ArticleAuthorForm,
     JournalForm, JournalEditorForm, ProjectForm, ProjectContributorForm,
@@ -698,11 +702,11 @@ def initialize_payment(request):
             if amount_usd_cents <= 0:
                 return JsonResponse({'error': 'Invalid amount'}, status=400)
             
-            # Convert USD cents to NGN kobo (1 USD = ~1500 NGN)
-            # First convert cents to dollars, then to NGN, then to kobo
+            # Convert USD cents to GHS pesewas (1 USD = ~13.5 GHS)
+            # First convert cents to dollars, then to GHS, then to pesewas
             amount_usd = amount_usd_cents / 100
-            amount_ngn = amount_usd * 1500  # Approximate conversion rate
-            amount_kobo = int(amount_ngn * 100)  # Convert to kobo
+            amount_ghs = amount_usd * 13.5  # Approximate conversion rate
+            amount_pesewas = int(amount_ghs * 100)  # Convert to pesewas
             
             # Initialize Paystack transaction
             url = 'https://api.paystack.co/transaction/initialize'
@@ -712,8 +716,8 @@ def initialize_payment(request):
             }
             payload = {
                 'email': email,
-                'amount': amount_kobo,
-                'currency': 'NGN',
+                'amount': amount_pesewas,
+                'currency': 'GHS',
                 'reference': f'sponsor_{request.user.id if request.user.is_authenticated else "guest"}_{int(time.time())}',
                 'metadata': {
                     'name': name,
@@ -963,9 +967,107 @@ def dashboard(request):
         except UserProfile.DoesNotExist:
             profile = UserProfile.objects.create(user=user)
     
+    # Get statistics
+    articles_count = Article.objects.filter(status='approved').count()
+    journals_count = Journal.objects.count()
+    projects_count = Project.objects.count()
+    
+    # Get all pending requests from different models
+    pending_plagiarism_checks = PlagiarismCheck.objects.all()
+    pending_plagiarism_works = PlagiarismWork.objects.all()
+    pending_thesis_articles = ThesisToArticle.objects.all()
+    pending_thesis_books = ThesisToBook.objects.all()
+    pending_thesis_chapters = ThesisToBookChapter.objects.all()
+    pending_powerpoints = PowerPointPreparation.objects.all()
+    
+    # Combine all requests and get latest 10
+    all_requests = []
+    for req in pending_plagiarism_checks:
+        all_requests.append({
+            'id': req.id,
+            'type': 'check_plagiarism',
+            'email': req.email,
+            'created_at': req.created_at,
+            'document': req.document,
+            'name': req.name or '',
+        })
+    for req in pending_plagiarism_works:
+        all_requests.append({
+            'id': req.id,
+            'type': 'work_plagiarism',
+            'email': req.email,
+            'created_at': req.created_at,
+            'document': req.document,
+            'name': req.name or '',
+        })
+    for req in pending_thesis_articles:
+        all_requests.append({
+            'id': req.id,
+            'type': 'thesis_to_article',
+            'email': req.email,
+            'created_at': req.created_at,
+            'document': req.thesis_file,
+            'name': req.name or '',
+        })
+    for req in pending_thesis_books:
+        all_requests.append({
+            'id': req.id,
+            'type': 'thesis_to_book',
+            'email': req.email,
+            'created_at': req.created_at,
+            'document': req.thesis_file,
+            'name': req.name or '',
+        })
+    for req in pending_thesis_chapters:
+        all_requests.append({
+            'id': req.id,
+            'type': 'thesis_to_book_chapter',
+            'email': req.email,
+            'created_at': req.created_at,
+            'document': req.thesis_file,
+            'name': req.name or '',
+        })
+    for req in pending_powerpoints:
+        all_requests.append({
+            'id': req.id,
+            'type': 'powerpoint_preparation',
+            'email': req.email,
+            'created_at': req.created_at,
+            'document': req.thesis_file,
+            'name': req.name or '',
+        })
+    
+    # Sort by created_at and get latest 10
+    all_requests.sort(key=lambda x: x['created_at'] if x['created_at'] else None, reverse=True)
+    latest_requests = all_requests[:10]
+    pending_requests_count = len(all_requests)
+    
+    # Get account statistics
+    total_users = User.objects.count()
+    directory_researchers_count = DirectoryApplication.objects.filter(terms_accepted=True).count()
+    eminent_personalities_count = HallOfFameApplication.objects.count()
+    registered_members_count = MembershipRequest.objects.count()
+    
+    # Get recent accounts (users with profiles)
+    recent_users = User.objects.select_related('profile').order_by('-date_joined')[:5]
+    
+    # Get recent blog posts (using articles as blog posts for now)
+    recent_blogs = Article.objects.filter(status='approved').order_by('-created_at')[:5]
+    
     return render(request, 'app/dashboard.html', {
         'user': user,
         'profile': profile,
+        'articles_count': articles_count,
+        'journals_count': journals_count,
+        'projects_count': projects_count,
+        'pending_requests_count': pending_requests_count,
+        'latest_requests': latest_requests,
+        'total_users': total_users,
+        'directory_researchers_count': directory_researchers_count,
+        'eminent_personalities_count': eminent_personalities_count,
+        'registered_members_count': registered_members_count,
+        'recent_users': recent_users,
+        'recent_blogs': recent_blogs,
     })
 
 @login_required
@@ -982,6 +1084,523 @@ def account_detail(request):
         'profile': profile,
         'active_page': 'account_detail',
     })
+
+@login_required
+def list_accounts(request):
+    """List all accounts page"""
+    # Get search and filter parameters
+    search_query = request.GET.get('search', '').strip()
+    sort_by = request.GET.get('sort', 'recent')
+    role_filter = request.GET.get('role', '')
+    
+    # Get all users with profiles
+    users = User.objects.filter(profile__isnull=False).select_related('profile')
+    
+    # Apply role filter
+    if role_filter == 'admin':
+        users = users.filter(is_superuser=True)
+    elif role_filter == 'staff':
+        users = users.filter(is_staff=True, is_superuser=False)
+    elif role_filter == 'user':
+        users = users.filter(is_staff=False, is_superuser=False)
+    
+    # Apply search filter
+    if search_query:
+        users = users.filter(
+            Q(username__icontains=search_query) |
+            Q(email__icontains=search_query) |
+            Q(first_name__icontains=search_query) |
+            Q(last_name__icontains=search_query)
+        )
+    
+    # Apply sorting
+    if sort_by == 'recent':
+        users = users.order_by('-date_joined')
+    elif sort_by == 'oldest':
+        users = users.order_by('date_joined')
+    elif sort_by == 'name':
+        users = users.order_by('first_name', 'last_name', 'username')
+    else:
+        users = users.order_by('-date_joined')
+    
+    # Pagination
+    from django.core.paginator import Paginator
+    paginator = Paginator(users, 20)  # Show 20 users per page
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    
+    # Calculate record range
+    start_record = (page_obj.number - 1) * paginator.per_page + 1
+    end_record = min(start_record + paginator.per_page - 1, paginator.count)
+    
+    return render(request, 'app/list_accounts.html', {
+        'page_obj': page_obj,
+        'users': page_obj,
+        'current_search': search_query,
+        'current_sort': sort_by,
+        'current_role': role_filter,
+        'start_record': start_record,
+        'end_record': end_record,
+        'total_records': paginator.count,
+    })
+
+@login_required
+def view_account(request, user_id):
+    """View Account page - displays account details for a specific user"""
+    try:
+        view_user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        messages.error(request, 'User not found.')
+        return redirect('app:dashboard')
+    
+    try:
+        profile = view_user.profile
+    except UserProfile.DoesNotExist:
+        profile = UserProfile.objects.create(user=view_user)
+    
+    # Calculate document counts
+    doc_counts = (
+        Article.objects.filter(submitted_by=view_user).count() +
+        Journal.objects.filter(submitted_by=view_user).count() +
+        Project.objects.filter(submitted_by=view_user).count() +
+        PlagiarismCheck.objects.filter(submitted_by=view_user).count() +
+        PlagiarismWork.objects.filter(submitted_by=view_user).count() +
+        ThesisToArticle.objects.filter(submitted_by=view_user).count() +
+        ThesisToBook.objects.filter(submitted_by=view_user).count() +
+        ThesisToBookChapter.objects.filter(submitted_by=view_user).count() +
+        PowerPointPreparation.objects.filter(submitted_by=view_user).count()
+    )
+    
+    # Get position from DirectoryApplication if exists
+    position = None
+    organization_url = None
+    try:
+        directory_app = DirectoryApplication.objects.filter(submitted_by=view_user, terms_accepted=True).first()
+        if directory_app:
+            position = directory_app.position
+            # DirectoryApplication doesn't have organization_url, so we'll use institution or None
+            organization_url = getattr(directory_app, 'institution', None)
+    except:
+        pass
+    
+    # Determine role (simplified - you can enhance this based on your needs)
+    role = 'user'
+    if view_user.is_staff:
+        role = 'staff'
+    if view_user.is_superuser:
+        role = 'admin'
+    
+    # Status
+    status = 'active' if view_user.is_active else 'inactive'
+    
+    return render(request, 'app/view_account.html', {
+        'view_user': view_user,
+        'profile': profile,
+        'doc_counts': doc_counts,
+        'position': position or 'N/A',
+        'organization_url': organization_url,
+        'role': role,
+        'status': status,
+    })
+
+@login_required
+def export_account(request, user_id, format_type):
+    """Export account details in various formats"""
+    try:
+        view_user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        messages.error(request, 'User not found.')
+        return redirect('app:dashboard')
+    
+    try:
+        profile = view_user.profile
+    except UserProfile.DoesNotExist:
+        profile = UserProfile.objects.create(user=view_user)
+    
+    # Calculate document counts
+    doc_counts = (
+        Article.objects.filter(submitted_by=view_user).count() +
+        Journal.objects.filter(submitted_by=view_user).count() +
+        Project.objects.filter(submitted_by=view_user).count() +
+        PlagiarismCheck.objects.filter(submitted_by=view_user).count() +
+        PlagiarismWork.objects.filter(submitted_by=view_user).count() +
+        ThesisToArticle.objects.filter(submitted_by=view_user).count() +
+        ThesisToBook.objects.filter(submitted_by=view_user).count() +
+        ThesisToBookChapter.objects.filter(submitted_by=view_user).count() +
+        PowerPointPreparation.objects.filter(submitted_by=view_user).count()
+    )
+    
+    # Get position from DirectoryApplication if exists
+    position = None
+    organization_url = None
+    try:
+        directory_app = DirectoryApplication.objects.filter(submitted_by=view_user, terms_accepted=True).first()
+        if directory_app:
+            position = directory_app.position
+            organization_url = getattr(directory_app, 'institution', None)
+    except:
+        pass
+    
+    # Determine role
+    role = 'user'
+    if view_user.is_staff:
+        role = 'staff'
+    if view_user.is_superuser:
+        role = 'admin'
+    
+    status = 'active' if view_user.is_active else 'inactive'
+    
+    # Prepare account data
+    account_data = {
+        'Id': view_user.id,
+        'Name': view_user.get_full_name() or view_user.username,
+        'Email': view_user.email or 'N/A',
+        'Phone': profile.phone or 'N/A',
+        'Country': profile.country or 'N/A',
+        'Status': status,
+        'Role': role,
+        'Doc Counts': doc_counts,
+        'Itp': '0.5',
+        'Ctrl': '97',
+        'Profile Photo': profile.profile_photo.url if profile.profile_photo else 'null',
+        'Position': position or 'N/A',
+        'Organization Url': organization_url or 'null',
+    }
+    
+    filename = f"account_{view_user.username}_{view_user.id}"
+    
+    if format_type == 'print':
+        # Print-friendly HTML
+        html_content = render_to_string('app/export_account_print.html', {
+            'view_user': view_user,
+            'account_data': account_data,
+        })
+        response = HttpResponse(html_content, content_type='text/html')
+        return response
+    
+    elif format_type == 'pdf':
+        # PDF export using reportlab or weasyprint
+        try:
+            from reportlab.lib.pagesizes import letter
+            from reportlab.lib import colors
+            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+            from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+            from reportlab.lib.units import inch
+            
+            buffer = io.BytesIO()
+            doc = SimpleDocTemplate(buffer, pagesize=letter)
+            elements = []
+            
+            styles = getSampleStyleSheet()
+            title_style = ParagraphStyle(
+                'CustomTitle',
+                parent=styles['Heading1'],
+                fontSize=18,
+                textColor=colors.HexColor('#111827'),
+                spaceAfter=30,
+            )
+            
+            elements.append(Paragraph("Account Details", title_style))
+            elements.append(Spacer(1, 0.2*inch))
+            
+            # Create table data
+            table_data = [['Field', 'Value']]
+            for key, value in account_data.items():
+                table_data.append([key, str(value)])
+            
+            table = Table(table_data, colWidths=[2*inch, 4*inch])
+            table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#f9fafb')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor('#374151')),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 10),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                ('TEXTCOLOR', (0, 1), (-1, -1), colors.HexColor('#111827')),
+                ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 1), (-1, -1), 9),
+                ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#e5e7eb')),
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f9fafb')]),
+            ]))
+            
+            elements.append(table)
+            doc.build(elements)
+            
+            response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="{filename}.pdf"'
+            return response
+        except ImportError:
+            # Fallback to simple text if reportlab not available
+            response = HttpResponse(content_type='text/plain')
+            response['Content-Disposition'] = f'attachment; filename="{filename}.txt"'
+            for key, value in account_data.items():
+                response.write(f"{key}: {value}\n")
+            return response
+    
+    elif format_type == 'word':
+        # Word export using python-docx
+        try:
+            from docx import Document
+            from docx.shared import Inches, Pt
+            from docx.enum.text import WD_ALIGN_PARAGRAPH
+            
+            doc = Document()
+            doc.add_heading('Account Details', 0)
+            
+            table = doc.add_table(rows=1, cols=2)
+            table.style = 'Light Grid Accent 1'
+            
+            # Header row
+            header_cells = table.rows[0].cells
+            header_cells[0].text = 'Field'
+            header_cells[1].text = 'Value'
+            for cell in header_cells:
+                cell.paragraphs[0].runs[0].font.bold = True
+            
+            # Data rows
+            for key, value in account_data.items():
+                row_cells = table.add_row().cells
+                row_cells[0].text = key
+                row_cells[1].text = str(value)
+            
+            buffer = io.BytesIO()
+            doc.save(buffer)
+            buffer.seek(0)
+            
+            response = HttpResponse(buffer.getvalue(), content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+            response['Content-Disposition'] = f'attachment; filename="{filename}.docx"'
+            return response
+        except ImportError:
+            # Fallback to simple text
+            response = HttpResponse(content_type='text/plain')
+            response['Content-Disposition'] = f'attachment; filename="{filename}.txt"'
+            for key, value in account_data.items():
+                response.write(f"{key}: {value}\n")
+            return response
+    
+    elif format_type == 'csv':
+        # CSV export
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="{filename}.csv"'
+        
+        writer = csv.writer(response)
+        writer.writerow(['Field', 'Value'])
+        for key, value in account_data.items():
+            writer.writerow([key, value])
+        
+        return response
+    
+    elif format_type == 'excel':
+        # Excel export using openpyxl
+        try:
+            from openpyxl import Workbook
+            from openpyxl.styles import Font, PatternFill, Alignment
+            
+            wb = Workbook()
+            ws = wb.active
+            ws.title = "Account Details"
+            
+            # Header row
+            header_fill = PatternFill(start_color="F9FAFB", end_color="F9FAFB", fill_type="solid")
+            header_font = Font(bold=True, color="374151")
+            
+            ws['A1'] = 'Field'
+            ws['B1'] = 'Value'
+            ws['A1'].fill = header_fill
+            ws['B1'].fill = header_fill
+            ws['A1'].font = header_font
+            ws['B1'].font = header_font
+            
+            # Data rows
+            row = 2
+            for key, value in account_data.items():
+                ws[f'A{row}'] = key
+                ws[f'B{row}'] = str(value)
+                if row % 2 == 0:
+                    ws[f'A{row}'].fill = PatternFill(start_color="F9FAFB", end_color="F9FAFB", fill_type="solid")
+                    ws[f'B{row}'].fill = PatternFill(start_color="F9FAFB", end_color="F9FAFB", fill_type="solid")
+                row += 1
+            
+            # Adjust column widths
+            ws.column_dimensions['A'].width = 20
+            ws.column_dimensions['B'].width = 40
+            
+            buffer = io.BytesIO()
+            wb.save(buffer)
+            buffer.seek(0)
+            
+            response = HttpResponse(buffer.getvalue(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = f'attachment; filename="{filename}.xlsx"'
+            return response
+        except ImportError:
+            # Fallback to CSV if openpyxl not available
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = f'attachment; filename="{filename}.csv"'
+            writer = csv.writer(response)
+            writer.writerow(['Field', 'Value'])
+            for key, value in account_data.items():
+                writer.writerow([key, value])
+            return response
+    
+    else:
+        messages.error(request, 'Invalid export format.')
+        return redirect('app:view_account', user_id=user_id)
+
+@login_required
+def update_user_role(request, user_id):
+    """Update user role (Admin, Staff, User)"""
+    # Only superusers can change roles
+    if not request.user.is_superuser:
+        return JsonResponse({'success': False, 'error': 'Permission denied. Only superusers can change roles.'}, status=403)
+    
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'User not found'}, status=404)
+    
+    if request.method == 'POST':
+        import json
+        data = json.loads(request.body)
+        role_type = data.get('role_type')
+        
+        # Set role based on selection
+        if role_type == 'admin':
+            user.is_superuser = True
+            user.is_staff = True  # Admin is also staff
+            user.is_active = True
+        elif role_type == 'staff':
+            user.is_superuser = False
+            user.is_staff = True
+            user.is_active = True
+        elif role_type == 'user':
+            user.is_superuser = False
+            user.is_staff = False
+            # Keep is_active as is (don't deactivate when changing to user)
+        
+        user.save()
+        return JsonResponse({'success': True})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request'}, status=400)
+
+@login_required
+def get_user_data(request, user_id):
+    """Get user data for edit modal"""
+    # Allow any logged-in user to view account data (they can see it in the list anyway)
+    
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'User not found'}, status=404)
+    
+    try:
+        profile = user.profile
+    except UserProfile.DoesNotExist:
+        profile = UserProfile.objects.create(user=user)
+    
+    # Determine role
+    role = 'user'
+    if user.is_superuser:
+        role = 'admin'
+    elif user.is_staff:
+        role = 'staff'
+    
+    return JsonResponse({
+        'success': True,
+        'user': {
+            'username': user.username or '',
+            'email': user.email or '',
+            'first_name': user.first_name or '',
+            'last_name': user.last_name or '',
+            'is_active': user.is_active,
+            'is_superuser': user.is_superuser,
+            'is_staff': user.is_staff,
+            'role': role,
+        },
+        'profile': {
+            'phone': profile.phone or '',
+            'country': profile.country or '',
+        }
+    })
+
+@login_required
+def edit_user_account(request, user_id):
+    """Edit user account page"""
+    # Allow any logged-in user to edit accounts (they can see them in the list)
+    # But only superusers can change roles
+    
+    try:
+        edit_user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': 'User not found'}, status=404)
+        messages.error(request, 'User not found.')
+        return redirect('app:list_accounts')
+    
+    try:
+        profile = edit_user.profile
+    except UserProfile.DoesNotExist:
+        profile = UserProfile.objects.create(user=edit_user)
+    
+    if request.method == 'POST':
+        # Update user fields
+        edit_user.username = request.POST.get('username', edit_user.username)
+        edit_user.email = request.POST.get('email', edit_user.email)
+        edit_user.first_name = request.POST.get('first_name', edit_user.first_name)
+        edit_user.last_name = request.POST.get('last_name', edit_user.last_name)
+        edit_user.is_active = request.POST.get('is_active') == 'on'
+        
+        # Update role (only superusers can change roles)
+        role = request.POST.get('role', 'user')
+        if request.user.is_superuser:
+            if role == 'admin':
+                edit_user.is_superuser = True
+                edit_user.is_staff = True
+            elif role == 'staff':
+                edit_user.is_superuser = False
+                edit_user.is_staff = True
+            elif role == 'user':
+                edit_user.is_superuser = False
+                edit_user.is_staff = False
+        
+        edit_user.save()
+        
+        # Update profile fields
+        profile.phone = request.POST.get('phone', profile.phone)
+        profile.country = request.POST.get('country', profile.country)
+        if 'profile_photo' in request.FILES:
+            profile.profile_photo = request.FILES['profile_photo']
+        profile.save()
+        
+        # Return JSON for AJAX requests, otherwise redirect
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': True})
+        
+        messages.success(request, 'Account updated successfully.')
+        return redirect('app:view_account', user_id=user_id)
+    
+    return render(request, 'app/edit_user_account.html', {
+        'edit_user': edit_user,
+        'profile': profile,
+    })
+
+@login_required
+def delete_user_account(request, user_id):
+    """Delete user account"""
+    if not (request.user.is_superuser or request.user.is_staff):
+        return JsonResponse({'success': False, 'error': 'Permission denied'}, status=403)
+    
+    if request.user.id == user_id:
+        return JsonResponse({'success': False, 'error': 'Cannot delete your own account'}, status=400)
+    
+    try:
+        user = User.objects.get(id=user_id)
+        user.delete()
+        return JsonResponse({'success': True})
+    except User.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'User not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 @login_required
 def edit_account(request):

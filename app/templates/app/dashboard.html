@@ -40,6 +40,47 @@
             min-height: 100vh !important;
             width: 100% !important;
         }
+        
+        /* Dashboard Modern Styles */
+        .dashboard-main {
+            background: #f9fafb;
+        }
+        
+        /* Stat Cards Hover Effects */
+        .stat-card-modern {
+            transition: all 0.2s ease;
+        }
+        .stat-card-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Table Row Hover */
+        .request-table tbody tr:hover {
+            background-color: #f9fafb;
+        }
+        
+        /* Responsive Grid */
+        @media (max-width: 1400px) {
+            .dashboard-content > div[style*="grid-template-columns: 1fr 320px"] {
+                grid-template-columns: 1fr !important;
+            }
+            .dashboard-content > div[style*="grid-template-columns: 1fr 320px"] > div:last-child {
+                margin-top: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .dashboard-content > div[style*="grid-template-columns: repeat(4, 1fr)"] {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .dashboard-content > div[style*="grid-template-columns: repeat(4, 1fr)"] {
+                grid-template-columns: 1fr !important;
+            }
+        }
     </style>
     <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
@@ -68,64 +109,78 @@
                                     <span>Dashboard</span>
                                 </a>
                             </li>
-                            <li class="menu-item">
-                                <a href="{% url 'app:indexed_articles' %}" class="menu-link" data-tooltip="Articles">
+                            <li class="menu-item collapsible">
+                                <button class="menu-link collapsible-trigger" data-tooltip="Articles">
                                     <i data-lucide="file-text"></i>
                                     <span>Articles</span>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="{% url 'app:indexed_journals' %}" class="menu-link" data-tooltip="Journals">
-                                    <i data-lucide="book"></i>
-                                    <span>Journals</span>
-                                </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="{% url 'app:project_archive' %}" class="menu-link" data-tooltip="Projects">
-                                    <i data-lucide="folder"></i>
-                                    <span>Projects</span>
-                                </a>
-                            </li>
-                            <li class="menu-item collapsible">
-                                <button class="menu-link collapsible-trigger" data-tooltip="Submissions">
-                                    <i data-lucide="upload"></i>
-                                    <span>Submissions</span>
                                     <i data-lucide="chevron-down" class="chevron"></i>
                                 </button>
                                 <ul class="menu-sub">
-                                    <li><a href="{% url 'app:upload_article' %}" class="menu-sub-link">Upload Article</a></li>
-                                    <li><a href="{% url 'app:register_journal' %}" class="menu-sub-link">Register Journal</a></li>
-                                    <li><a href="{% url 'app:upload_project' %}" class="menu-sub-link">Upload Project</a></li>
+                                    <li><a href="{% url 'app:indexed_articles' %}" class="menu-sub-link">Articles</a></li>
+                                    <li><a href="{% url 'app:indexed_journals' %}" class="menu-sub-link">Journals</a></li>
+                                    <li><a href="{% url 'app:project_archive' %}" class="menu-sub-link">Research and project archive</a></li>
+                                    <li><a href="{% url 'app:register_journal' %}" class="menu-sub-link">Add a journal</a></li>
+                                    <li><a href="{% url 'app:upload_article' %}" class="menu-sub-link">Add an article</a></li>
+                                    <li><a href="{% url 'app:upload_project' %}" class="menu-sub-link">Add project archive</a></li>
                                 </ul>
                             </li>
-                            <li class="menu-item">
-                                <a href="{% url 'app:directory_researchers' %}" class="menu-link" data-tooltip="Researchers">
-                                    <i data-lucide="users"></i>
-                                    <span>Researchers</span>
-                                </a>
+                            <li class="menu-item collapsible">
+                                <button class="menu-link collapsible-trigger" data-tooltip="Documents">
+                                    <i data-lucide="file-text"></i>
+                                    <span>Documents</span>
+                                    <i data-lucide="chevron-down" class="chevron"></i>
+                                </button>
+                                <ul class="menu-sub">
+                                    <li><a href="{% url 'app:dashboard' %}" class="menu-sub-link">All Request</a></li>
+                                    <li><a href="{% url 'app:check_turnitin' %}" class="menu-sub-link">Check plagiarism</a></li>
+                                    <li><a href="{% url 'app:work_plagiarism' %}" class="menu-sub-link">Work plagiarism</a></li>
+                                    <li><a href="{% url 'app:thesis_to_article' %}" class="menu-sub-link">Thesis to article</a></li>
+                                    <li><a href="{% url 'app:thesis_to_book' %}" class="menu-sub-link">Thesis to book</a></li>
+                                    <li><a href="{% url 'app:thesis_to_book_chapter' %}" class="menu-sub-link">Thesis to book chapter</a></li>
+                                    <li><a href="{% url 'app:powerpoint_preparation' %}" class="menu-sub-link">Power point preparation</a></li>
+                                </ul>
+                            </li>
+                            <li class="menu-item collapsible">
+                                <button class="menu-link collapsible-trigger" data-tooltip="Roles Eminent personalities">
+                                    <i data-lucide="award"></i>
+                                    <span>Roles Eminent personalities</span>
+                                    <i data-lucide="chevron-down" class="chevron"></i>
+                                </button>
+                                <ul class="menu-sub">
+                                    <li><a href="{% url 'app:directory_researchers' %}" class="menu-sub-link">Directory of researchers</a></li>
+                                    <li><a href="{% url 'app:council_members' %}" class="menu-sub-link">Council members</a></li>
+                                    <li><a href="{% url 'app:team_members' %}" class="menu-sub-link">Team members</a></li>
+                                    <li><a href="{% url 'app:request_membership' %}" class="menu-sub-link">Reg Institutions</a></li>
+                                    <li><a href="{% url 'app:account_detail' %}" class="menu-sub-link">Accounts</a></li>
+                                    <li><a href="{% url 'app:sponsors' %}" class="menu-sub-link">Sponsors</a></li>
+                                </ul>
+                            </li>
+                            <li class="menu-item collapsible">
+                                <button class="menu-link collapsible-trigger" data-tooltip="News">
+                                    <i data-lucide="newspaper"></i>
+                                    <span>News</span>
+                                    <i data-lucide="chevron-down" class="chevron"></i>
+                                </button>
+                                <ul class="menu-sub">
+                                    <li><a href="{% url 'app:indexed_articles' %}" class="menu-sub-link">Published records</a></li>
+                                    <li><a href="{% url 'app:dashboard' %}" class="menu-sub-link">Write | create new blog</a></li>
+                                </ul>
                             </li>
                         </ul>
                     </div>
 
                     <div class="menu-group">
-                        <div class="menu-label">OTHERS</div>
                         <ul class="menu-list">
-                            <li class="menu-item collapsible">
-                                <button class="menu-link collapsible-trigger" data-tooltip="Services">
-                                    <i data-lucide="settings"></i>
-                                    <span>Services</span>
-                                    <i data-lucide="chevron-down" class="chevron"></i>
-                                </button>
-                                <ul class="menu-sub">
-                                    <li><a href="{% url 'app:check_turnitin' %}" class="menu-sub-link">Check Turnitin</a></li>
-                                    <li><a href="{% url 'app:work_plagiarism' %}" class="menu-sub-link">Work Plagiarism</a></li>
-                                    <li><a href="{% url 'app:thesis_to_article' %}" class="menu-sub-link">Thesis to Article</a></li>
-                                </ul>
+                            <li class="menu-item">
+                                <a href="{% url 'app:sponsors' %}" class="menu-link" data-tooltip="Payment">
+                                    <i data-lucide="credit-card"></i>
+                                    <span>Payment</span>
+                                </a>
                             </li>
                             <li class="menu-item">
-                                <a href="{% url 'app:landing' %}" class="menu-link" data-tooltip="Home">
-                                    <i data-lucide="home"></i>
-                                    <span>Home</span>
+                                <a href="{% url 'app:account_detail' %}" class="menu-link" data-tooltip="Settings">
+                                    <i data-lucide="settings"></i>
+                                    <span>Settings</span>
                                 </a>
                             </li>
                         </ul>
@@ -302,401 +357,228 @@
                     <!-- Page Header -->
                     <div class="page-header">
                         <div>
-                            <h1 class="page-title">Welcome to ScholarIndex</h1>
-                            <p class="page-subtitle">Your comprehensive academic research platform</p>
+                            <h1 class="page-title">Property details</h1>
+                            <p class="page-subtitle">Registered account: <strong>{{ total_users }}</strong> Users, Staff and Admins Inclusive</p>
                         </div>
                     </div>
 
-                    <!-- Stat Cards -->
-                    <div class="stat-cards-grid">
-                        <div class="stat-card">
-                            <div class="stat-card-content">
-                                <div>
-                                    <p class="stat-card-title">Indexed Articles</p>
-                                    <h3 class="stat-card-value">3,712</h3>
-                                    <div class="stat-card-change positive">
-                                        <i data-lucide="arrow-up"></i>
-                                        <span>12.5%</span>
-                                    </div>
-                                </div>
-                                <div class="stat-card-icon">
-                                    <i data-lucide="file-text"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-card-content">
-                                <div>
-                                    <p class="stat-card-title">Archived Projects</p>
-                                    <h3 class="stat-card-value">1,337</h3>
-                                    <div class="stat-card-change positive">
-                                        <i data-lucide="arrow-up"></i>
-                                        <span>8.2%</span>
-                                    </div>
-                                </div>
-                                <div class="stat-card-icon">
-                                    <i data-lucide="folder"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-card-content">
-                                <div>
-                                    <p class="stat-card-title">Indexed Journals</p>
-                                    <h3 class="stat-card-value">23</h3>
-                                    <div class="stat-card-change positive">
-                                        <i data-lucide="arrow-up"></i>
-                                        <span>5.1%</span>
-                                    </div>
-                                </div>
-                                <div class="stat-card-icon">
-                                    <i data-lucide="book"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-card-content">
-                                <div>
-                                    <p class="stat-card-title">Registered Users</p>
-                                    <h3 class="stat-card-value">205</h3>
-                                    <div class="stat-card-change positive">
-                                        <i data-lucide="arrow-up"></i>
-                                        <span>15.3%</span>
-                                    </div>
-                                </div>
-                                <div class="stat-card-icon">
-                                    <i data-lucide="users"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-card-content">
-                                <div>
-                                    <p class="stat-card-title">Visits (24hrs)</p>
-                                    <h3 class="stat-card-value">100</h3>
-                                    <div class="stat-card-change positive">
-                                        <i data-lucide="arrow-up"></i>
-                                        <span>22.4%</span>
-                                    </div>
-                                </div>
-                                <div class="stat-card-icon">
-                                    <i data-lucide="activity"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-card-content">
-                                <div>
-                                    <p class="stat-card-title">Total Visits</p>
-                                    <h3 class="stat-card-value">507,295</h3>
-                                    <div class="stat-card-change positive">
-                                        <i data-lucide="arrow-up"></i>
-                                        <span>18.7%</span>
-                                    </div>
-                                </div>
-                                <div class="stat-card-icon">
-                                    <i data-lucide="trending-up"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Featured Articles Section -->
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-header-content">
-                                <h3 class="card-title">Featured Articles</h3>
-                                <a href="{% url 'app:indexed_articles' %}" class="link-button">View all</a>
-                            </div>
-                        </div>
-                        <div class="card-content">
-                            <div class="articles-grid">
-                                <div class="article-card">
-                                    <div class="article-image">
-                                        <i data-lucide="file-text"></i>
-                                    </div>
-                                    <div class="article-content">
-                                        <div class="article-badge">Medicine</div>
-                                        <h4 class="article-title">Machine Learning Applications in Healthcare Diagnosis</h4>
-                                        <p class="article-author">Dr. Sarah Martinez, Prof. James Park</p>
-                                        <div class="article-meta">
-                                            <span class="article-meta-item">
-                                                <i data-lucide="message-circle"></i>
-                                                234 citations
-                                            </span>
-                                            <span class="article-meta-item">
-                                                <i data-lucide="calendar"></i>
-                                                2024
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="article-card">
-                                    <div class="article-image">
-                                        <i data-lucide="file-text"></i>
-                                    </div>
-                                    <div class="article-content">
-                                        <div class="article-badge">Technology</div>
-                                        <h4 class="article-title">Quantum Computing: Breakthroughs in Drug Discovery</h4>
-                                        <p class="article-author">Dr. Michael Chen, Dr. Emily Liu</p>
-                                        <div class="article-meta">
-                                            <span class="article-meta-item">
-                                                <i data-lucide="message-circle"></i>
-                                                189 citations
-                                            </span>
-                                            <span class="article-meta-item">
-                                                <i data-lucide="calendar"></i>
-                                                2024
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="article-card">
-                                    <div class="article-image">
-                                        <i data-lucide="file-text"></i>
-                                    </div>
-                                    <div class="article-content">
-                                        <div class="article-badge">Environmental</div>
-                                        <h4 class="article-title">Climate Change Impact on Ocean Currents</h4>
-                                        <p class="article-author">Prof. Emma Johnson, Dr. Robert Kim</p>
-                                        <div class="article-meta">
-                                            <span class="article-meta-item">
-                                                <i data-lucide="message-circle"></i>
-                                                312 citations
-                                            </span>
-                                            <span class="article-meta-item">
-                                                <i data-lucide="calendar"></i>
-                                                2024
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Two Column Layout -->
-                    <div class="charts-grid">
-                        <!-- Recent Publications -->
-                        <div class="chart-card large">
-                            <div class="chart-header">
-                                <div>
-                                    <h3 class="chart-title">Recent Publications</h3>
-                                    <p class="chart-subtitle">Latest articles and research papers</p>
-                                </div>
-                                <a href="{% url 'app:indexed_articles' %}" class="link-button">See all</a>
-                            </div>
-                            <div class="chart-content">
-                                <div class="publications-list">
-                                    <div class="publication-item">
-                                        <div class="publication-icon">
-                                            <i data-lucide="file-text"></i>
-                                        </div>
-                                        <div class="publication-details">
-                                            <h4 class="publication-title">Neuroplasticity in Adult Brain Development</h4>
-                                            <p class="publication-info">Prof. Maria González • Neuroscience • 2024</p>
-                                            <div class="publication-stats">
-                                                <span><i data-lucide="message-circle"></i> 312 citations</span>
-                                                <span><i data-lucide="eye"></i> 1.2K views</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="publication-item">
-                                        <div class="publication-icon">
-                                            <i data-lucide="file-text"></i>
-                                        </div>
-                                        <div class="publication-details">
-                                            <h4 class="publication-title">CRISPR Gene Editing: Therapeutic Applications</h4>
-                                            <p class="publication-info">Dr. Emily Liu • Biotechnology • 2024</p>
-                                            <div class="publication-stats">
-                                                <span><i data-lucide="message-circle"></i> 278 citations</span>
-                                                <span><i data-lucide="eye"></i> 980 views</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="publication-item">
-                                        <div class="publication-icon">
-                                            <i data-lucide="file-text"></i>
-                                        </div>
-                                        <div class="publication-details">
-                                            <h4 class="publication-title">Global Warming Impact on Marine Ecosystems</h4>
-                                            <p class="publication-info">Dr. Michael Chen • Climate Science • 2024</p>
-                                            <div class="publication-stats">
-                                                <span><i data-lucide="message-circle"></i> 421 citations</span>
-                                                <span><i data-lucide="eye"></i> 1.5K views</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="publication-item">
-                                        <div class="publication-icon">
-                                            <i data-lucide="file-text"></i>
-                                        </div>
-                                        <div class="publication-details">
-                                            <h4 class="publication-title">Deep Learning Models for Medical Diagnosis</h4>
-                                            <p class="publication-info">Dr. Alex Thompson • AI • 2024</p>
-                                            <div class="publication-stats">
-                                                <span><i data-lucide="message-circle"></i> 567 citations</span>
-                                                <span><i data-lucide="eye"></i> 2.1K views</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Featured Researchers -->
-                        <div class="chart-card">
-                            <div class="chart-header">
-                                <div>
-                                    <h3 class="chart-title">Featured Researchers</h3>
-                                    <p class="chart-subtitle">Top contributors this month</p>
-                                </div>
-                                <a href="{% url 'app:directory_researchers' %}" class="link-button">View all</a>
-                            </div>
-                            <div class="chart-content">
-                                <div class="researchers-list">
-                                    <div class="researcher-item">
-                                        <div class="researcher-avatar">SM</div>
-                                        <div class="researcher-info">
-                                            <h4 class="researcher-name">Dr. Sarah Martinez</h4>
-                                            <p class="researcher-title">Stanford University</p>
-                                            <div class="researcher-stats">
-                                                <span>45 papers</span>
-                                                <span>8.9K citations</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="researcher-item">
-                                        <div class="researcher-avatar">JP</div>
-                                        <div class="researcher-info">
-                                            <h4 class="researcher-name">Prof. James Park</h4>
-                                            <p class="researcher-title">MIT</p>
-                                            <div class="researcher-stats">
-                                                <span>32 papers</span>
-                                                <span>6.2K citations</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="researcher-item">
-                                        <div class="researcher-avatar">MC</div>
-                                        <div class="researcher-info">
-                                            <h4 class="researcher-name">Dr. Michael Chen</h4>
-                                            <p class="researcher-title">Harvard University</p>
-                                            <div class="researcher-stats">
-                                                <span>28 papers</span>
-                                                <span>4.5K citations</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="researcher-item">
-                                        <div class="researcher-avatar">EL</div>
-                                        <div class="researcher-info">
-                                            <h4 class="researcher-name">Dr. Emily Liu</h4>
-                                            <p class="researcher-title">UC Berkeley</p>
-                                            <div class="researcher-stats">
-                                                <span>38 papers</span>
-                                                <span>5.8K citations</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Actions & News -->
-                    <div class="charts-grid">
-                        <!-- Quick Actions -->
-                        <div class="chart-card">
-                            <div class="chart-header">
-                                <div>
-                                    <h3 class="chart-title">Quick Actions</h3>
-                                    <p class="chart-subtitle">Get started with common tasks</p>
-                                </div>
-                            </div>
-                            <div class="chart-content">
-                                <div class="quick-actions-grid">
-                                    <a href="{% url 'app:upload_article' %}" class="quick-action-item">
-                                        <div class="quick-action-icon">
-                                            <i data-lucide="upload"></i>
+                    <!-- Main Content Layout -->
+                    <div style="display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <!-- Left Column -->
+                        <div>
+                            <!-- Stat Cards -->
+                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                                <div class="stat-card-modern" style="background: white; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.25rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer;">
+                                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                        <div style="width: 2.5rem; height: 2.5rem; border-radius: 0.375rem; background: #f3f4f6; display: flex; align-items: center; justify-content: center;">
+                                            <i data-lucide="file-text" style="width: 1.25rem; height: 1.25rem; color: #3b82f6;"></i>
                                         </div>
                                         <div>
-                                            <h4 class="quick-action-title">Upload Article</h4>
-                                            <p class="quick-action-desc">Submit your research</p>
+                                            <p style="font-size: 0.75rem; color: #6b7280; margin: 0 0 0.25rem 0;">Indexed Articles</p>
+                                            <h3 style="font-size: 1.5rem; font-weight: 700; margin: 0; color: #111827;">{{ articles_count|default:"3,712" }}</h3>
                                         </div>
+                                    </div>
+                                    <a href="{% url 'app:indexed_articles' %}" style="color: #6b7280; text-decoration: none;">
+                                        <i data-lucide="external-link" style="width: 1rem; height: 1rem;"></i>
                                     </a>
-                                    <a href="{% url 'app:register_journal' %}" class="quick-action-item">
-                                        <div class="quick-action-icon">
-                                            <i data-lucide="book"></i>
+                                </div>
+                                <div class="stat-card-modern" style="background: white; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.25rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer;">
+                                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                        <div style="width: 2.5rem; height: 2.5rem; border-radius: 0.375rem; background: #f3f4f6; display: flex; align-items: center; justify-content: center;">
+                                            <i data-lucide="layers" style="width: 1.25rem; height: 1.25rem; color: #3b82f6;"></i>
                                         </div>
                                         <div>
-                                            <h4 class="quick-action-title">Register Journal</h4>
-                                            <p class="quick-action-desc">Add a new journal</p>
+                                            <p style="font-size: 0.75rem; color: #6b7280; margin: 0 0 0.25rem 0;">Indexed Journals</p>
+                                            <h3 style="font-size: 1.5rem; font-weight: 700; margin: 0; color: #111827;">{{ journals_count|default:"23" }}</h3>
                                         </div>
+                                    </div>
+                                    <a href="{% url 'app:indexed_journals' %}" style="color: #6b7280; text-decoration: none;">
+                                        <i data-lucide="external-link" style="width: 1rem; height: 1rem;"></i>
                                     </a>
-                                    <a href="{% url 'app:upload_project' %}" class="quick-action-item">
-                                        <div class="quick-action-icon">
-                                            <i data-lucide="folder"></i>
+                                </div>
+                                <div class="stat-card-modern" style="background: white; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.25rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer;">
+                                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                        <div style="width: 2.5rem; height: 2.5rem; border-radius: 0.375rem; background: #f3f4f6; display: flex; align-items: center; justify-content: center;">
+                                            <i data-lucide="folder" style="width: 1.25rem; height: 1.25rem; color: #3b82f6;"></i>
                                         </div>
                                         <div>
-                                            <h4 class="quick-action-title">Upload Project</h4>
-                                            <p class="quick-action-desc">Archive your project</p>
+                                            <p style="font-size: 0.75rem; color: #6b7280; margin: 0 0 0.25rem 0;">Archived projects</p>
+                                            <h3 style="font-size: 1.5rem; font-weight: 700; margin: 0; color: #111827;">{{ projects_count|default:"1,337" }}</h3>
                                         </div>
+                                    </div>
+                                    <a href="{% url 'app:project_archive' %}" style="color: #6b7280; text-decoration: none;">
+                                        <i data-lucide="external-link" style="width: 1rem; height: 1rem;"></i>
                                     </a>
-                                    <a href="{% url 'app:check_turnitin' %}" class="quick-action-item">
-                                        <div class="quick-action-icon">
-                                            <i data-lucide="shield-check"></i>
+                                </div>
+                                <div class="stat-card-modern" style="background: white; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.25rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer;">
+                                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                        <div style="width: 2.5rem; height: 2.5rem; border-radius: 0.375rem; background: #f3f4f6; display: flex; align-items: center; justify-content: center;">
+                                            <i data-lucide="check-square" style="width: 1.25rem; height: 1.25rem; color: #3b82f6;"></i>
                                         </div>
                                         <div>
-                                            <h4 class="quick-action-title">Check Turnitin</h4>
-                                            <p class="quick-action-desc">Verify originality</p>
+                                            <p style="font-size: 0.75rem; color: #6b7280; margin: 0 0 0.25rem 0;">Pending requests</p>
+                                            <h3 style="font-size: 1.5rem; font-weight: 700; margin: 0; color: #111827;">{{ pending_requests_count|default:"304" }}</h3>
                                         </div>
+                                    </div>
+                                    <a href="#" style="color: #6b7280; text-decoration: none;">
+                                        <i data-lucide="external-link" style="width: 1rem; height: 1rem;"></i>
                                     </a>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- News & Announcements -->
-                        <div class="chart-card">
-                            <div class="chart-header">
-                                <div>
-                                    <h3 class="chart-title">News & Announcements</h3>
-                                    <p class="chart-subtitle">Latest updates and news</p>
+                            <!-- Statistical Analysis Section -->
+                            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                <button style="background: #3b82f6; color: white; border: none; border-radius: 0.375rem; padding: 0.5rem 1rem; font-weight: 500; cursor: pointer; font-size: 0.8125rem; margin-bottom: 1rem; transition: background-color 0.2s;" onmouseover="this.style.background='#2563eb';" onmouseout="this.style.background='#3b82f6';">
+                                    Statistical Analysis
+                                </button>
+                                
+                                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0;">
+                                        <span style="font-size: 0.8125rem; color: #374151;">Registered Members</span>
+                                        <strong style="font-size: 0.8125rem; color: #111827;">{{ registered_members_count|default:"23" }} Accounts</strong>
+                                    </div>
+                                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0; border-top: 1px solid #f3f4f6;">
+                                        <span style="font-size: 0.8125rem; color: #374151;">Directory of Researchers</span>
+                                        <strong style="font-size: 0.8125rem; color: #111827;">{{ directory_researchers_count|default:"1337" }} Accounts</strong>
+                                    </div>
+                                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0; border-top: 1px solid #f3f4f6;">
+                                        <span style="font-size: 0.8125rem; color: #374151;">Eminent personalities</span>
+                                        <strong style="font-size: 0.8125rem; color: #111827;">{{ eminent_personalities_count|default:"304" }} Accounts</strong>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="chart-content">
-                                <div class="announcements-list">
-                                    <div class="announcement-item">
-                                        <div class="announcement-icon">
-                                            <i data-lucide="megaphone"></i>
-                                        </div>
-                                        <div class="announcement-content">
-                                            <h4 class="announcement-title">New Submission Guidelines</h4>
-                                            <p class="announcement-text">Updated guidelines for article submissions are now available.</p>
-                                            <span class="announcement-date">2 days ago</span>
-                                        </div>
-                                    </div>
-                                    <div class="announcement-item">
-                                        <div class="announcement-icon">
-                                            <i data-lucide="star"></i>
-                                        </div>
-                                        <div class="announcement-content">
-                                            <h4 class="announcement-title">Hall of Fame 2024</h4>
-                                            <p class="announcement-text">Congratulations to our top researchers this year!</p>
-                                            <span class="announcement-date">1 week ago</span>
-                                        </div>
-                                    </div>
-                                    <div class="announcement-item">
-                                        <div class="announcement-icon">
-                                            <i data-lucide="zap"></i>
-                                        </div>
-                                        <div class="announcement-content">
-                                            <h4 class="announcement-title">Platform Updates</h4>
-                                            <p class="announcement-text">New features and improvements have been deployed.</p>
-                                            <span class="announcement-date">2 weeks ago</span>
-                                        </div>
-                                    </div>
+
+                            <!-- Latest Requests -->
+                            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+                                    <h3 style="font-size: 1.125rem; font-weight: 600; margin: 0; color: #111827;">Latest requests</h3>
+                                    <a href="#" style="font-size: 0.875rem; color: #3b82f6; text-decoration: none; font-weight: 500;">LIST ALL</a>
                                 </div>
+                                <div style="overflow-x: auto;">
+                                    <table class="request-table" style="width: 100%; border-collapse: collapse;">
+                                        <thead>
+                                            <tr style="border-bottom: 1px solid #e5e7eb;">
+                                                <th style="text-align: left; padding: 0.75rem; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; width: 3rem;">#</th>
+                                                <th style="text-align: left; padding: 0.75rem; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; width: 3rem;"></th>
+                                                <th style="text-align: left; padding: 0.75rem; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase;">ID</th>
+                                                <th style="text-align: left; padding: 0.75rem; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase;">Email</th>
+                                                <th style="text-align: left; padding: 0.75rem; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase;">Code</th>
+                                                <th style="text-align: left; padding: 0.75rem; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase;">Type</th>
+                                                <th style="text-align: left; padding: 0.75rem; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase;">Attachment</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for request in latest_requests|slice:":10" %}
+                                            <tr style="border-bottom: 1px solid #f3f4f6; transition: background-color 0.2s;">
+                                                <td style="padding: 1rem 0.75rem; font-size: 0.875rem; color: #6b7280;">{{ forloop.counter }}</td>
+                                                <td style="padding: 1rem 0.75rem;">
+                                                    <button style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0.25rem;">
+                                                        <i data-lucide="more-vertical" style="width: 1rem; height: 1rem;"></i>
+                                                    </button>
+                                                </td>
+                                                <td style="padding: 1rem 0.75rem; font-size: 0.875rem; color: #111827; font-family: monospace; letter-spacing: 0.05em;">{{ request.id|stringformat:"d"|truncatechars:12 }}</td>
+                                                <td style="padding: 1rem 0.75rem; font-size: 0.875rem; color: #111827;">{{ request.email|default:"N/A"|truncatechars:30 }}</td>
+                                                <td style="padding: 1rem 0.75rem; font-size: 0.875rem; color: #111827; font-family: monospace; letter-spacing: 0.05em;">{{ request.id|stringformat:"d"|truncatechars:12 }}</td>
+                                                <td style="padding: 1rem 0.75rem;">
+                                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                        {% if request.type == 'check_plagiarism' %}
+                                                        <div style="width: 0.5rem; height: 0.5rem; border-radius: 50%; background: #9333ea;"></div>
+                                                        <span style="font-size: 0.875rem; color: #111827;">check plagiarism</span>
+                                                        {% elif request.type == 'work_plagiarism' %}
+                                                        <div style="width: 0.5rem; height: 0.5rem; border-radius: 50%; background: #22c55e;"></div>
+                                                        <span style="font-size: 0.875rem; color: #111827;">work plagiarism</span>
+                                                        {% elif request.type == 'thesis_to_article' %}
+                                                        <div style="width: 0.5rem; height: 0.5rem; border-radius: 50%; background: #eab308;"></div>
+                                                        <span style="font-size: 0.875rem; color: #111827;">thesis to article</span>
+                                                        {% elif request.type == 'thesis_to_book' %}
+                                                        <div style="width: 0.5rem; height: 0.5rem; border-radius: 50%; background: #1e40af;"></div>
+                                                        <span style="font-size: 0.875rem; color: #111827;">thesis to book</span>
+                                                        {% elif request.type == 'thesis_to_book_chapter' %}
+                                                        <div style="width: 0.5rem; height: 0.5rem; border-radius: 50%; background: #000000;"></div>
+                                                        <span style="font-size: 0.875rem; color: #111827;">thesis to book chapter</span>
+                                                        {% elif request.type == 'powerpoint_preparation' %}
+                                                        <div style="width: 0.5rem; height: 0.5rem; border-radius: 50%; background: #f97316;"></div>
+                                                        <span style="font-size: 0.875rem; color: #111827;">power point preparation</span>
+                                                        {% endif %}
+                                                    </div>
+                                                </td>
+                                                <td style="padding: 1rem 0.75rem;">
+                                                    {% if request.document %}
+                                                    <a href="{{ request.document.url }}" style="font-size: 0.875rem; color: #3b82f6; text-decoration: none;">Attachment</a>
+                                                    {% else %}
+                                                    <span style="font-size: 0.875rem; color: #9ca3af;">-</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% empty %}
+                                            <tr>
+                                                <td colspan="6" style="padding: 2rem; text-align: center; color: #6b7280; font-size: 0.875rem;">No requests found</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Sidebar -->
+                        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                            <!-- Recent Account -->
+                            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                <h3 style="font-size: 1rem; font-weight: 600; margin: 0 0 1.25rem 0; color: #111827;">Recent account</h3>
+                                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                    {% for user in recent_users|slice:":5" %}
+                                    <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 1rem; border-bottom: 1px solid #f3f4f6;">
+                                        <div style="display: flex; align-items: center; gap: 0.75rem; flex: 1;">
+                                            <div style="width: 2.5rem; height: 2.5rem; border-radius: 50%; background: #3b82f6; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.875rem; flex-shrink: 0;">
+                                                {{ user.first_name|first|default:user.username|first|upper }}{{ user.last_name|first|default:""|upper }}
+                                            </div>
+                                            <div style="flex: 1; min-width: 0;">
+                                                <p style="font-size: 0.875rem; font-weight: 500; margin: 0 0 0.25rem 0; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ user.get_full_name|default:user.username }}</p>
+                                                <p style="font-size: 0.75rem; color: #6b7280; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ user.email|default:"No email" }}</p>
+                                            </div>
+                                        </div>
+                                        <a href="{% url 'app:view_account' user.id %}" style="color: #6b7280; text-decoration: none; margin-left: 0.5rem; flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem; border-radius: 0.25rem; transition: all 0.2s ease;" onmouseover="this.style.backgroundColor='#f3f4f6'; this.style.color='#3b82f6';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#6b7280';">
+                                            <i data-lucide="eye" style="width: 1rem; height: 1rem;"></i>
+                                        </a>
+                                    </div>
+                                    {% empty %}
+                                    <p style="font-size: 0.875rem; color: #6b7280; text-align: center; padding: 1rem 0;">No recent accounts</p>
+                                    {% endfor %}
+                                </div>
+                                <a href="{% url 'app:list_accounts' %}" style="display: block; text-align: center; margin-top: 1rem; font-size: 0.875rem; color: #3b82f6; text-decoration: none; font-weight: 500; transition: color 0.2s ease;" onmouseover="this.style.color='#2563eb';" onmouseout="this.style.color='#3b82f6';">List more</a>
+                            </div>
+
+                            <!-- Recent Blog -->
+                            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                <h3 style="font-size: 1rem; font-weight: 600; margin: 0 0 1.25rem 0; color: #111827;">Recent blog</h3>
+                                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                    {% for blog in recent_blogs|slice:":5" %}
+                                    <div style="display: flex; gap: 0.75rem; padding-bottom: 1rem; border-bottom: 1px solid #f3f4f6;">
+                                        <div style="width: 4rem; height: 4rem; border-radius: 0.375rem; background: #f3f4f6; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                                            <i data-lucide="file-text" style="width: 1.5rem; height: 1.5rem; color: #6b7280;"></i>
+                                        </div>
+                                        <div style="flex: 1; min-width: 0;">
+                                            <h4 style="font-size: 0.8125rem; font-weight: 500; margin: 0 0 0.375rem 0; color: #111827; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ blog.title|truncatewords:10 }}</h4>
+                                            <p style="font-size: 0.75rem; color: #6b7280; margin: 0;">
+                                                {% if blog.created_at %}
+                                                    {% now "Y" as current_year %}
+                                                    {% if blog.created_at|date:"Y" == current_year %}
+                                                        {{ blog.created_at|timesince }} ago
+                                                    {% else %}
+                                                        {{ blog.created_at|date:"Y"|add:"-1"|add:"-1"|add:"-1" }} years ago
+                                                    {% endif %}
+                                                {% else %}
+                                                    3 years ago
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <p style="font-size: 0.875rem; color: #6b7280; text-align: center; padding: 1rem 0;">No recent blogs</p>
+                                    {% endfor %}
+                                </div>
+                                <a href="#" style="display: block; text-align: center; margin-top: 1rem; font-size: 0.875rem; color: #3b82f6; text-decoration: none; font-weight: 500;">List more</a>
                             </div>
                         </div>
                     </div>
@@ -706,7 +588,12 @@
     </div>
 
     <script src="{% static 'app/js/dashboard.js' %}"></script>
-    
+    <script>
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    </script>
 </body>
 </html>
 

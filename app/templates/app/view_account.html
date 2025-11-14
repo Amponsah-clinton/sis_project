@@ -1,0 +1,601 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}View Accounts - ScholarIndex{% endblock %}
+
+{% block extra_css %}
+<style>
+  .view-account-page {
+    min-height: calc(100vh - 5rem);
+    background-color: #f9fafb;
+    padding: 2rem 1rem;
+  }
+
+  .view-account-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    overflow: hidden;
+  }
+
+  .view-account-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #e5e7eb;
+    background: white;
+  }
+
+  .view-account-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+  }
+
+  .view-account-content {
+    padding: 0;
+    overflow-x: auto;
+  }
+
+  .account-details-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .account-detail-row {
+    transition: background-color 0.2s ease;
+  }
+
+  .account-detail-row:hover {
+    background-color: #f3f4f6;
+  }
+
+  .account-detail-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    padding: 1rem 1.5rem;
+    background-color: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    width: 200px;
+    vertical-align: top;
+  }
+
+  .account-detail-value {
+    font-size: 0.875rem;
+    color: #111827;
+    word-break: break-word;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: top;
+  }
+
+  .account-detail-row:last-child .account-detail-label,
+  .account-detail-row:last-child .account-detail-value {
+    border-bottom: none;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+  }
+
+  .status-badge.active {
+    background-color: #d1fae5;
+    color: #065f46;
+  }
+
+  .status-badge.inactive {
+    background-color: #fee2e2;
+    color: #991b1b;
+  }
+
+  .account-actions {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid #e5e7eb;
+    background: white;
+    justify-content: flex-end;
+  }
+
+  .action-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: 1.5px solid;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  .action-button.export {
+    background: white;
+    color: #f97316;
+    border-color: #f97316;
+    position: relative;
+  }
+
+  .action-button.export:hover {
+    background: #f97316;
+    color: white;
+    border-color: #f97316;
+    box-shadow: 0 4px 6px rgba(249, 115, 22, 0.15);
+    transform: translateY(-1px);
+  }
+
+  .export-dropdown {
+    position: absolute;
+    bottom: calc(100% + 0.5rem);
+    right: 0;
+    background: white;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    min-width: 180px;
+    z-index: 50;
+    display: none;
+    overflow: hidden;
+  }
+
+  .export-dropdown.show {
+    display: block;
+  }
+
+  .export-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-decoration: none;
+    color: #111827;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-size: 0.875rem;
+  }
+
+  .export-option:hover {
+    background-color: #f9fafb;
+  }
+
+  .export-option-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.75rem;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .export-option-icon.print {
+    background: #60a5fa;
+  }
+
+  .export-option-icon.pdf {
+    background: #ef4444;
+  }
+
+  .export-option-icon.word {
+    background: #2563eb;
+  }
+
+  .export-option-icon.csv {
+    background: #22c55e;
+  }
+
+  .export-option-icon.excel {
+    background: #16a34a;
+  }
+
+  .action-button.edit {
+    background: white;
+    color: #3b82f6;
+    border-color: #3b82f6;
+  }
+
+  .action-button.edit:hover {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+    box-shadow: 0 4px 6px rgba(59, 130, 246, 0.15);
+    transform: translateY(-1px);
+  }
+
+  .action-button.delete {
+    background: white;
+    color: #ef4444;
+    border-color: #ef4444;
+  }
+
+  .action-button.delete:hover {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+    box-shadow: 0 4px 6px rgba(239, 68, 68, 0.15);
+    transform: translateY(-1px);
+  }
+
+  .action-button i {
+    width: 1.125rem;
+    height: 1.125rem;
+    stroke-width: 2;
+  }
+
+  .role-toggle {
+    position: relative;
+    display: inline-block;
+    width: 3rem;
+    height: 1.5rem;
+    cursor: pointer;
+  }
+
+  .role-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #d1d5db;
+    transition: 0.3s;
+    border-radius: 1.5rem;
+  }
+
+  .toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 1.125rem;
+    width: 1.125rem;
+    left: 0.1875rem;
+    bottom: 0.1875rem;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+  }
+
+  .role-toggle input:checked + .toggle-slider {
+    background-color: #3b82f6;
+  }
+
+  .role-toggle input:checked + .toggle-slider:before {
+    transform: translateX(1.5rem);
+  }
+
+  .role-toggle input:disabled + .toggle-slider {
+    background-color: #e5e7eb;
+    cursor: not-allowed;
+  }
+
+  .role-toggle input:disabled + .toggle-slider:before {
+    background-color: #9ca3af;
+  }
+
+  @media (max-width: 768px) {
+    .account-detail-row {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+
+    .account-actions {
+      flex-direction: column;
+    }
+
+    .action-button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="view-account-page">
+  <div class="view-account-container">
+    <div class="view-account-header">
+      <h1 class="view-account-title">View Accounts</h1>
+    </div>
+
+    <div class="view-account-content">
+      <table class="account-details-table">
+        <tbody>
+          <tr class="account-detail-row">
+            <td class="account-detail-label">Id</td>
+            <td class="account-detail-value">{{ view_user.id }}</td>
+          </tr>
+
+          <tr class="account-detail-row">
+            <td class="account-detail-label">Name</td>
+            <td class="account-detail-value">{{ view_user.get_full_name|default:view_user.username }}</td>
+          </tr>
+
+          <tr class="account-detail-row">
+            <td class="account-detail-label">Email</td>
+            <td class="account-detail-value">{{ view_user.email|default:"N/A" }}</td>
+          </tr>
+
+          <tr class="account-detail-row">
+            <td class="account-detail-label">Phone</td>
+            <td class="account-detail-value">{{ profile.phone|default:"N/A" }}</td>
+          </tr>
+
+          <tr class="account-detail-row">
+            <td class="account-detail-label">Country</td>
+            <td class="account-detail-value">{{ profile.country|default:"N/A" }}</td>
+          </tr>
+
+          <tr class="account-detail-row">
+            <td class="account-detail-label">Status</td>
+            <td class="account-detail-value">
+              <span class="status-badge {{ status }}">{{ status }}</span>
+            </td>
+          </tr>
+
+          <tr class="account-detail-row">
+            <td class="account-detail-label">Role</td>
+            <td class="account-detail-value">{{ role }}</td>
+          </tr>
+
+          <tr class="account-detail-row">
+            <td class="account-detail-label">Doc Counts</td>
+            <td class="account-detail-value">{{ doc_counts }}</td>
+          </tr>
+
+          <tr class="account-detail-row">
+            <td class="account-detail-label">Itp</td>
+            <td class="account-detail-value">0.5</td>
+          </tr>
+
+          <tr class="account-detail-row">
+            <td class="account-detail-label">Ctrl</td>
+            <td class="account-detail-value">97</td>
+          </tr>
+
+          <tr class="account-detail-row">
+            <td class="account-detail-label">Profile Photo</td>
+            <td class="account-detail-value">
+              {% if profile.profile_photo %}
+                {{ profile.profile_photo.url }}
+              {% else %}
+                null
+              {% endif %}
+            </td>
+          </tr>
+
+          <tr class="account-detail-row">
+            <td class="account-detail-label">Position</td>
+            <td class="account-detail-value">{{ position }}</td>
+          </tr>
+
+          <tr class="account-detail-row">
+            <td class="account-detail-label">Organization Url</td>
+            <td class="account-detail-value">{{ organization_url|default:"null" }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Role Management Section -->
+      {% if request.user.is_superuser %}
+      <div style="padding: 1.5rem 2rem; border-top: 1px solid #e5e7eb; background: #f9fafb;">
+        <h3 style="font-size: 1rem; font-weight: 600; margin: 0 0 1rem 0; color: #111827;">Role Management</h3>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <label style="font-size: 0.875rem; font-weight: 500; color: #111827; cursor: pointer;">Admin Role</label>
+            <label class="role-toggle">
+              <input type="checkbox" id="adminRole" {% if view_user.is_superuser %}checked{% endif %} onchange="updateRole('admin', this.checked)">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <label style="font-size: 0.875rem; font-weight: 500; color: #111827; cursor: pointer;">Staff Role</label>
+            <label class="role-toggle">
+              <input type="checkbox" id="staffRole" {% if view_user.is_staff %}checked{% endif %} onchange="updateRole('staff', this.checked)">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <label style="font-size: 0.875rem; font-weight: 500; color: #111827; cursor: pointer;">User Role</label>
+            <label class="role-toggle">
+              <input type="checkbox" id="userRole" {% if not view_user.is_superuser and not view_user.is_staff %}checked{% endif %} onchange="updateRole('user', this.checked)" {% if view_user.is_superuser or view_user.is_staff %}disabled{% endif %}>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="account-actions">
+      <div style="position: relative;">
+        <button class="action-button export" onclick="toggleExportDropdown(event)">
+          <i data-lucide="download"></i>
+          Export
+        </button>
+        <div class="export-dropdown" id="exportDropdown">
+          <a href="{% url 'app:export_account' view_user.id 'print' %}" class="export-option" target="_blank" onclick="closeDropdown()">
+            <div class="export-option-icon print">
+              <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+              </svg>
+            </div>
+            <span>PRINT</span>
+          </a>
+          <a href="{% url 'app:export_account' view_user.id 'pdf' %}" class="export-option" onclick="closeDropdown()">
+            <div class="export-option-icon pdf">PDF</div>
+            <span>PDF</span>
+          </a>
+          <a href="{% url 'app:export_account' view_user.id 'word' %}" class="export-option" onclick="closeDropdown()">
+            <div class="export-option-icon word">W</div>
+            <span>WORD</span>
+          </a>
+          <a href="{% url 'app:export_account' view_user.id 'csv' %}" class="export-option" onclick="closeDropdown()">
+            <div class="export-option-icon csv">CSV</div>
+            <span>CSV</span>
+          </a>
+          <a href="{% url 'app:export_account' view_user.id 'excel' %}" class="export-option" onclick="closeDropdown()">
+            <div class="export-option-icon excel">X</div>
+            <span>EXCEL</span>
+          </a>
+        </div>
+      </div>
+      <a href="{% url 'app:edit_user_account' view_user.id %}" class="action-button edit">
+        <i data-lucide="pencil"></i>
+        Edit
+      </a>
+      <button class="action-button delete" onclick="deleteAccount({{ view_user.id }})">
+        <i data-lucide="x"></i>
+        Delete
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+  // Initialize Lucide icons after script loads
+  function initLucideIcons() {
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    } else {
+      // Retry if script hasn't loaded yet
+      setTimeout(initLucideIcons, 100);
+    }
+  }
+  
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLucideIcons);
+  } else {
+    initLucideIcons();
+  }
+
+  function toggleExportDropdown(event) {
+    event.stopPropagation();
+    const dropdown = document.getElementById('exportDropdown');
+    dropdown.classList.toggle('show');
+  }
+
+  function closeDropdown() {
+    const dropdown = document.getElementById('exportDropdown');
+    dropdown.classList.remove('show');
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('exportDropdown');
+    const button = event.target.closest('.action-button.export');
+    if (!button && !dropdown.contains(event.target)) {
+      dropdown.classList.remove('show');
+    }
+  });
+
+  function updateRole(roleType, isChecked) {
+    const userId = {{ view_user.id }};
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{{ csrf_token }}';
+    
+    // Update UI immediately for better UX
+    if (roleType === 'admin' && isChecked) {
+      document.getElementById('staffRole').checked = false;
+      document.getElementById('userRole').checked = false;
+      document.getElementById('userRole').disabled = true;
+    } else if (roleType === 'staff' && isChecked) {
+      document.getElementById('adminRole').checked = false;
+      document.getElementById('userRole').checked = false;
+      document.getElementById('userRole').disabled = true;
+    } else if (roleType === 'user' && isChecked) {
+      document.getElementById('adminRole').checked = false;
+      document.getElementById('staffRole').checked = false;
+      document.getElementById('userRole').disabled = false;
+    }
+    
+    if (roleType === 'admin' && !isChecked) {
+      if (!document.getElementById('staffRole').checked) {
+        document.getElementById('userRole').checked = true;
+        document.getElementById('userRole').disabled = false;
+      }
+    }
+    if (roleType === 'staff' && !isChecked) {
+      if (!document.getElementById('adminRole').checked) {
+        document.getElementById('userRole').checked = true;
+        document.getElementById('userRole').disabled = false;
+      }
+    }
+    
+    fetch(`/update_user_role/${userId}/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken
+      },
+      body: JSON.stringify({
+        role_type: roleType,
+        is_active: isChecked
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (!data.success) {
+        alert('Error updating role: ' + (data.error || 'Unknown error'));
+        location.reload();
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error updating role. Please try again.');
+      location.reload();
+    });
+  }
+
+  function deleteAccount(userId) {
+    if (confirm('Are you sure you want to delete this account? This action cannot be undone.')) {
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{{ csrf_token }}';
+      
+      fetch(`/delete_user_account/${userId}/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          window.location.href = '{% url "app:list_accounts" %}';
+        } else {
+          alert('Error deleting account: ' + (data.error || 'Unknown error'));
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error deleting account. Please try again.');
+      });
+    }
+  }
+</script>
+{% endblock %}
+

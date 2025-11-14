@@ -40,6 +40,13 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('account_detail/', views.account_detail, name='account_detail'),
     path('edit_account/', views.edit_account, name='edit_account'),
+    path('view_account/<int:user_id>/', views.view_account, name='view_account'),
+    path('list_accounts/', views.list_accounts, name='list_accounts'),
+    path('get_user_data/<int:user_id>/', views.get_user_data, name='get_user_data'),
+    path('edit_user_account/<int:user_id>/', views.edit_user_account, name='edit_user_account'),
+    path('update_user_role/<int:user_id>/', views.update_user_role, name='update_user_role'),
+    path('delete_user_account/<int:user_id>/', views.delete_user_account, name='delete_user_account'),
+    path('export_account/<int:user_id>/<str:format_type>/', views.export_account, name='export_account'),
     path('change_email/', views.change_email, name='change_email'),
     path('reset_password/', views.reset_password, name='reset_password'),
 ]
