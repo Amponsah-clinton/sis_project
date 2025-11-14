@@ -5,6 +5,7 @@ from .models import (
     MembershipRequest, DirectoryApplication, HallOfFameApplication, PlagiarismCheck,
     PlagiarismWork, ThesisToArticle, ThesisToBook, ThesisToBookChapter, PowerPointPreparation
 )
+from .forms import ProjectForm
 
 # User Profile Admin
 @admin.register(UserProfile)
@@ -87,6 +88,7 @@ class ProjectContributorInline(admin.TabularInline):
 # Project Admin
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
+    form = ProjectForm
     list_display = ('project_title', 'project_type', 'category', 'institution', 'status', 'created_at')
     list_filter = ('project_type', 'status', 'category', 'created_at')
     search_fields = ('project_title', 'description', 'institution', 'category')

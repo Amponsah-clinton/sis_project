@@ -27,82 +27,71 @@
           </div>
           
           <div class="filter-content">
-            <!-- Search Filter -->
-            <div class="filter-group">
-              <label>Search Projects</label>
-              <input type="text" class="filter-input" placeholder="Search by title, institution..." id="projectSearch">
-            </div>
+            <form method="get" action="{% url 'app:project_archive' %}" id="filterForm">
+              <!-- Search Filter -->
+              <div class="filter-group">
+                <label>Search Projects</label>
+                <input type="text" class="filter-input" name="search" placeholder="Search by title, institution..." id="projectSearch" value="{{ current_search }}">
+              </div>
 
-            <!-- Category Filter -->
-            <div class="filter-group">
-              <label>Category</label>
-              <select class="filter-select" id="categoryFilter">
-                <option value="">All Categories</option>
-                <option value="research-project">Research Project</option>
-                <option value="collaboration">Collaboration</option>
-                <option value="grant-funded">Grant Funded</option>
-                <option value="institutional">Institutional</option>
-                <option value="international">International</option>
-                <option value="ongoing">Ongoing</option>
-                <option value="completed">Completed</option>
-              </select>
-            </div>
+              <!-- Category Filter -->
+              <div class="filter-group">
+                <label>Category</label>
+                <select class="filter-select" name="category" id="categoryFilter">
+                  <option value="">All Categories</option>
+                  {% for cat in categories %}
+                    <option value="{{ cat }}" {% if current_category == cat %}selected{% endif %}>{{ cat }}</option>
+                  {% endfor %}
+                </select>
+              </div>
 
-            <!-- Institution Filter -->
-            <div class="filter-group">
-              <label>Institution</label>
-              <select class="filter-select" id="institutionFilter">
-                <option value="">All Institutions</option>
-                <option value="mit">MIT</option>
-                <option value="stanford">Stanford University</option>
-                <option value="harvard">Harvard University</option>
-                <option value="oxford">Oxford University</option>
-                <option value="cambridge">Cambridge University</option>
-                <option value="eth-zurich">ETH Zurich</option>
-                <option value="nus">National University of Singapore</option>
-                <option value="tsinghua">Tsinghua University</option>
-              </select>
-            </div>
+              <!-- Institution Filter -->
+              <div class="filter-group">
+                <label>Institution</label>
+                <select class="filter-select" name="institution" id="institutionFilter">
+                  <option value="">All Institutions</option>
+                  {% for inst in institutions %}
+                    <option value="{{ inst }}" {% if current_institution == inst %}selected{% endif %}>{{ inst }}</option>
+                  {% endfor %}
+                </select>
+              </div>
 
-            <!-- Year Filter -->
-            <div class="filter-group">
-              <label>Year</label>
-              <select class="filter-select" id="yearFilter">
-                <option value="">All Years</option>
-                <option value="2024">2024</option>
-                <option value="2023">2023</option>
-                <option value="2022">2022</option>
-                <option value="2021">2021</option>
-                <option value="2020">2020</option>
-                <option value="2019">2019</option>
-                <option value="2018">2018</option>
-              </select>
-            </div>
+              <!-- Year Filter -->
+              <div class="filter-group">
+                <label>Year</label>
+                <select class="filter-select" name="year" id="yearFilter">
+                  <option value="">All Years</option>
+                  {% for year_obj in years %}
+                    <option value="{{ year_obj|date:'Y' }}" {% if current_year == year_obj|date:'Y' %}selected{% endif %}>{{ year_obj|date:'Y' }}</option>
+                  {% endfor %}
+                </select>
+              </div>
 
-            <!-- Status Filter -->
-            <div class="filter-group">
-              <label>Status</label>
-              <select class="filter-select" id="statusFilter">
-                <option value="">All Status</option>
-                <option value="active">Active</option>
-                <option value="completed">Completed</option>
-                <option value="archived">Archived</option>
-              </select>
-            </div>
+              <!-- Status Filter -->
+              <div class="filter-group">
+                <label>Status</label>
+                <select class="filter-select" name="status" id="statusFilter">
+                  <option value="">All Status</option>
+                  <option value="active" {% if current_status == 'active' %}selected{% endif %}>Active</option>
+                  <option value="completed" {% if current_status == 'completed' %}selected{% endif %}>Completed</option>
+                  <option value="archived" {% if current_status == 'archived' %}selected{% endif %}>Archived</option>
+                </select>
+              </div>
 
-            <!-- Sort By -->
-            <div class="filter-group">
-              <label>Sort By</label>
-              <select class="filter-select" id="sortFilter">
-                <option value="recent">Most Recent</option>
-                <option value="oldest">Oldest First</option>
-                <option value="title">Title (A-Z)</option>
-                <option value="funding">Funding Amount</option>
-              </select>
-            </div>
+              <!-- Sort By -->
+              <div class="filter-group">
+                <label>Sort By</label>
+                <select class="filter-select" name="sort" id="sortFilter">
+                  <option value="recent" {% if current_sort == 'recent' %}selected{% endif %}>Most Recent</option>
+                  <option value="oldest" {% if current_sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+                  <option value="title" {% if current_sort == 'title' %}selected{% endif %}>Title (A-Z)</option>
+                </select>
+              </div>
 
-            <!-- Clear Filters -->
-            <button class="btn-filter-clear" onclick="clearFilters()">Clear All Filters</button>
+              <!-- Submit and Clear Filters -->
+              <button type="submit" class="btn-filter-clear" style="background-color: var(--primary); color: var(--primary-foreground); margin-bottom: 0.5rem;">Apply Filters</button>
+              <button type="button" class="btn-filter-clear" onclick="clearFilters()">Clear All Filters</button>
+            </form>
           </div>
         </div>
       </aside>
@@ -477,31 +466,38 @@
   }
 
   function clearFilters() {
-    document.getElementById('projectSearch').value = '';
-    document.getElementById('categoryFilter').value = '';
-    document.getElementById('institutionFilter').value = '';
-    document.getElementById('yearFilter').value = '';
-    document.getElementById('statusFilter').value = '';
-    document.getElementById('sortFilter').value = 'recent';
+    window.location.href = '{% url "app:project_archive" %}';
   }
 
-  // Filter functionality
-  document.getElementById('projectSearch')?.addEventListener('input', function(e) {
-    filterProjects();
-  });
-
+  // Auto-submit form when select filters change
   document.getElementById('categoryFilter')?.addEventListener('change', function(e) {
-    filterProjects();
+    document.getElementById('filterForm').submit();
   });
 
   document.getElementById('institutionFilter')?.addEventListener('change', function(e) {
-    filterProjects();
+    document.getElementById('filterForm').submit();
   });
 
-  function filterProjects() {
-    // Filter logic would go here
-    console.log('Filtering projects...');
-  }
+  document.getElementById('yearFilter')?.addEventListener('change', function(e) {
+    document.getElementById('filterForm').submit();
+  });
+
+  document.getElementById('statusFilter')?.addEventListener('change', function(e) {
+    document.getElementById('filterForm').submit();
+  });
+
+  document.getElementById('sortFilter')?.addEventListener('change', function(e) {
+    document.getElementById('filterForm').submit();
+  });
+
+  // Debounce search input to avoid too many requests
+  let searchTimeout;
+  document.getElementById('projectSearch')?.addEventListener('input', function(e) {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(function() {
+      document.getElementById('filterForm').submit();
+    }, 500); // Wait 500ms after user stops typing
+  });
 </script>
 {% endblock %}
 

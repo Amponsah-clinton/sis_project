@@ -122,6 +122,10 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
+# Media files (User uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -130,3 +134,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Authentication settings
 LOGIN_URL = '/auth/'
 LOGIN_REDIRECT_URL = '/'
+
+# Paystack settings
+PAYSTACK_PUBLIC_KEY = 'pk_test_af37d26c0fa360522c4e66495f3877e498c18850'
+PAYSTACK_SECRET_KEY = 'sk_test_185fc53d96addab7232060c86f4221918ab59d1c'

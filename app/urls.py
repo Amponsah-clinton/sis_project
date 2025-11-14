@@ -10,6 +10,7 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('auth/', views.auth, name='auth'),
     path('indexed_articles/', views.indexed_articles, name='indexed_articles'),
+    path('indexed_articles/view/<int:article_id>/', views.article_detail, name='article_detail'),
     path('indexed_journals/', views.indexed_journals, name='indexed_journals'),
     path('project_archive/', views.project_archive, name='project_archive'),
     path('upload_article/', views.upload_article, name='upload_article'),
@@ -19,6 +20,7 @@ urlpatterns = [
     path('council_members/', views.council_members, name='council_members'),
     path('team_members/', views.team_members, name='team_members'),
     path('sponsors/', views.sponsors, name='sponsors'),
+    path('initialize-payment/', views.initialize_payment, name='initialize_payment'),
     path('request_membership/', views.request_membership, name='request_membership'),
     path('apply_directory/', views.apply_directory, name='apply_directory'),
     path('hall_of_fame/', views.hall_of_fame, name='hall_of_fame'),
@@ -36,5 +38,9 @@ urlpatterns = [
     path('service_solution/', views.service_solution, name='service_solution'),
     path('policy_terms/', views.policy_terms, name='policy_terms'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('account_detail/', views.account_detail, name='account_detail'),
+    path('edit_account/', views.edit_account, name='edit_account'),
+    path('change_email/', views.change_email, name='change_email'),
+    path('reset_password/', views.reset_password, name='reset_password'),
 ]
 

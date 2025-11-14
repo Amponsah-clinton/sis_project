@@ -1,0 +1,1038 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}{{ article.title }} - ScholarIndex{% endblock %}
+
+{% block extra_css %}
+<style>
+  .article-detail-wrapper {
+    background-color: #f5f5f5;
+    min-height: 100vh;
+    padding: 2rem 0;
+  }
+
+  .article-container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  /* PDF Viewer */
+  .pdf-viewer-section {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid #e5e7eb;
+  }
+
+  .pdf-viewer-container {
+    width: 100%;
+    height: 800px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #f9fafb;
+  }
+
+  .pdf-viewer-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .pdf-viewer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .pdf-viewer-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .pdf-viewer-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .pdf-action-btn {
+    padding: 0.5rem 1rem;
+    background-color: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+  }
+
+  .pdf-action-btn:hover {
+    background-color: #e5e7eb;
+    color: #111827;
+    text-decoration: none;
+  }
+
+  .pdf-action-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Main Content Area */
+  .article-content-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Article Card */
+  .article-card {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+  }
+
+  /* Article Header */
+  .article-header-section {
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .article-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.3;
+    margin-bottom: 1rem;
+  }
+
+  .article-number {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 0.75rem;
+  }
+
+  .article-number strong {
+    color: #3b82f6;
+    font-weight: 600;
+  }
+
+  .article-meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+
+  .meta-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    background-color: #f3f4f6;
+    border-radius: 4px;
+    font-size: 0.8125rem;
+  }
+
+  .meta-badge svg {
+    width: 14px;
+    height: 14px;
+    color: #3b82f6;
+  }
+
+  .authors-section {
+    margin-top: 1rem;
+  }
+
+  .authors-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
+
+  .authors-text {
+    font-size: 0.875rem;
+    color: #6b7280;
+    line-height: 1.6;
+  }
+
+  .author-name {
+    color: #111827;
+    font-weight: 500;
+  }
+
+  .corresponding-badge {
+    color: #3b82f6;
+    font-weight: 600;
+    font-size: 0.8125rem;
+  }
+
+  /* Abstract Section */
+  .abstract-section {
+    margin-bottom: 2rem;
+  }
+
+  .section-heading {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .abstract-text {
+    font-size: 0.9375rem;
+    line-height: 1.8;
+    color: #374151;
+    text-align: justify;
+    margin-bottom: 1rem;
+  }
+
+  .keywords-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .keyword-badge {
+    padding: 0.375rem 0.75rem;
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 4px;
+    font-size: 0.8125rem;
+    color: #1e40af;
+    font-weight: 500;
+  }
+
+  /* Share Section */
+  .share-section {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .share-heading {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.75rem;
+  }
+
+  .share-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .share-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+  }
+
+  .share-btn-whatsapp {
+    background-color: #25D366;
+    color: white;
+  }
+
+  .share-btn-whatsapp:hover {
+    background-color: #20ba5a;
+    color: white;
+    text-decoration: none;
+  }
+
+  .share-btn-email {
+    background-color: #3b82f6;
+    color: white;
+  }
+
+  .share-btn-email:hover {
+    background-color: #2563eb;
+    color: white;
+    text-decoration: none;
+  }
+
+  .share-btn-copy {
+    background-color: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+  }
+
+  .share-btn-copy:hover {
+    background-color: #e5e7eb;
+    color: #111827;
+    text-decoration: none;
+  }
+
+  .share-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Action Buttons */
+  .action-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .action-btn {
+    padding: 0.875rem 1.5rem;
+    border-radius: 6px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+  }
+
+  .action-btn-download {
+    background-color: #3b82f6;
+    color: white;
+  }
+
+  .action-btn-download:hover {
+    background-color: #2563eb;
+    color: white;
+    text-decoration: none;
+  }
+
+  .action-btn-certificate {
+    background-color: #ffffff;
+    color: #374151;
+    border: 2px solid #e5e7eb;
+  }
+
+  .action-btn-certificate:hover {
+    background-color: #f9fafb;
+    border-color: #3b82f6;
+    color: #3b82f6;
+    text-decoration: none;
+  }
+
+  .action-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    position: sticky;
+    top: 100px;
+  }
+
+  .sidebar-card {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .sidebar-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 0.875rem;
+  }
+
+  .info-row:last-child {
+    border-bottom: none;
+  }
+
+  .info-label {
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .info-value {
+    color: #111827;
+    font-weight: 600;
+    text-align: right;
+    max-width: 60%;
+  }
+
+  /* Recommended Articles */
+  .recommended-section {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid #e5e7eb;
+  }
+
+  .recommended-heading {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .recommended-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .recommended-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.2s;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .recommended-card:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .recommended-card-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    background-color: #f3f4f6;
+  }
+
+  .recommended-card-content {
+    padding: 1.25rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .recommended-card-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .recommended-card-title a {
+    color: #111827;
+    text-decoration: none;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .recommended-card-title a:hover {
+    color: #3b82f6;
+  }
+
+  .recommended-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.8125rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+  }
+
+  .recommended-card-discipline {
+    padding: 0.25rem 0.5rem;
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 4px;
+    color: #1e40af;
+    font-weight: 500;
+    font-size: 0.75rem;
+  }
+
+  .recommended-card-date {
+    color: #6b7280;
+  }
+
+  .recommended-card-excerpt {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-top: 0.5rem;
+  }
+
+  /* Related Articles */
+  .related-articles-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .related-item {
+    padding: 1rem;
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+
+  .related-item:hover {
+    border-color: #3b82f6;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .related-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+  }
+
+  .related-title a {
+    color: #111827;
+    text-decoration: none;
+  }
+
+  .related-title a:hover {
+    color: #3b82f6;
+  }
+
+  .related-meta {
+    font-size: 0.8125rem;
+    color: #6b7280;
+  }
+
+  /* Pagination */
+  .pagination-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .pagination-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .pagination-label {
+    color: #dc2626;
+    font-weight: 400;
+  }
+
+  .pagination-value {
+    color: #dc2626;
+    font-weight: 700;
+  }
+
+  .pagination-separator {
+    width: 2px;
+    height: 24px;
+    background-color: #1e40af;
+  }
+
+  .pagination-input {
+    width: 60px;
+    padding: 0.375rem 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    text-align: center;
+    background-color: #ffffff;
+    color: #111827;
+  }
+
+  .pagination-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .pagination-select {
+    width: 60px;
+    padding: 0.375rem 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    text-align: center;
+    background-color: #ffffff;
+    color: #111827;
+    cursor: pointer;
+  }
+
+  .pagination-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .pagination-limit-label {
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 968px) {
+    .article-content-wrapper {
+      grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+      position: relative;
+      top: 0;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .article-detail-wrapper {
+      padding: 1rem 0;
+    }
+
+    .article-card {
+      padding: 1.5rem;
+    }
+
+    .article-title {
+      font-size: 1.5rem;
+    }
+
+    .action-buttons {
+      grid-template-columns: 1fr;
+    }
+
+    .pagination-controls {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .pagination-separator {
+      display: none;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="article-detail-wrapper">
+  <div class="article-container">
+    <div class="article-content-wrapper">
+      <!-- Main Article Content -->
+      <main>
+        <div class="article-card">
+          <!-- Article Header -->
+          <div class="article-header-section">
+            <h1 class="article-title">{{ article.title }}</h1>
+            
+            {% if article.article_number %}
+            <div class="article-number">
+              Article Number: <strong>{{ article.article_number }}</strong>
+            </div>
+            {% endif %}
+
+            <div class="article-meta-row">
+              <span class="meta-badge">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                </svg>
+                {{ article.discipline }}
+              </span>
+              {% if article.publication_date %}
+              <span class="meta-badge">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                {{ article.publication_date|date:"F d, Y" }}
+              </span>
+              {% endif %}
+              <span class="meta-badge">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                {{ article.get_article_type_display }}
+              </span>
+            </div>
+
+            {% if authors %}
+            <div class="authors-section">
+              <div class="authors-label">Authors:</div>
+              <div class="authors-text">
+                {% for author in authors %}
+                  <span class="author-name">{{ author.name }}</span>{% if author.affiliation %}, {{ author.affiliation }}{% endif %}{% if author.is_corresponding %} <span class="corresponding-badge">(Corresponding Author)</span>{% endif %}{% if not forloop.last %}; {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Abstract Section -->
+          <div class="abstract-section">
+            <h2 class="section-heading">Abstract</h2>
+            <div class="abstract-text">
+              {{ article.abstract }}
+            </div>
+            
+            {% if keywords_list %}
+            <div class="keywords-container">
+              {% for keyword in keywords_list %}
+                <span class="keyword-badge">{{ keyword }}</span>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Share Section -->
+          <div class="share-section">
+            <h3 class="share-heading">Share Article</h3>
+            <div class="share-buttons">
+              <a href="https://wa.me/?text={{ article.title|urlencode }}%20{{ request.build_absolute_uri|urlencode }}" target="_blank" class="share-btn share-btn-whatsapp">
+                <svg fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.98 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                </svg>
+                WhatsApp
+              </a>
+              <a href="mailto:?subject={{ article.title|urlencode }}&body={{ request.build_absolute_uri|urlencode }}" class="share-btn share-btn-email">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+                Email
+              </a>
+              <button onclick="copyToClipboard('{{ request.build_absolute_uri }}')" class="share-btn share-btn-copy">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                </svg>
+                Copy Link
+              </button>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            {% if article.article_file %}
+            <a href="{{ article.article_file.url }}" class="action-btn action-btn-download" download>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+              </svg>
+              Download Full Text
+            </a>
+            {% else %}
+            <a href="#" class="action-btn action-btn-download" onclick="alert('PDF not available for this article'); return false;">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+              </svg>
+              Download Full Text
+            </a>
+            {% endif %}
+            <a href="#" class="action-btn action-btn-certificate" onclick="alert('Article indexing certificate will be available soon'); return false;">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              Article Indexing Certificate
+            </a>
+          </div>
+
+          <!-- PDF Viewer Section -->
+          {% if article.article_file %}
+          <div class="pdf-viewer-section">
+            <div class="pdf-viewer-header">
+              <h3 class="pdf-viewer-title">Full Text PDF</h3>
+              <div class="pdf-viewer-actions">
+                <a href="{{ article.article_file.url }}" target="_blank" class="pdf-action-btn">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                  </svg>
+                  Open in New Tab
+                </a>
+                <a href="{{ article.article_file.url }}" download class="pdf-action-btn">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                  </svg>
+                  Download
+                </a>
+              </div>
+            </div>
+            <div class="pdf-viewer-container">
+              <iframe src="{{ article.article_file.url }}#toolbar=1&navpanes=1&scrollbar=1" type="application/pdf"></iframe>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Recommended Articles Section -->
+        {% if related_articles %}
+        <div class="recommended-section">
+          <h2 class="recommended-heading">Recommended Articles</h2>
+          <div class="recommended-grid">
+            {% for related in related_articles %}
+            <div class="recommended-card">
+              {% if related.image %}
+              <img src="{{ related.image }}" alt="{{ related.title }}" class="recommended-card-image" />
+              {% else %}
+              <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=300&fit=crop" alt="{{ related.title }}" class="recommended-card-image" />
+              {% endif %}
+              <div class="recommended-card-content">
+                <h3 class="recommended-card-title">
+                  <a href="{% url 'app:article_detail' related.id %}?title={{ related.title|urlencode }}">{{ related.title }}</a>
+                </h3>
+                <div class="recommended-card-meta">
+                  <span class="recommended-card-discipline">{{ related.discipline }}</span>
+                  <span class="recommended-card-date">{{ related.created_at|date:"M Y" }}</span>
+                </div>
+                {% if related.abstract %}
+                <p class="recommended-card-excerpt">{{ related.abstract|truncatewords:25 }}</p>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Pagination Controls -->
+        <div class="pagination-controls">
+          <div class="pagination-item">
+            <span class="pagination-label">Records :</span>
+            <span class="pagination-value" id="currentRecords">20</span>
+            <span class="pagination-label">of</span>
+            <span class="pagination-value" id="totalRecords">3665</span>
+          </div>
+          <div class="pagination-separator"></div>
+          <div class="pagination-item">
+            <span class="pagination-label">Page :</span>
+            <input type="number" class="pagination-input" id="currentPage" value="1" min="1" max="184" />
+            <span class="pagination-label">of</span>
+            <span class="pagination-value" id="totalPages">184</span>
+          </div>
+          <div class="pagination-separator"></div>
+          <div class="pagination-item">
+            <span class="pagination-limit-label">Limit</span>
+            <select class="pagination-select" id="pageLimit">
+              <option value="10">10</option>
+              <option value="20" selected>20</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+        </div>
+      </main>
+
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <!-- Article Information -->
+        <div class="sidebar-card">
+          <h3 class="sidebar-title">Article Information</h3>
+          <div class="info-row">
+            <span class="info-label">Type</span>
+            <span class="info-value">{{ article.get_article_type_display }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Discipline</span>
+            <span class="info-value">{{ article.discipline }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Language</span>
+            <span class="info-value">{{ article.language }}</span>
+          </div>
+          {% if article.volume %}
+          <div class="info-row">
+            <span class="info-label">Volume</span>
+            <span class="info-value">{{ article.volume }}</span>
+          </div>
+          {% endif %}
+          {% if article.issue %}
+          <div class="info-row">
+            <span class="info-label">Issue</span>
+            <span class="info-value">{{ article.issue }}</span>
+          </div>
+          {% endif %}
+          {% if article.pages %}
+          <div class="info-row">
+            <span class="info-label">Pages</span>
+            <span class="info-value">{{ article.pages }}</span>
+          </div>
+          {% endif %}
+          {% if article.issn %}
+          <div class="info-row">
+            <span class="info-label">ISSN</span>
+            <span class="info-value">{{ article.issn }}</span>
+          </div>
+          {% endif %}
+          {% if article.doi %}
+          <div class="info-row">
+            <span class="info-label">DOI</span>
+            <span class="info-value" style="font-size: 0.8125rem; word-break: break-all;">{{ article.doi }}</span>
+          </div>
+          {% endif %}
+          {% if article.publication_date %}
+          <div class="info-row">
+            <span class="info-label">Published</span>
+            <span class="info-value">{{ article.publication_date|date:"M d, Y" }}</span>
+          </div>
+          {% endif %}
+          <div class="info-row">
+            <span class="info-label">Indexed</span>
+            <span class="info-value">{{ article.created_at|date:"M d, Y" }}</span>
+          </div>
+          {% if article.views %}
+          <div class="info-row">
+            <span class="info-label">Views</span>
+            <span class="info-value">{{ article.views }}</span>
+          </div>
+          {% endif %}
+          {% if article.citations %}
+          <div class="info-row">
+            <span class="info-label">Citations</span>
+            <span class="info-value">{{ article.citations }}</span>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Related Articles -->
+        {% if related_articles %}
+        <div class="sidebar-card">
+          <h3 class="sidebar-title">Related Articles</h3>
+          <div class="related-articles-list">
+            {% for related in related_articles %}
+            <div class="related-item">
+              <h4 class="related-title">
+                <a href="{% url 'app:article_detail' related.id %}?title={{ related.title|urlencode }}">{{ related.title|truncatewords:12 }}</a>
+              </h4>
+              <div class="related-meta">
+                {{ related.discipline }} • {{ related.created_at|date:"M Y" }}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </aside>
+    </div>
+  </div>
+</div>
+
+<script>
+  function copyToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        alert('Link copied to clipboard!');
+      }, function(err) {
+        fallbackCopy(text);
+      });
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.opacity = '0';
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      alert('Link copied to clipboard!');
+    } catch (err) {
+      alert('Failed to copy link');
+    }
+    document.body.removeChild(textArea);
+  }
+
+  // Pagination controls
+  document.addEventListener('DOMContentLoaded', function() {
+    const currentPageInput = document.getElementById('currentPage');
+    const pageLimitSelect = document.getElementById('pageLimit');
+    
+    if (currentPageInput) {
+      currentPageInput.addEventListener('change', function() {
+        const page = parseInt(this.value);
+        const maxPage = parseInt(document.getElementById('totalPages').textContent);
+        if (page < 1) {
+          this.value = 1;
+        } else if (page > maxPage) {
+          this.value = maxPage;
+        }
+        // Update records display
+        updateRecordsDisplay();
+      });
+    }
+
+    if (pageLimitSelect) {
+      pageLimitSelect.addEventListener('change', function() {
+        // Update records display when limit changes
+        updateRecordsDisplay();
+      });
+    }
+
+    function updateRecordsDisplay() {
+      const currentPage = parseInt(document.getElementById('currentPage').value) || 1;
+      const limit = parseInt(document.getElementById('pageLimit').value) || 20;
+      const totalRecords = parseInt(document.getElementById('totalRecords').textContent) || 3665;
+      const totalPages = Math.ceil(totalRecords / limit);
+      
+      // Update current records shown
+      const startRecord = (currentPage - 1) * limit + 1;
+      const endRecord = Math.min(currentPage * limit, totalRecords);
+      document.getElementById('currentRecords').textContent = endRecord - startRecord + 1;
+      
+      // Update total pages
+      document.getElementById('totalPages').textContent = totalPages;
+      
+      // Update current page max
+      if (currentPageInput) {
+        currentPageInput.max = totalPages;
+        if (currentPage > totalPages) {
+          currentPageInput.value = totalPages;
+        }
+      }
+    }
+  });
+</script>
+{% endblock %}

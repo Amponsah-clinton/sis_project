@@ -2055,97 +2055,118 @@
 
     /* Stats Section */
     .stats-section {
-      padding: 5rem 1.5rem;
-      background-color: var(--background);
+      padding: 4rem 1.5rem;
+      background-color: #ffffff;
+      overflow: hidden;
     }
 
     @media (min-width: 1024px) {
       .stats-section {
-        padding: 3.5rem 1.5rem;
+        padding: 3rem 1.5rem;
       }
     }
 
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 2rem;
-      max-width: 1000px;
+    .stats-carousel-wrapper {
+      overflow: hidden;
+      width: 100%;
+      max-width: 1600px;
       margin: 0 auto;
+      position: relative;
     }
 
-    .stat-card {
-      text-align: center;
-      padding: 2rem 1.5rem;
-      background-color: var(--card);
-      border: 1px solid var(--border);
-      border-radius: calc(var(--radius) + 4px);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      animation: fadeInUp 0.6s ease-out;
-      animation-fill-mode: both;
-    }
-
-    .stat-card:nth-child(1) {
-      animation-delay: 0.1s;
-    }
-
-    .stat-card:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-
-    .stat-card:nth-child(3) {
-      animation-delay: 0.3s;
-    }
-
-    .stat-card:nth-child(4) {
-      animation-delay: 0.4s;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
-      border-color: var(--primary);
-    }
-
-    .stat-icon-wrapper {
-      width: 4rem;
-      height: 4rem;
-      margin: 0 auto 1rem;
-      background-color: var(--secondary);
-      border-radius: 50%;
+    .stats-carousel-track {
       display: flex;
       align-items: center;
-      justify-content: center;
-      transition: all 0.3s;
+      will-change: transform;
+      animation: slideStats 50s linear infinite;
     }
 
-    .stat-card:hover .stat-icon-wrapper {
-      background-color: var(--primary);
-      transform: scale(1.1);
+    @keyframes slideStats {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(calc(-50% - 1px));
+      }
+    }
+
+    .stats-section:hover .stats-carousel-track {
+      animation-play-state: paused;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 2rem;
+      flex-shrink: 0;
+      min-width: 200px;
+    }
+
+    @media (max-width: 768px) {
+      .stat-item {
+        min-width: 160px;
+        padding: 1rem 1.5rem;
+      }
+    }
+
+    .stat-divider {
+      width: 1px;
+      height: 60px;
+      background-color: #d4a574;
+      flex-shrink: 0;
+      margin: 0 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .stat-divider {
+        height: 50px;
+        margin: 0 0.25rem;
+      }
     }
 
     .stat-icon {
-      width: 2rem;
-      height: 2rem;
-      color: var(--primary);
-      transition: color 0.3s;
+      width: 2.5rem;
+      height: 2.5rem;
+      color: #8b4513;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .stat-card:hover .stat-icon {
-      color: var(--primary-foreground);
+    .stat-icon svg {
+      width: 100%;
+      height: 100%;
     }
 
     .stat-number {
-      font-size: 2.5rem;
+      font-size: 2.25rem;
       font-weight: 700;
-      color: var(--primary);
+      color: #000000;
       margin-bottom: 0.5rem;
       line-height: 1.2;
     }
 
+    @media (max-width: 768px) {
+      .stat-number {
+        font-size: 1.75rem;
+      }
+    }
+
     .stat-label {
-      font-size: 1rem;
-      color: var(--muted-foreground);
-      font-weight: 500;
+      font-size: 0.875rem;
+      color: #000000;
+      font-weight: 400;
+      text-align: center;
+      text-transform: capitalize;
+    }
+
+    @media (max-width: 768px) {
+      .stat-label {
+        font-size: 0.75rem;
+      }
     }
 
     /* Article Cards with Images */
@@ -4028,4 +4049,9 @@
         width: 100%;
       }
     }
+
+
+
+
+
 

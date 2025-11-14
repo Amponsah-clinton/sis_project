@@ -327,7 +327,7 @@
         <p>Join our community of researchers and scholars. Apply for membership to access exclusive benefits and opportunities.</p>
       </div>
 
-      <form class="request-membership-form" method="post" action="{% url 'app:request_membership' %}">
+      <form class="request-membership-form" method="post" action="{% url 'app:request_membership' %}" enctype="multipart/form-data">
         {% csrf_token %}
 
         <!-- Personal Information Section -->

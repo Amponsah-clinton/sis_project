@@ -5,8 +5,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - ScholarIndex</title>
-    <link rel="stylesheet" href="{% static 'app/css/dashboard.css' %}">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'app/css/dashboard.css' %}">
+    <style>
+        /* CSS Variables */
+        :root {
+            --background: 0 0% 98%;
+            --foreground: 217 33% 17%;
+            --card: 0 0% 100%;
+            --card-foreground: 217 33% 17%;
+            --primary: 221 83% 53%;
+            --primary-foreground: 0 0% 100%;
+            --secondary: 210 40% 96%;
+            --secondary-foreground: 217 33% 17%;
+            --muted: 220 14% 96%;
+            --muted-foreground: 217 10% 55%;
+            --border: 220 13% 91%;
+            --sidebar-background: 0 0% 100%;
+            --sidebar-foreground: 217 33% 17%;
+            --sidebar-border: 220 13% 91%;
+            --success: 142 71% 45%;
+            --destructive: 0 84% 60%;
+        }
+        /* Override Tailwind reset */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif !important;
+            background-color: hsl(var(--background)) !important;
+            color: hsl(var(--foreground)) !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .sidebar-wrapper {
+            display: flex !important;
+            min-height: 100vh !important;
+            width: 100% !important;
+        }
+    </style>
     <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -192,15 +226,33 @@
                             <span class="user-name">User</span>
                         </button>
                         <div class="dropdown-menu" id="userDropdown">
-                            <div class="dropdown-item-label">My Account</div>
-                            <div class="dropdown-separator"></div>
-                            <a href="#" class="dropdown-item">
+                            <a href="{% url 'app:account_detail' %}" class="dropdown-item">
                                 <i data-lucide="user"></i>
-                                Profile
+                                Manage Account profile
                             </a>
-                            <a href="#" class="dropdown-item">Settings</a>
                             <div class="dropdown-separator"></div>
-                            <a href="{% url 'app:auth' %}" class="dropdown-item">Log out</a>
+                            <a href="{% url 'app:upload_article' %}" class="dropdown-item">
+                                <i data-lucide="upload"></i>
+                                Upload Articles
+                            </a>
+                            <a href="{% url 'app:register_journal' %}" class="dropdown-item">
+                                <i data-lucide="book"></i>
+                                Upload Journal
+                            </a>
+                            <a href="{% url 'app:upload_project' %}" class="dropdown-item">
+                                <i data-lucide="folder"></i>
+                                Upload a project
+                            </a>
+                            <div class="dropdown-separator"></div>
+                            <a href="{% url 'app:request_membership' %}" class="dropdown-item">
+                                <i data-lucide="inbox"></i>
+                                Requests
+                            </a>
+                            <div class="dropdown-separator"></div>
+                            <a href="{% url 'app:auth' %}" class="dropdown-item" style="color: #dc2626;">
+                                <i data-lucide="log-out"></i>
+                                Log out
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -209,16 +261,24 @@
             <!-- Dashboard Content -->
             <main class="dashboard-main">
                 <div class="dashboard-content">
+                    <!-- Page Header -->
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Welcome to ScholarIndex</h1>
+                            <p class="page-subtitle">Your comprehensive academic research platform</p>
+                        </div>
+                    </div>
+
                     <!-- Stat Cards -->
                     <div class="stat-cards-grid">
                         <div class="stat-card">
                             <div class="stat-card-content">
                                 <div>
-                                    <p class="stat-card-title">Total Articles</p>
-                                    <h3 class="stat-card-value">3,782</h3>
+                                    <p class="stat-card-title">Indexed Articles</p>
+                                    <h3 class="stat-card-value">3,712</h3>
                                     <div class="stat-card-change positive">
                                         <i data-lucide="arrow-up"></i>
-                                        <span>11.01%</span>
+                                        <span>12.5%</span>
                                     </div>
                                 </div>
                                 <div class="stat-card-icon">
@@ -229,11 +289,26 @@
                         <div class="stat-card">
                             <div class="stat-card-content">
                                 <div>
+                                    <p class="stat-card-title">Archived Projects</p>
+                                    <h3 class="stat-card-value">1,337</h3>
+                                    <div class="stat-card-change positive">
+                                        <i data-lucide="arrow-up"></i>
+                                        <span>8.2%</span>
+                                    </div>
+                                </div>
+                                <div class="stat-card-icon">
+                                    <i data-lucide="folder"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-content">
+                                <div>
                                     <p class="stat-card-title">Indexed Journals</p>
-                                    <h3 class="stat-card-value">5,359</h3>
-                                    <div class="stat-card-change negative">
-                                        <i data-lucide="arrow-down"></i>
-                                        <span>9.05%</span>
+                                    <h3 class="stat-card-value">23</h3>
+                                    <div class="stat-card-change positive">
+                                        <i data-lucide="arrow-up"></i>
+                                        <span>5.1%</span>
                                     </div>
                                 </div>
                                 <div class="stat-card-icon">
@@ -241,221 +316,349 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Charts Row 1 -->
-                    <div class="charts-grid">
-                        <div class="chart-card large">
-                            <div class="chart-header">
+                        <div class="stat-card">
+                            <div class="stat-card-content">
                                 <div>
-                                    <h3 class="chart-title">Monthly Submissions</h3>
+                                    <p class="stat-card-title">Registered Users</p>
+                                    <h3 class="stat-card-value">205</h3>
+                                    <div class="stat-card-change positive">
+                                        <i data-lucide="arrow-up"></i>
+                                        <span>15.3%</span>
+                                    </div>
                                 </div>
-                                <button class="icon-button-small">
-                                    <i data-lucide="more-vertical"></i>
-                                </button>
-                            </div>
-                            <div class="chart-content">
-                                <div id="barChart" style="width: 100%; height: 300px;"></div>
+                                <div class="stat-card-icon">
+                                    <i data-lucide="users"></i>
+                                </div>
                             </div>
                         </div>
-
-                        <div class="chart-card">
-                            <div class="chart-header">
+                        <div class="stat-card">
+                            <div class="stat-card-content">
                                 <div>
-                                    <h3 class="chart-title">Monthly Target</h3>
-                                    <p class="chart-subtitle">Target you've set for each month</p>
+                                    <p class="stat-card-title">Visits (24hrs)</p>
+                                    <h3 class="stat-card-value">100</h3>
+                                    <div class="stat-card-change positive">
+                                        <i data-lucide="arrow-up"></i>
+                                        <span>22.4%</span>
+                                    </div>
                                 </div>
-                                <button class="icon-button-small">
-                                    <i data-lucide="more-vertical"></i>
-                                </button>
+                                <div class="stat-card-icon">
+                                    <i data-lucide="activity"></i>
+                                </div>
                             </div>
-                            <div class="chart-content">
-                                <div class="circular-progress-container">
-                                    <svg class="circular-progress" viewBox="0 0 100 100">
-                                        <circle class="circular-progress-bg" cx="50" cy="50" r="40"></circle>
-                                        <circle class="circular-progress-fill" cx="50" cy="50" r="40" id="progressCircle"></circle>
-                                    </svg>
-                                    <div class="circular-progress-text">
-                                        <span class="progress-percentage">75.55%</span>
-                                        <span class="progress-change positive">+10%</span>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-content">
+                                <div>
+                                    <p class="stat-card-title">Total Visits</p>
+                                    <h3 class="stat-card-value">507,295</h3>
+                                    <div class="stat-card-change positive">
+                                        <i data-lucide="arrow-up"></i>
+                                        <span>18.7%</span>
                                     </div>
                                 </div>
-                                <p class="progress-description">
-                                    You've indexed 3287 items this month, it's higher than last month. Keep up your good work!
-                                </p>
-                                <div class="progress-stats">
-                                    <div class="progress-stat">
-                                        <p class="progress-stat-label">Target</p>
-                                        <p class="progress-stat-value">20K</p>
-                                    </div>
-                                    <div class="progress-stat">
-                                        <p class="progress-stat-label">Indexed</p>
-                                        <p class="progress-stat-value">15K</p>
-                                    </div>
-                                    <div class="progress-stat">
-                                        <p class="progress-stat-label">Today</p>
-                                        <p class="progress-stat-value">3287</p>
-                                    </div>
+                                <div class="stat-card-icon">
+                                    <i data-lucide="trending-up"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Charts Row 2 -->
-                    <div class="charts-grid">
-                        <div class="chart-card large">
-                            <div class="chart-header">
-                                <div>
-                                    <h3 class="chart-title">Statistics</h3>
-                                    <p class="chart-subtitle">Target you've set for each month</p>
-                                </div>
-                                <div class="tabs-container">
-                                    <div class="tabs">
-                                        <button class="tab-trigger active">Monthly</button>
-                                        <button class="tab-trigger">Quarterly</button>
-                                        <button class="tab-trigger">Annually</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="chart-content">
-                                <div id="areaChart" style="width: 100%; height: 300px;"></div>
-                            </div>
-                        </div>
-
-                        <div class="chart-card">
-                            <div class="chart-header">
-                                <h3 class="chart-title">Submissions by Country</h3>
-                                <p class="chart-subtitle">Number of submissions based on country</p>
-                            </div>
-                            <div class="chart-content">
-                                <div class="demographic-list">
-                                    <div class="demographic-item">
-                                        <div class="demographic-header">
-                                            <div class="demographic-info">
-                                                <div class="flag-placeholder"></div>
-                                                <div>
-                                                    <p class="demographic-name">USA</p>
-                                                    <p class="demographic-customers">2,379 Submissions</p>
-                                                </div>
-                                            </div>
-                                            <span class="demographic-percentage">79%</span>
-                                        </div>
-                                        <div class="demographic-bar">
-                                            <div class="demographic-bar-fill" style="width: 79%"></div>
-                                        </div>
-                                    </div>
-                                    <div class="demographic-item">
-                                        <div class="demographic-header">
-                                            <div class="demographic-info">
-                                                <div class="flag-placeholder"></div>
-                                                <div>
-                                                    <p class="demographic-name">France</p>
-                                                    <p class="demographic-customers">589 Submissions</p>
-                                                </div>
-                                            </div>
-                                            <span class="demographic-percentage">23%</span>
-                                        </div>
-                                        <div class="demographic-bar">
-                                            <div class="demographic-bar-fill" style="width: 23%"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Recent Submissions -->
+                    <!-- Featured Articles Section -->
                     <div class="card">
                         <div class="card-header">
                             <div class="card-header-content">
-                                <h3 class="card-title">Recent Submissions</h3>
-                                <button class="link-button">See all</button>
+                                <h3 class="card-title">Featured Articles</h3>
+                                <a href="{% url 'app:indexed_articles' %}" class="link-button">View all</a>
                             </div>
                         </div>
                         <div class="card-content">
-                            <div class="table-container">
-                                <table class="data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Title</th>
-                                            <th>Category</th>
-                                            <th>Date</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <div class="table-product">
-                                                    <div class="product-image"></div>
-                                                    <div>
-                                                        <p class="product-name">Machine Learning in Healthcare</p>
-                                                        <p class="product-variant">Research Article</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>Medicine</td>
-                                            <td class="table-price">2024-01-15</td>
-                                            <td><span class="badge badge-default">published</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="table-product">
-                                                    <div class="product-image"></div>
-                                                    <div>
-                                                        <p class="product-name">Quantum Computing Advances</p>
-                                                        <p class="product-variant">Research Article</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>Technology</td>
-                                            <td class="table-price">2024-01-14</td>
-                                            <td><span class="badge badge-secondary">pending</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="table-product">
-                                                    <div class="product-image"></div>
-                                                    <div>
-                                                        <p class="product-name">Climate Change Research</p>
-                                                        <p class="product-variant">Research Article</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>Environmental</td>
-                                            <td class="table-price">2024-01-13</td>
-                                            <td><span class="badge badge-default">published</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="table-product">
-                                                    <div class="product-image"></div>
-                                                    <div>
-                                                        <p class="product-name">AI Ethics Framework</p>
-                                                        <p class="product-variant">Research Article</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>Social Science</td>
-                                            <td class="table-price">2024-01-12</td>
-                                            <td><span class="badge badge-destructive">rejected</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="table-product">
-                                                    <div class="product-image"></div>
-                                                    <div>
-                                                        <p class="product-name">Renewable Energy Systems</p>
-                                                        <p class="product-variant">Research Article</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>Engineering</td>
-                                            <td class="table-price">2024-01-11</td>
-                                            <td><span class="badge badge-default">published</span></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <div class="articles-grid">
+                                <div class="article-card">
+                                    <div class="article-image">
+                                        <i data-lucide="file-text"></i>
+                                    </div>
+                                    <div class="article-content">
+                                        <div class="article-badge">Medicine</div>
+                                        <h4 class="article-title">Machine Learning Applications in Healthcare Diagnosis</h4>
+                                        <p class="article-author">Dr. Sarah Martinez, Prof. James Park</p>
+                                        <div class="article-meta">
+                                            <span class="article-meta-item">
+                                                <i data-lucide="message-circle"></i>
+                                                234 citations
+                                            </span>
+                                            <span class="article-meta-item">
+                                                <i data-lucide="calendar"></i>
+                                                2024
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="article-card">
+                                    <div class="article-image">
+                                        <i data-lucide="file-text"></i>
+                                    </div>
+                                    <div class="article-content">
+                                        <div class="article-badge">Technology</div>
+                                        <h4 class="article-title">Quantum Computing: Breakthroughs in Drug Discovery</h4>
+                                        <p class="article-author">Dr. Michael Chen, Dr. Emily Liu</p>
+                                        <div class="article-meta">
+                                            <span class="article-meta-item">
+                                                <i data-lucide="message-circle"></i>
+                                                189 citations
+                                            </span>
+                                            <span class="article-meta-item">
+                                                <i data-lucide="calendar"></i>
+                                                2024
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="article-card">
+                                    <div class="article-image">
+                                        <i data-lucide="file-text"></i>
+                                    </div>
+                                    <div class="article-content">
+                                        <div class="article-badge">Environmental</div>
+                                        <h4 class="article-title">Climate Change Impact on Ocean Currents</h4>
+                                        <p class="article-author">Prof. Emma Johnson, Dr. Robert Kim</p>
+                                        <div class="article-meta">
+                                            <span class="article-meta-item">
+                                                <i data-lucide="message-circle"></i>
+                                                312 citations
+                                            </span>
+                                            <span class="article-meta-item">
+                                                <i data-lucide="calendar"></i>
+                                                2024
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Two Column Layout -->
+                    <div class="charts-grid">
+                        <!-- Recent Publications -->
+                        <div class="chart-card large">
+                            <div class="chart-header">
+                                <div>
+                                    <h3 class="chart-title">Recent Publications</h3>
+                                    <p class="chart-subtitle">Latest articles and research papers</p>
+                                </div>
+                                <a href="{% url 'app:indexed_articles' %}" class="link-button">See all</a>
+                            </div>
+                            <div class="chart-content">
+                                <div class="publications-list">
+                                    <div class="publication-item">
+                                        <div class="publication-icon">
+                                            <i data-lucide="file-text"></i>
+                                        </div>
+                                        <div class="publication-details">
+                                            <h4 class="publication-title">Neuroplasticity in Adult Brain Development</h4>
+                                            <p class="publication-info">Prof. Maria González • Neuroscience • 2024</p>
+                                            <div class="publication-stats">
+                                                <span><i data-lucide="message-circle"></i> 312 citations</span>
+                                                <span><i data-lucide="eye"></i> 1.2K views</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="publication-item">
+                                        <div class="publication-icon">
+                                            <i data-lucide="file-text"></i>
+                                        </div>
+                                        <div class="publication-details">
+                                            <h4 class="publication-title">CRISPR Gene Editing: Therapeutic Applications</h4>
+                                            <p class="publication-info">Dr. Emily Liu • Biotechnology • 2024</p>
+                                            <div class="publication-stats">
+                                                <span><i data-lucide="message-circle"></i> 278 citations</span>
+                                                <span><i data-lucide="eye"></i> 980 views</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="publication-item">
+                                        <div class="publication-icon">
+                                            <i data-lucide="file-text"></i>
+                                        </div>
+                                        <div class="publication-details">
+                                            <h4 class="publication-title">Global Warming Impact on Marine Ecosystems</h4>
+                                            <p class="publication-info">Dr. Michael Chen • Climate Science • 2024</p>
+                                            <div class="publication-stats">
+                                                <span><i data-lucide="message-circle"></i> 421 citations</span>
+                                                <span><i data-lucide="eye"></i> 1.5K views</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="publication-item">
+                                        <div class="publication-icon">
+                                            <i data-lucide="file-text"></i>
+                                        </div>
+                                        <div class="publication-details">
+                                            <h4 class="publication-title">Deep Learning Models for Medical Diagnosis</h4>
+                                            <p class="publication-info">Dr. Alex Thompson • AI • 2024</p>
+                                            <div class="publication-stats">
+                                                <span><i data-lucide="message-circle"></i> 567 citations</span>
+                                                <span><i data-lucide="eye"></i> 2.1K views</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Featured Researchers -->
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <div>
+                                    <h3 class="chart-title">Featured Researchers</h3>
+                                    <p class="chart-subtitle">Top contributors this month</p>
+                                </div>
+                                <a href="{% url 'app:directory_researchers' %}" class="link-button">View all</a>
+                            </div>
+                            <div class="chart-content">
+                                <div class="researchers-list">
+                                    <div class="researcher-item">
+                                        <div class="researcher-avatar">SM</div>
+                                        <div class="researcher-info">
+                                            <h4 class="researcher-name">Dr. Sarah Martinez</h4>
+                                            <p class="researcher-title">Stanford University</p>
+                                            <div class="researcher-stats">
+                                                <span>45 papers</span>
+                                                <span>8.9K citations</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="researcher-item">
+                                        <div class="researcher-avatar">JP</div>
+                                        <div class="researcher-info">
+                                            <h4 class="researcher-name">Prof. James Park</h4>
+                                            <p class="researcher-title">MIT</p>
+                                            <div class="researcher-stats">
+                                                <span>32 papers</span>
+                                                <span>6.2K citations</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="researcher-item">
+                                        <div class="researcher-avatar">MC</div>
+                                        <div class="researcher-info">
+                                            <h4 class="researcher-name">Dr. Michael Chen</h4>
+                                            <p class="researcher-title">Harvard University</p>
+                                            <div class="researcher-stats">
+                                                <span>28 papers</span>
+                                                <span>4.5K citations</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="researcher-item">
+                                        <div class="researcher-avatar">EL</div>
+                                        <div class="researcher-info">
+                                            <h4 class="researcher-name">Dr. Emily Liu</h4>
+                                            <p class="researcher-title">UC Berkeley</p>
+                                            <div class="researcher-stats">
+                                                <span>38 papers</span>
+                                                <span>5.8K citations</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions & News -->
+                    <div class="charts-grid">
+                        <!-- Quick Actions -->
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <div>
+                                    <h3 class="chart-title">Quick Actions</h3>
+                                    <p class="chart-subtitle">Get started with common tasks</p>
+                                </div>
+                            </div>
+                            <div class="chart-content">
+                                <div class="quick-actions-grid">
+                                    <a href="{% url 'app:upload_article' %}" class="quick-action-item">
+                                        <div class="quick-action-icon">
+                                            <i data-lucide="upload"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="quick-action-title">Upload Article</h4>
+                                            <p class="quick-action-desc">Submit your research</p>
+                                        </div>
+                                    </a>
+                                    <a href="{% url 'app:register_journal' %}" class="quick-action-item">
+                                        <div class="quick-action-icon">
+                                            <i data-lucide="book"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="quick-action-title">Register Journal</h4>
+                                            <p class="quick-action-desc">Add a new journal</p>
+                                        </div>
+                                    </a>
+                                    <a href="{% url 'app:upload_project' %}" class="quick-action-item">
+                                        <div class="quick-action-icon">
+                                            <i data-lucide="folder"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="quick-action-title">Upload Project</h4>
+                                            <p class="quick-action-desc">Archive your project</p>
+                                        </div>
+                                    </a>
+                                    <a href="{% url 'app:check_turnitin' %}" class="quick-action-item">
+                                        <div class="quick-action-icon">
+                                            <i data-lucide="shield-check"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="quick-action-title">Check Turnitin</h4>
+                                            <p class="quick-action-desc">Verify originality</p>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- News & Announcements -->
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <div>
+                                    <h3 class="chart-title">News & Announcements</h3>
+                                    <p class="chart-subtitle">Latest updates and news</p>
+                                </div>
+                            </div>
+                            <div class="chart-content">
+                                <div class="announcements-list">
+                                    <div class="announcement-item">
+                                        <div class="announcement-icon">
+                                            <i data-lucide="megaphone"></i>
+                                        </div>
+                                        <div class="announcement-content">
+                                            <h4 class="announcement-title">New Submission Guidelines</h4>
+                                            <p class="announcement-text">Updated guidelines for article submissions are now available.</p>
+                                            <span class="announcement-date">2 days ago</span>
+                                        </div>
+                                    </div>
+                                    <div class="announcement-item">
+                                        <div class="announcement-icon">
+                                            <i data-lucide="star"></i>
+                                        </div>
+                                        <div class="announcement-content">
+                                            <h4 class="announcement-title">Hall of Fame 2024</h4>
+                                            <p class="announcement-text">Congratulations to our top researchers this year!</p>
+                                            <span class="announcement-date">1 week ago</span>
+                                        </div>
+                                    </div>
+                                    <div class="announcement-item">
+                                        <div class="announcement-icon">
+                                            <i data-lucide="zap"></i>
+                                        </div>
+                                        <div class="announcement-content">
+                                            <h4 class="announcement-title">Platform Updates</h4>
+                                            <p class="announcement-text">New features and improvements have been deployed.</p>
+                                            <span class="announcement-date">2 weeks ago</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

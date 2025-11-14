@@ -1,0 +1,65 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+/staticfiles/
+/media/
+
+# Media files (user uploads)
+media/
+articles/
+profiles/
+journals/
+projects/
+membership_requests/
+directory_applications/
+hall_of_fame/
+plagiarism_checks/
+plagiarism_reports/
+plagiarism_work/
+thesis_to_article/
+thesis_to_book/
+thesis_to_book_chapter/
+powerpoint_preparation/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+
