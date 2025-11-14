@@ -955,7 +955,18 @@ def policy_terms(request):
 
 def dashboard(request):
     """Dashboard page view"""
-    return render(request, 'app/dashboard.html')
+    user = request.user
+    profile = None
+    if user.is_authenticated:
+        try:
+            profile = user.profile
+        except UserProfile.DoesNotExist:
+            profile = UserProfile.objects.create(user=user)
+    
+    return render(request, 'app/dashboard.html', {
+        'user': user,
+        'profile': profile,
+    })
 
 @login_required
 def account_detail(request):
