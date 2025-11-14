@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
+from django.core.mail import send_mail
+from django.conf import settings
 import time
 import csv
 import io
@@ -146,6 +148,12 @@ def auth(request):
                 return render(request, 'app/auth.html')
     
     return render(request, 'app/auth.html')
+
+def logout_view(request):
+    """Logout view"""
+    logout(request)
+    messages.success(request, 'You have been logged out successfully.')
+    return redirect('app:landing')
 
 def indexed_articles(request):
     """Indexed Articles page view"""
@@ -1096,6 +1104,9 @@ def list_accounts(request):
     # Get all users with profiles
     users = User.objects.filter(profile__isnull=False).select_related('profile')
     
+    # Get total count before filtering (for display)
+    total_all_users = users.count()
+    
     # Apply role filter
     if role_filter == 'admin':
         users = users.filter(is_superuser=True)
@@ -1133,6 +1144,18 @@ def list_accounts(request):
     start_record = (page_obj.number - 1) * paginator.per_page + 1
     end_record = min(start_record + paginator.per_page - 1, paginator.count)
     
+    # Ensure superusers have correct flags (fix any data inconsistencies)
+    # Superusers should have both is_superuser=True and is_staff=True
+    # Also check for users who might be superusers but have wrong flags
+    for user in page_obj:
+        if user.is_superuser:
+            if not user.is_staff:
+                user.is_staff = True
+                user.save(update_fields=['is_staff'])
+        # If user has is_staff=True but is_superuser=False, and they're the first superuser
+        # or have a specific username pattern, we might want to check
+        # For now, we'll let the frontend handle the display fix
+    
     return render(request, 'app/list_accounts.html', {
         'page_obj': page_obj,
         'users': page_obj,
@@ -1142,6 +1165,8 @@ def list_accounts(request):
         'start_record': start_record,
         'end_record': end_record,
         'total_records': paginator.count,
+        'total_all_users': total_all_users,
+        'has_filters': bool(search_query or role_filter),
     })
 
 @login_required
@@ -1481,7 +1506,45 @@ def update_user_role(request, user_id):
             user.is_staff = False
             # Keep is_active as is (don't deactivate when changing to user)
         
+        # Save the user
         user.save()
+        
+        # Send email notification to the user
+        try:
+            role_display = {
+                'admin': 'Administrator',
+                'staff': 'Staff',
+                'user': 'User'
+            }.get(role_type, role_type.capitalize())
+            
+            subject = f'Your Account Role Has Been Updated - ScholarIndex'
+            message = f'''
+Hello {user.get_full_name() or user.username},
+
+Your account role on ScholarIndex has been updated.
+
+New Role: {role_display}
+
+This change was made by: {request.user.get_full_name() or request.user.username}
+
+If you did not request this change or have any concerns, please contact our support team immediately.
+
+Best regards,
+ScholarIndex Team
+'''
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email],
+                fail_silently=False,
+            )
+        except Exception as e:
+            # Log the error but don't fail the role update
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f'Failed to send role change email to {user.email}: {str(e)}')
+        
         return JsonResponse({'success': True})
     
     return JsonResponse({'success': False, 'error': 'Invalid request'}, status=400)

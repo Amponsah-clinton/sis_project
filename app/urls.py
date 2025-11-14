@@ -9,6 +9,7 @@ urlpatterns = [
     path('submit/', views.submit, name='submit'),
     path('about/', views.about, name='about'),
     path('auth/', views.auth, name='auth'),
+    path('logout/', views.logout_view, name='logout'),
     path('indexed_articles/', views.indexed_articles, name='indexed_articles'),
     path('indexed_articles/view/<int:article_id>/', views.article_detail, name='article_detail'),
     path('indexed_journals/', views.indexed_journals, name='indexed_journals'),

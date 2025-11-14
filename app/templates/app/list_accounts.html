@@ -34,19 +34,36 @@
 
   .search-filter-bar {
     display: flex;
-    gap: 1rem;
+    gap: 0.75rem;
     align-items: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+  }
+  
+  .search-filter-left {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: nowrap;
+    flex: 1;
+  }
+  
+  .search-filter-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
   }
 
   .search-input {
-    flex: 1;
-    min-width: 200px;
+    width: 320px;
+    min-width: 250px;
+    max-width: 320px;
     padding: 0.625rem 1rem;
     border: 1.5px solid #e5e7eb;
     border-radius: 0.5rem;
     font-size: 0.875rem;
     transition: border-color 0.2s ease;
+    flex-shrink: 0;
   }
 
   .search-input:focus {
@@ -62,6 +79,8 @@
     background: white;
     cursor: pointer;
     transition: border-color 0.2s ease;
+    flex-shrink: 0;
+    min-width: 140px;
   }
 
   .sort-select:focus {
@@ -89,6 +108,13 @@
   .account-card:hover {
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     transform: translateY(-2px);
+  }
+
+  /* Ensure popover stays visible when interacting with it */
+  .account-card:hover .account-role-selector,
+  .account-role-selector:hover {
+    display: block !important;
+    opacity: 1;
   }
 
   .account-card-header {
@@ -261,6 +287,25 @@
     text-align: center;
     padding: 3rem 1rem;
     color: #6b7280;
+  }
+
+  .results-count-inline {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    white-space: nowrap;
+  }
+
+  .results-count-number {
+    background: transparent;
+    color: #3b82f6;
+    padding: 0.25rem 0;
+    border-radius: 0;
+    font-weight: 700;
+    font-size: 0.875rem;
   }
 
   /* Modal Styles */
@@ -456,28 +501,36 @@
   .role-toggle-container {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.75rem;
   }
 
   .role-toggle-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.375rem 0;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.625rem;
+    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  .role-toggle-item:hover {
+    background: rgba(59, 130, 246, 0.05);
   }
 
   .role-toggle-label {
     font-size: 0.875rem;
-    font-weight: 500;
-    color: #374151;
+    font-weight: 600;
+    color: #1f2937;
     margin: 0;
+    letter-spacing: 0.01em;
   }
 
   .toggle-switch {
     position: relative;
     display: inline-block;
-    width: 3rem;
-    height: 1.5rem;
+    width: 3.25rem;
+    height: 1.75rem;
   }
 
   .toggle-switch input {
@@ -493,82 +546,104 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #d1d5db;
-    transition: 0.3s;
-    border-radius: 1.5rem;
+    background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 2rem;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
   .toggle-slider:before {
     position: absolute;
     content: "";
-    height: 1.125rem;
-    width: 1.125rem;
+    height: 1.375rem;
+    width: 1.375rem;
     left: 0.1875rem;
     bottom: 0.1875rem;
-    background-color: white;
-    transition: 0.3s;
+    background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1);
   }
 
   .toggle-switch input:checked + .toggle-slider {
-    background-color: #3b82f6;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
 
   .toggle-switch input:checked + .toggle-slider:before {
     transform: translateX(1.5rem);
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4), 0 1px 3px rgba(59, 130, 246, 0.3);
   }
 
   .toggle-switch input:disabled + .toggle-slider {
     opacity: 0.5;
     cursor: not-allowed;
+    background: #f3f4f6;
   }
 
   .toggle-switch input:focus + .toggle-slider {
-    box-shadow: 0 0 1px #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
   }
 
-  /* Role Popover Styles */
+  .toggle-switch:hover .toggle-slider:not(.disabled) {
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(59, 130, 246, 0.1);
+  }
+
+  /* Role Popover Styles - Modern Design */
   .account-role-selector {
     display: none;
     position: absolute;
     top: calc(100% + 0.5rem);
     left: 50%;
     transform: translateX(-50%);
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    padding: 0.75rem;
-    z-index: 100;
-    min-width: 180px;
-    animation: fadeIn 0.2s ease;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 
+      0 20px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04),
+      0 0 0 1px rgba(0, 0, 0, 0.05);
+    padding: 1rem 1.25rem;
+    z-index: 1000;
+    min-width: 200px;
+    max-width: 220px;
+    animation: fadeInScale 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: auto;
+    backdrop-filter: blur(10px);
   }
 
-  @keyframes fadeIn {
+  @keyframes fadeInScale {
     from {
       opacity: 0;
-      transform: translateX(-50%) translateY(-0.5rem);
+      transform: translateX(-50%) translateY(-0.5rem) scale(0.95);
     }
     to {
       opacity: 1;
-      transform: translateX(-50%) translateY(0);
+      transform: translateX(-50%) translateY(0) scale(1);
     }
   }
 
-  .account-card:hover .account-role-selector {
+  .account-card:hover .account-role-selector,
+  .account-role-selector:hover {
     display: block;
+  }
+
+  /* Keep popover visible when hovering over it or the card */
+  .account-card:hover .account-role-selector,
+  .account-card .account-role-selector:hover {
+    display: block !important;
   }
 
   .role-popover-arrow {
     position: absolute;
-    top: -0.375rem;
+    top: -0.5rem;
     left: 50%;
     transform: translateX(-50%) rotate(45deg);
-    width: 0.75rem;
-    height: 0.75rem;
-    background: white;
-    border-left: 1px solid #e5e7eb;
-    border-top: 1px solid #e5e7eb;
+    width: 1rem;
+    height: 1rem;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: none;
+    box-shadow: -2px -2px 5px rgba(0, 0, 0, 0.05);
   }
 
   @media (max-width: 768px) {
@@ -578,11 +653,28 @@
 
     .search-filter-bar {
       flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .search-filter-left {
+      flex-direction: column;
+      width: 100%;
+    }
+    
+    .search-filter-right {
+      width: 100%;
+      justify-content: center;
+      margin-top: 0.5rem;
     }
 
-    .search-input,
+    .search-input {
+      width: 100%;
+      max-width: 100%;
+    }
+    
     .sort-select {
       width: 100%;
+      min-width: auto;
     }
   }
 </style>
@@ -595,32 +687,49 @@
       <h1 class="page-title">All Accounts</h1>
       
       <form method="get" action="{% url 'app:list_accounts' %}" id="filterForm" class="search-filter-bar">
-        <input 
-          type="text" 
-          name="search" 
-          value="{{ current_search }}" 
-          placeholder="Search by name or email..." 
-          class="search-input"
-        >
-        <select name="role" class="sort-select" onchange="document.getElementById('filterForm').submit();">
-          <option value="">All Roles</option>
-          <option value="admin" {% if current_role == 'admin' %}selected{% endif %}>Admin</option>
-          <option value="staff" {% if current_role == 'staff' %}selected{% endif %}>Staff</option>
-          <option value="user" {% if current_role == 'user' %}selected{% endif %}>User</option>
-        </select>
-        <select name="sort" class="sort-select" onchange="document.getElementById('filterForm').submit();">
-          <option value="recent" {% if current_sort == 'recent' %}selected{% endif %}>Most Recent</option>
-          <option value="oldest" {% if current_sort == 'oldest' %}selected{% endif %}>Oldest First</option>
-          <option value="name" {% if current_sort == 'name' %}selected{% endif %}>Name (A-Z)</option>
-        </select>
-        <button type="submit" style="padding: 0.625rem 1.5rem; background: #3b82f6; color: white; border: none; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: background 0.2s ease;" onmouseover="this.style.background='#2563eb';" onmouseout="this.style.background='#3b82f6';">
-          Search
-        </button>
-        {% if current_search or current_role %}
-        <a href="{% url 'app:list_accounts' %}" style="padding: 0.625rem 1.5rem; background: white; color: #6b7280; border: 1.5px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; text-decoration: none; transition: all 0.2s ease;" onmouseover="this.style.background='#f9fafb';" onmouseout="this.style.background='white';">
-          Clear
-        </a>
-        {% endif %}
+        <div class="search-filter-left">
+          <input 
+            type="text" 
+            name="search" 
+            id="searchInput"
+            value="{{ current_search }}" 
+            placeholder="Search by name or email..." 
+            class="search-input"
+            autocomplete="off"
+          >
+          <select name="role" class="sort-select" onchange="document.getElementById('filterForm').submit();">
+            <option value="">All Roles</option>
+            <option value="admin" {% if current_role == 'admin' %}selected{% endif %}>Admin</option>
+            <option value="staff" {% if current_role == 'staff' %}selected{% endif %}>Staff</option>
+            <option value="user" {% if current_role == 'user' %}selected{% endif %}>User</option>
+          </select>
+          <select name="sort" class="sort-select" onchange="document.getElementById('filterForm').submit();">
+            <option value="recent" {% if current_sort == 'recent' %}selected{% endif %}>Most Recent</option>
+            <option value="oldest" {% if current_sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+            <option value="name" {% if current_sort == 'name' %}selected{% endif %}>Name (A-Z)</option>
+          </select>
+          {% if current_search or current_role %}
+          <a href="{% url 'app:list_accounts' %}" style="padding: 0.625rem 1.5rem; background: white; color: #6b7280; border: 1.5px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; text-decoration: none; transition: all 0.2s ease;" onmouseover="this.style.background='#f9fafb';" onmouseout="this.style.background='white';">
+            Clear
+          </a>
+          {% endif %}
+        </div>
+        <div class="search-filter-right">
+          <div class="results-count-inline">
+            <span>Showing</span>
+            <span class="results-count-number">{{ total_records }}</span>
+            <span>
+              {% if has_filters %}
+                result{{ total_records|pluralize }}
+                {% if total_records != total_all_users %}
+                  of {{ total_all_users }}
+                {% endif %}
+              {% else %}
+                account{{ total_records|pluralize }}
+              {% endif %}
+            </span>
+          </div>
+        </div>
       </form>
     </div>
 
@@ -644,9 +753,7 @@
         {% if request.user.is_superuser or request.user.is_staff %}
         <div class="account-role-selector">
           <div class="role-popover-arrow"></div>
-          <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #1e40af; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">User Role</label>
           <div class="role-toggle-container">
-            {% if request.user.is_superuser %}
             <div class="role-toggle-item">
               <label class="role-toggle-label" for="admin-toggle-{{ user.id }}">Admin</label>
               <label class="toggle-switch">
@@ -655,11 +762,11 @@
                        data-role="admin" 
                        data-user-id="{{ user.id }}"
                        {% if user.is_superuser %}checked{% endif %}
-                       onchange="handleRoleToggle({{ user.id }}, 'admin', this)">
+                       {% if not request.user.is_superuser %}disabled{% endif %}
+                       onclick="handleRoleToggleClick({{ user.id }}, 'admin', this, event)">
                 <span class="toggle-slider"></span>
               </label>
             </div>
-            {% endif %}
             <div class="role-toggle-item">
               <label class="role-toggle-label" for="staff-toggle-{{ user.id }}">Staff</label>
               <label class="toggle-switch">
@@ -668,7 +775,7 @@
                        data-role="staff" 
                        data-user-id="{{ user.id }}"
                        {% if user.is_staff and not user.is_superuser %}checked{% endif %}
-                       onchange="handleRoleToggle({{ user.id }}, 'staff', this)">
+                       onclick="handleRoleToggleClick({{ user.id }}, 'staff', this, event)">
                 <span class="toggle-slider"></span>
               </label>
             </div>
@@ -680,7 +787,7 @@
                        data-role="user" 
                        data-user-id="{{ user.id }}"
                        {% if not user.is_superuser and not user.is_staff %}checked{% endif %}
-                       onchange="handleRoleToggle({{ user.id }}, 'user', this)">
+                       onclick="handleRoleToggleClick({{ user.id }}, 'user', this, event)">
                 <span class="toggle-slider"></span>
               </label>
             </div>
@@ -882,6 +989,41 @@
         }
       });
     }
+    
+    // Ensure role toggles are in correct state on page load
+    // Fix any inconsistencies - superusers should always show Admin checked
+    {% for user in users %}
+    (function() {
+      const adminToggle = document.getElementById('admin-toggle-{{ user.id }}');
+      const staffToggle = document.getElementById('staff-toggle-{{ user.id }}');
+      const userToggle = document.getElementById('user-toggle-{{ user.id }}');
+      
+      if (!adminToggle || !staffToggle || !userToggle) return;
+      
+      // If user is superuser according to backend, ensure Admin is checked
+      {% if user.is_superuser %}
+      adminToggle.checked = true;
+      staffToggle.checked = false;
+      userToggle.checked = false;
+      {% else %}
+      // For non-superusers, ensure only one toggle is checked
+      // Priority: Admin > Staff > User
+      if (adminToggle.checked) {
+        staffToggle.checked = false;
+        userToggle.checked = false;
+      } else if (staffToggle.checked) {
+        adminToggle.checked = false;
+        userToggle.checked = false;
+      } else if (userToggle.checked) {
+        adminToggle.checked = false;
+        staffToggle.checked = false;
+      } else {
+        // If none are checked, default to User
+        userToggle.checked = true;
+      }
+      {% endif %}
+    })();
+    {% endfor %}
   });
 
   function openEditModal(userId) {
@@ -1058,19 +1200,36 @@
     window.location.href = url.toString();
   }
 
-  function handleRoleToggle(userId, roleType, toggleElement) {
+  function handleRoleToggleClick(userId, roleType, toggleElement, event) {
+    event.preventDefault();
+    
     // Get all toggles for this user
     const adminToggle = document.getElementById(`admin-toggle-${userId}`);
     const staffToggle = document.getElementById(`staff-toggle-${userId}`);
     const userToggle = document.getElementById(`user-toggle-${userId}`);
     
-    // If trying to turn off a toggle, don't allow it - user must select another role first
-    if (!toggleElement.checked) {
-      toggleElement.checked = true; // Keep it checked
-      return; // Don't proceed with the change
+    // Get current state before any changes
+    const wasChecked = toggleElement.checked;
+    
+    // If trying to turn off the currently active role, prevent it
+    if (wasChecked) {
+      // Check if this is the only checked role
+      const checkedCount = [
+        adminToggle?.checked,
+        staffToggle?.checked,
+        userToggle?.checked
+      ].filter(Boolean).length;
+      
+      if (checkedCount === 1) {
+        // This is the only active role, don't allow turning it off
+        return;
+      }
     }
     
-    // If turning on a role, turn off all others (only one role can be active at a time)
+    // Toggle the clicked element
+    toggleElement.checked = !wasChecked;
+    
+    // If turning on this role, turn off all others (only one role can be active)
     if (toggleElement.checked) {
       if (roleType === 'admin') {
         if (staffToggle) staffToggle.checked = false;
@@ -1082,7 +1241,17 @@
         if (adminToggle) adminToggle.checked = false;
         if (staffToggle) staffToggle.checked = false;
       }
+      
+      // Only proceed with database update if turning ON a role
+      updateRoleInDatabase(userId, roleType, toggleElement);
     }
+  }
+
+  function updateRoleInDatabase(userId, roleType, toggleElement) {
+    // Get all toggles for this user
+    const adminToggle = document.getElementById(`admin-toggle-${userId}`);
+    const staffToggle = document.getElementById(`staff-toggle-${userId}`);
+    const userToggle = document.getElementById(`user-toggle-${userId}`);
     
     // Disable all toggles while processing
     if (adminToggle) adminToggle.disabled = true;
@@ -1143,6 +1312,100 @@
       if (userToggle) userToggle.disabled = false;
     });
   }
+
+  // Legacy function for backward compatibility
+  function handleRoleToggle(userId, roleType, toggleElement) {
+    handleRoleToggleClick(userId, roleType, toggleElement, { preventDefault: () => {} });
+  }
+
+  // Role popover hover management
+  let rolePopoverTimeout = null;
+
+  function clearRolePopoverTimeout(popover) {
+    if (rolePopoverTimeout) {
+      clearTimeout(rolePopoverTimeout);
+      rolePopoverTimeout = null;
+    }
+  }
+
+  function hideRolePopoverDelayed(popover) {
+    clearRolePopoverTimeout(popover);
+    rolePopoverTimeout = setTimeout(() => {
+      if (popover) {
+        popover.style.display = 'none';
+      }
+    }, 300); // 300ms delay before hiding
+  }
+
+  // Keep popover visible when hovering over account card
+  document.addEventListener('DOMContentLoaded', function() {
+    // Auto-search functionality
+    let searchTimeout = null;
+    const searchInput = document.getElementById('searchInput');
+    const filterForm = document.getElementById('filterForm');
+    
+    if (searchInput && filterForm) {
+      searchInput.addEventListener('input', function(e) {
+        // Clear previous timeout
+        if (searchTimeout) {
+          clearTimeout(searchTimeout);
+        }
+        
+        // Set new timeout to submit form after user stops typing (500ms delay)
+        searchTimeout = setTimeout(function() {
+          filterForm.submit();
+        }, 500);
+      });
+      
+      // Also submit on Enter key
+      searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (searchTimeout) {
+            clearTimeout(searchTimeout);
+          }
+          filterForm.submit();
+        }
+      });
+    }
+    const accountCards = document.querySelectorAll('.account-card');
+    accountCards.forEach(card => {
+      const popover = card.querySelector('.account-role-selector');
+      if (!popover) return;
+
+      let cardTimeout = null;
+      let popoverTimeout = null;
+
+      card.addEventListener('mouseenter', function() {
+        clearTimeout(cardTimeout);
+        clearTimeout(popoverTimeout);
+        popover.style.display = 'block';
+      });
+
+      card.addEventListener('mouseleave', function(e) {
+        // Check if mouse is moving to popover
+        const relatedTarget = e.relatedTarget;
+        if (popover.contains(relatedTarget)) {
+          return; // Don't hide if moving to popover
+        }
+        cardTimeout = setTimeout(() => {
+          popover.style.display = 'none';
+        }, 200);
+      });
+
+      popover.addEventListener('mouseenter', function() {
+        clearTimeout(cardTimeout);
+        clearTimeout(popoverTimeout);
+        popover.style.display = 'block';
+      });
+
+      popover.addEventListener('mouseleave', function() {
+        popoverTimeout = setTimeout(() => {
+          popover.style.display = 'none';
+        }, 200);
+      });
+    });
+  });
 
   // Legacy function for backward compatibility (if needed elsewhere)
   function changeUserRole(userId, newRole, selectElement) {
