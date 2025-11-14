@@ -33,7 +33,7 @@ a{
   justify-content: center;
   gap: 0.5rem;
   white-space: nowrap;
-  padding: 0.625rem 1.25rem;
+  padding: calc(0.625rem - 1.5px) calc(1.25rem - 1.5px);
   border: 1.5px solid #dc2626;
   border-radius: 10px;
   font-size: 0.875rem;
@@ -44,6 +44,8 @@ a{
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   background: white;
   color: #dc2626;
+  box-sizing: border-box;
+  line-height: 1;
 }
 
 .logout-button:hover {
@@ -193,7 +195,10 @@ a{
         {% else %}
         <a href="{% url 'app:auth' %}" class="btn btn-ghost">Sign In</a>
         {% endif %}
-        <a href="{% url 'app:sponsors' %}" class="btn btn-primary">Donate</a>
+        <a href="{% url 'app:sponsors' %}" class="btn btn-primary">
+          <i data-lucide="gift"></i>
+          Donate
+        </a>
       </div>
 
       <button class="menu-button" onclick="toggleMenu()">
@@ -233,7 +238,10 @@ a{
         {% else %}
         <a href="{% url 'app:auth' %}" class="btn btn-ghost" onclick="closeMenu()">Sign In</a>
         {% endif %}
-        <a href="{% url 'app:sponsors' %}" class="btn btn-primary" onclick="closeMenu()">Donate</a>
+        <a href="{% url 'app:sponsors' %}" class="btn btn-primary" onclick="closeMenu()">
+          <i data-lucide="gift"></i>
+          Donate
+        </a>
       </div>
     </div>
   </div>

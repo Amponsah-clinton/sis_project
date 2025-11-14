@@ -100,6 +100,11 @@ def auth(request):
             name = request.POST.get('name', '')
             username = request.POST.get('username', email.split('@')[0] if email else 'user')
             
+            # Check if email is already registered
+            if email and User.objects.filter(email=email).exists():
+                messages.error(request, 'A user with this email already exists. Please use a different email address or try logging in.')
+                return render(request, 'app/auth.html')
+            
             # Ensure username is unique
             base_username = username
             counter = 1
