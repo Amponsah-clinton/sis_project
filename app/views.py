@@ -1450,9 +1450,9 @@ def export_account(request, user_id, format_type):
 @login_required
 def update_user_role(request, user_id):
     """Update user role (Admin, Staff, User)"""
-    # Only superusers can change roles
-    if not request.user.is_superuser:
-        return JsonResponse({'success': False, 'error': 'Permission denied. Only superusers can change roles.'}, status=403)
+    # Superusers can change any role, staff can change to user/staff (not admin)
+    if not (request.user.is_superuser or request.user.is_staff):
+        return JsonResponse({'success': False, 'error': 'Permission denied. Only staff/superusers can change roles.'}, status=403)
     
     try:
         user = User.objects.get(id=user_id)
@@ -1465,7 +1465,10 @@ def update_user_role(request, user_id):
         role_type = data.get('role_type')
         
         # Set role based on selection
+        # Only superusers can set admin role
         if role_type == 'admin':
+            if not request.user.is_superuser:
+                return JsonResponse({'success': False, 'error': 'Only superusers can assign admin role.'}, status=403)
             user.is_superuser = True
             user.is_staff = True  # Admin is also staff
             user.is_active = True

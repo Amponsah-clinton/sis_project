@@ -83,6 +83,7 @@
     padding: 1.25rem;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     transition: all 0.2s ease;
+    position: relative;
   }
 
   .account-card:hover {
@@ -271,13 +272,14 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
+    z-index: 10050 !important;
     align-items: center;
     justify-content: center;
+    padding: 1rem;
   }
 
   .modal-overlay.show {
-    display: flex;
+    display: flex !important;
   }
 
   .modal {
@@ -289,6 +291,8 @@
     max-height: 90vh;
     overflow-y: auto;
     position: relative;
+    z-index: 10051 !important;
+    margin: auto;
   }
 
   .modal-header {
@@ -448,6 +452,125 @@
     color: #6b7280;
   }
 
+  /* Toggle Switch Styles */
+  .role-toggle-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .role-toggle-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.375rem 0;
+  }
+
+  .role-toggle-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin: 0;
+  }
+
+  .toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 3rem;
+    height: 1.5rem;
+  }
+
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #d1d5db;
+    transition: 0.3s;
+    border-radius: 1.5rem;
+  }
+
+  .toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 1.125rem;
+    width: 1.125rem;
+    left: 0.1875rem;
+    bottom: 0.1875rem;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+  }
+
+  .toggle-switch input:checked + .toggle-slider {
+    background-color: #3b82f6;
+  }
+
+  .toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(1.5rem);
+  }
+
+  .toggle-switch input:disabled + .toggle-slider {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .toggle-switch input:focus + .toggle-slider {
+    box-shadow: 0 0 1px #3b82f6;
+  }
+
+  /* Role Popover Styles */
+  .account-role-selector {
+    display: none;
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 0.75rem;
+    z-index: 100;
+    min-width: 180px;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-0.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  }
+
+  .account-card:hover .account-role-selector {
+    display: block;
+  }
+
+  .role-popover-arrow {
+    position: absolute;
+    top: -0.375rem;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 0.75rem;
+    height: 0.75rem;
+    background: white;
+    border-left: 1px solid #e5e7eb;
+    border-top: 1px solid #e5e7eb;
+  }
+
   @media (max-width: 768px) {
     .accounts-grid {
       grid-template-columns: 1fr;
@@ -518,21 +641,50 @@
             <p class="account-email">{{ user.email|default:"No email" }}</p>
           </div>
         </div>
-        {% if request.user.is_superuser %}
-        <div class="account-role-selector" style="margin-bottom: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #f3f4f6;">
-          <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">User Role</label>
-          <select class="role-select" id="role-select-{{ user.id }}" data-user-id="{{ user.id }}" data-current-role="{% if user.is_superuser %}admin{% elif user.is_staff %}staff{% else %}user{% endif %}" onchange="changeUserRole({{ user.id }}, this.value, this)" style="width: 100%; padding: 0.5rem 0.75rem; border: 1.5px solid #e5e7eb; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 500; background: white; cursor: pointer; transition: all 0.2s ease;">
-            <option value="user" {% if not user.is_superuser and not user.is_staff %}selected{% endif %}>User</option>
-            <option value="staff" {% if user.is_staff and not user.is_superuser %}selected{% endif %}>Staff</option>
-            <option value="admin" {% if user.is_superuser %}selected{% endif %}>Admin</option>
-          </select>
-        </div>
-        {% else %}
-        <div style="margin-bottom: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #f3f4f6;">
-          <span style="font-size: 0.75rem; font-weight: 600; color: #374151; margin-right: 0.5rem;">Role:</span>
-          <span style="font-size: 0.75rem; color: #6b7280; text-transform: capitalize;">
-            {% if user.is_superuser %}Admin{% elif user.is_staff %}Staff{% else %}User{% endif %}
-          </span>
+        {% if request.user.is_superuser or request.user.is_staff %}
+        <div class="account-role-selector">
+          <div class="role-popover-arrow"></div>
+          <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #1e40af; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">User Role</label>
+          <div class="role-toggle-container">
+            {% if request.user.is_superuser %}
+            <div class="role-toggle-item">
+              <label class="role-toggle-label" for="admin-toggle-{{ user.id }}">Admin</label>
+              <label class="toggle-switch">
+                <input type="checkbox" 
+                       id="admin-toggle-{{ user.id }}" 
+                       data-role="admin" 
+                       data-user-id="{{ user.id }}"
+                       {% if user.is_superuser %}checked{% endif %}
+                       onchange="handleRoleToggle({{ user.id }}, 'admin', this)">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            {% endif %}
+            <div class="role-toggle-item">
+              <label class="role-toggle-label" for="staff-toggle-{{ user.id }}">Staff</label>
+              <label class="toggle-switch">
+                <input type="checkbox" 
+                       id="staff-toggle-{{ user.id }}" 
+                       data-role="staff" 
+                       data-user-id="{{ user.id }}"
+                       {% if user.is_staff and not user.is_superuser %}checked{% endif %}
+                       onchange="handleRoleToggle({{ user.id }}, 'staff', this)">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="role-toggle-item">
+              <label class="role-toggle-label" for="user-toggle-{{ user.id }}">User</label>
+              <label class="toggle-switch">
+                <input type="checkbox" 
+                       id="user-toggle-{{ user.id }}" 
+                       data-role="user" 
+                       data-user-id="{{ user.id }}"
+                       {% if not user.is_superuser and not user.is_staff %}checked{% endif %}
+                       onchange="handleRoleToggle({{ user.id }}, 'user', this)">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
         </div>
         {% endif %}
         <div class="account-actions">
@@ -540,6 +692,7 @@
             <i data-lucide="eye" style="width: 1rem; height: 1rem;"></i>
             View
           </a>
+          {% if request.user.is_superuser or request.user.is_staff %}
           <button onclick="openEditModal({{ user.id }})" class="view-btn" style="flex: 1; border-color: #3b82f6; color: #3b82f6; background: white; cursor: pointer; font-family: inherit; font-size: inherit;" onmouseover="this.style.background='#3b82f6'; this.style.color='white';" onmouseout="this.style.background='white'; this.style.color='#3b82f6';">
             <i data-lucide="pencil" style="width: 1rem; height: 1rem;"></i>
             Edit
@@ -548,6 +701,7 @@
             <i data-lucide="trash-2" style="width: 1rem; height: 1rem;"></i>
             Delete
           </button>
+          {% endif %}
         </div>
       </div>
       {% endfor %}
@@ -708,10 +862,39 @@
   let currentEditUserId = null;
   let currentDeleteUserId = null;
 
+  // Close modals when clicking outside
+  document.addEventListener('DOMContentLoaded', function() {
+    const editModal = document.getElementById('editModal');
+    const deleteModal = document.getElementById('deleteModal');
+    
+    if (editModal) {
+      editModal.addEventListener('click', function(e) {
+        if (e.target === editModal) {
+          closeEditModal();
+        }
+      });
+    }
+    
+    if (deleteModal) {
+      deleteModal.addEventListener('click', function(e) {
+        if (e.target === deleteModal) {
+          closeDeleteModal();
+        }
+      });
+    }
+  });
+
   function openEditModal(userId) {
     currentEditUserId = userId;
     const modal = document.getElementById('editModal');
+    if (!modal) {
+      console.error('Edit modal not found');
+      return;
+    }
+    // Force display and ensure visibility
+    modal.style.display = 'flex';
     modal.classList.add('show');
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
     
     // Fetch user data
     const url = `{% url 'app:get_user_data' 0 %}`.replace('0', userId.toString());
@@ -762,20 +945,47 @@
   }
 
   function closeEditModal() {
-    document.getElementById('editModal').classList.remove('show');
+    const modal = document.getElementById('editModal');
+    if (modal) {
+      modal.classList.remove('show');
+      modal.style.display = 'none';
+    }
+    document.body.style.overflow = ''; // Restore scrolling
     currentEditUserId = null;
-    document.getElementById('editForm').reset();
+    const form = document.getElementById('editForm');
+    if (form) {
+      form.reset();
+    }
   }
 
   function openDeleteModal(userId, userName) {
     currentDeleteUserId = userId;
-    document.getElementById('deleteUserName').textContent = userName;
-    document.getElementById('deleteModal').classList.add('show');
+    const modal = document.getElementById('deleteModal');
+    const userNameElement = document.getElementById('deleteUserName');
+    
+    if (!modal) {
+      console.error('Delete modal not found');
+      return;
+    }
+    
+    if (userNameElement) {
+      userNameElement.textContent = userName;
+    }
+    
+    // Force display and ensure visibility
+    modal.style.display = 'flex';
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
     lucide.createIcons();
   }
 
   function closeDeleteModal() {
-    document.getElementById('deleteModal').classList.remove('show');
+    const modal = document.getElementById('deleteModal');
+    if (modal) {
+      modal.classList.remove('show');
+      modal.style.display = 'none';
+    }
+    document.body.style.overflow = ''; // Restore scrolling
     currentDeleteUserId = null;
   }
 
@@ -840,18 +1050,7 @@
     });
   });
 
-  // Close modals when clicking outside
-  document.getElementById('editModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-      closeEditModal();
-    }
-  });
-
-  document.getElementById('deleteModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-      closeDeleteModal();
-    }
-  });
+  // Duplicate event listeners removed - already handled in DOMContentLoaded above
 
   function goToPage(pageNum) {
     const url = new URL(window.location.href);
@@ -859,38 +1058,42 @@
     window.location.href = url.toString();
   }
 
-  function changeUserRole(userId, newRole, selectElement) {
-    const select = selectElement || document.getElementById(`role-select-${userId}`);
-    const previousValue = select ? select.getAttribute('data-current-role') : null;
+  function handleRoleToggle(userId, roleType, toggleElement) {
+    // Get all toggles for this user
+    const adminToggle = document.getElementById(`admin-toggle-${userId}`);
+    const staffToggle = document.getElementById(`staff-toggle-${userId}`);
+    const userToggle = document.getElementById(`user-toggle-${userId}`);
     
-    if (!confirm(`Are you sure you want to change this user's role to ${newRole.toUpperCase()}?`)) {
-      // Reset dropdown to previous value
-      if (select && previousValue) {
-        select.value = previousValue;
+    // If trying to turn off a toggle, don't allow it - user must select another role first
+    if (!toggleElement.checked) {
+      toggleElement.checked = true; // Keep it checked
+      return; // Don't proceed with the change
+    }
+    
+    // If turning on a role, turn off all others (only one role can be active at a time)
+    if (toggleElement.checked) {
+      if (roleType === 'admin') {
+        if (staffToggle) staffToggle.checked = false;
+        if (userToggle) userToggle.checked = false;
+      } else if (roleType === 'staff') {
+        if (adminToggle) adminToggle.checked = false;
+        if (userToggle) userToggle.checked = false;
+      } else if (roleType === 'user') {
+        if (adminToggle) adminToggle.checked = false;
+        if (staffToggle) staffToggle.checked = false;
       }
-      return;
     }
     
-    // Disable while processing
-    if (select) {
-      select.disabled = true;
-      select.style.opacity = '0.6';
-      select.style.cursor = 'wait';
-    }
+    // Disable all toggles while processing
+    if (adminToggle) adminToggle.disabled = true;
+    if (staffToggle) staffToggle.disabled = true;
+    if (userToggle) userToggle.disabled = true;
     
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{{ csrf_token }}';
     const roleUrl = `{% url 'app:update_user_role' 0 %}`.replace('0', userId.toString());
     
-    // Update role based on selection
-    let roleType = 'user';
-    if (newRole === 'admin') {
-      roleType = 'admin';
-    } else if (newRole === 'staff') {
-      roleType = 'staff';
-    } else {
-      roleType = 'user';
-    }
-    
+    // Update role in database
+    console.log('Updating role for user', userId, 'to', roleType);
     fetch(roleUrl, {
       method: 'POST',
       headers: {
@@ -902,48 +1105,54 @@
         role_type: roleType
       })
     })
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
     .then(data => {
       if (data.success) {
-        // Update the current role attribute
-        if (select) {
-          select.setAttribute('data-current-role', newRole);
-          select.style.borderColor = '#22c55e';
-          select.style.backgroundColor = '#f0fdf4';
-          select.disabled = false;
-          select.style.opacity = '1';
-          select.style.cursor = 'pointer';
+        console.log('Role updated successfully in database');
+        // Success - show visual feedback
+        const slider = toggleElement.nextElementSibling;
+        if (slider) {
+          const originalBg = slider.style.backgroundColor;
+          slider.style.backgroundColor = '#22c55e';
           setTimeout(() => {
-            select.style.borderColor = '#e5e7eb';
-            select.style.backgroundColor = 'white';
-          }, 2000);
+            slider.style.backgroundColor = originalBg || '';
+          }, 1000);
         }
       } else {
+        console.error('Error updating role:', data.error);
         alert('Error updating role: ' + (data.error || 'Unknown error'));
-        // Reset dropdown to previous value
-        if (select && previousValue) {
-          select.value = previousValue;
-          select.disabled = false;
-          select.style.opacity = '1';
-          select.style.cursor = 'pointer';
-        } else {
-          location.reload();
-        }
+        // Reload to get correct state from database
+        location.reload();
       }
     })
     .catch(error => {
-      console.error('Error:', error);
+      console.error('Error updating role:', error);
       alert('Error updating role. Please try again.');
-      // Reset dropdown to previous value
-      if (select && previousValue) {
-        select.value = previousValue;
-        select.disabled = false;
-        select.style.opacity = '1';
-        select.style.cursor = 'pointer';
-      } else {
-        location.reload();
-      }
+      // Reload to get correct state from database
+      location.reload();
+    })
+    .finally(() => {
+      // Re-enable all toggles
+      if (adminToggle) adminToggle.disabled = false;
+      if (staffToggle) staffToggle.disabled = false;
+      if (userToggle) userToggle.disabled = false;
     });
+  }
+
+  // Legacy function for backward compatibility (if needed elsewhere)
+  function changeUserRole(userId, newRole, selectElement) {
+    // Map to toggle-based approach
+    const toggleId = `${newRole}-toggle-${userId}`;
+    const toggle = document.getElementById(toggleId);
+    if (toggle) {
+      toggle.checked = true;
+      handleRoleToggle(userId, newRole, toggle);
+    }
   }
 </script>
 {% csrf_token %}
