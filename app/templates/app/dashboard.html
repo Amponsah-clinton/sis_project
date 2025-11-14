@@ -1,0 +1,471 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - ScholarIndex</title>
+    <link rel="stylesheet" href="{% static 'app/css/dashboard.css' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/recharts@2.15.4/umd/Recharts.js"></script>
+</head>
+<body>
+    <div class="sidebar-wrapper" id="sidebarWrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar" data-state="expanded">
+            <div class="sidebar-content">
+                <div class="sidebar-header">
+                    <div class="logo-container">
+                        <div class="logo-icon">S</div>
+                        <span class="logo-text" id="logoText">ScholarIndex</span>
+                    </div>
+                </div>
+
+                <div class="sidebar-menu-section">
+                    <div class="menu-group">
+                        <div class="menu-label">MENU</div>
+                        <ul class="menu-list">
+                            <li class="menu-item">
+                                <a href="#" class="menu-link active" data-tooltip="Dashboard">
+                                    <i data-lucide="layout-dashboard"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="{% url 'app:indexed_articles' %}" class="menu-link" data-tooltip="Articles">
+                                    <i data-lucide="file-text"></i>
+                                    <span>Articles</span>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="{% url 'app:indexed_journals' %}" class="menu-link" data-tooltip="Journals">
+                                    <i data-lucide="book"></i>
+                                    <span>Journals</span>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="{% url 'app:project_archive' %}" class="menu-link" data-tooltip="Projects">
+                                    <i data-lucide="folder"></i>
+                                    <span>Projects</span>
+                                </a>
+                            </li>
+                            <li class="menu-item collapsible">
+                                <button class="menu-link collapsible-trigger" data-tooltip="Submissions">
+                                    <i data-lucide="upload"></i>
+                                    <span>Submissions</span>
+                                    <i data-lucide="chevron-down" class="chevron"></i>
+                                </button>
+                                <ul class="menu-sub">
+                                    <li><a href="{% url 'app:upload_article' %}" class="menu-sub-link">Upload Article</a></li>
+                                    <li><a href="{% url 'app:register_journal' %}" class="menu-sub-link">Register Journal</a></li>
+                                    <li><a href="{% url 'app:upload_project' %}" class="menu-sub-link">Upload Project</a></li>
+                                </ul>
+                            </li>
+                            <li class="menu-item">
+                                <a href="{% url 'app:directory_researchers' %}" class="menu-link" data-tooltip="Researchers">
+                                    <i data-lucide="users"></i>
+                                    <span>Researchers</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="menu-group">
+                        <div class="menu-label">OTHERS</div>
+                        <ul class="menu-list">
+                            <li class="menu-item collapsible">
+                                <button class="menu-link collapsible-trigger" data-tooltip="Services">
+                                    <i data-lucide="settings"></i>
+                                    <span>Services</span>
+                                    <i data-lucide="chevron-down" class="chevron"></i>
+                                </button>
+                                <ul class="menu-sub">
+                                    <li><a href="{% url 'app:check_turnitin' %}" class="menu-sub-link">Check Turnitin</a></li>
+                                    <li><a href="{% url 'app:work_plagiarism' %}" class="menu-sub-link">Work Plagiarism</a></li>
+                                    <li><a href="{% url 'app:thesis_to_article' %}" class="menu-sub-link">Thesis to Article</a></li>
+                                </ul>
+                            </li>
+                            <li class="menu-item">
+                                <a href="{% url 'app:landing' %}" class="menu-link" data-tooltip="Home">
+                                    <i data-lucide="home"></i>
+                                    <span>Home</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Navigation -->
+            <header class="top-nav">
+                <div class="top-nav-left">
+                    <button class="sidebar-trigger" id="sidebarTrigger">
+                        <i data-lucide="panel-left"></i>
+                    </button>
+                    <div class="search-container">
+                        <i data-lucide="search" class="search-icon"></i>
+                        <input type="text" placeholder="Search or type command..." class="search-input">
+                        <kbd class="search-kbd">⌘K</kbd>
+                    </div>
+                </div>
+                <div class="top-nav-right">
+                    <button class="icon-button" id="themeToggle">
+                        <i data-lucide="moon" id="themeIcon"></i>
+                    </button>
+                    <div class="notification-menu">
+                        <button class="icon-button notification-button" id="notificationTrigger">
+                            <i data-lucide="bell"></i>
+                            <span class="notification-badge">3</span>
+                        </button>
+                        <div class="notification-backdrop" id="notificationBackdrop"></div>
+                        <div class="notification-dropdown" id="notificationDropdown">
+                            <div class="notification-header">
+                                <h3 class="notification-title">Notifications</h3>
+                                <div class="notification-header-actions">
+                                    <button class="notification-mark-all">Mark all as read</button>
+                                    <button class="notification-close" id="notificationClose" aria-label="Close notifications">
+                                        <i data-lucide="x"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="notification-list">
+                                <div class="notification-item unread">
+                                    <div class="notification-icon">
+                                        <i data-lucide="user-plus"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p class="notification-text"><strong>New article submitted</strong></p>
+                                        <p class="notification-time">2 minutes ago</p>
+                                    </div>
+                                </div>
+                                <div class="notification-item unread">
+                                    <div class="notification-icon">
+                                        <i data-lucide="file-check"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p class="notification-text"><strong>Journal registration approved</strong></p>
+                                        <p class="notification-time">15 minutes ago</p>
+                                    </div>
+                                </div>
+                                <div class="notification-item unread">
+                                    <div class="notification-icon">
+                                        <i data-lucide="alert-circle"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p class="notification-text"><strong>Review pending</strong></p>
+                                        <p class="notification-time">1 hour ago</p>
+                                    </div>
+                                </div>
+                                <div class="notification-item">
+                                    <div class="notification-icon">
+                                        <i data-lucide="check-circle"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p class="notification-text"><strong>Project archived successfully</strong></p>
+                                        <p class="notification-time">2 hours ago</p>
+                                    </div>
+                                </div>
+                                <div class="notification-item">
+                                    <div class="notification-icon">
+                                        <i data-lucide="mail"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p class="notification-text"><strong>New message from admin</strong></p>
+                                        <p class="notification-time">3 hours ago</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="notification-footer">
+                                <a href="#" class="notification-view-all">View all notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-menu">
+                        <button class="user-menu-trigger" id="userMenuTrigger">
+                            <div class="avatar">U</div>
+                            <span class="user-name">User</span>
+                        </button>
+                        <div class="dropdown-menu" id="userDropdown">
+                            <div class="dropdown-item-label">My Account</div>
+                            <div class="dropdown-separator"></div>
+                            <a href="#" class="dropdown-item">
+                                <i data-lucide="user"></i>
+                                Profile
+                            </a>
+                            <a href="#" class="dropdown-item">Settings</a>
+                            <div class="dropdown-separator"></div>
+                            <a href="{% url 'app:auth' %}" class="dropdown-item">Log out</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <main class="dashboard-main">
+                <div class="dashboard-content">
+                    <!-- Stat Cards -->
+                    <div class="stat-cards-grid">
+                        <div class="stat-card">
+                            <div class="stat-card-content">
+                                <div>
+                                    <p class="stat-card-title">Total Articles</p>
+                                    <h3 class="stat-card-value">3,782</h3>
+                                    <div class="stat-card-change positive">
+                                        <i data-lucide="arrow-up"></i>
+                                        <span>11.01%</span>
+                                    </div>
+                                </div>
+                                <div class="stat-card-icon">
+                                    <i data-lucide="file-text"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-content">
+                                <div>
+                                    <p class="stat-card-title">Indexed Journals</p>
+                                    <h3 class="stat-card-value">5,359</h3>
+                                    <div class="stat-card-change negative">
+                                        <i data-lucide="arrow-down"></i>
+                                        <span>9.05%</span>
+                                    </div>
+                                </div>
+                                <div class="stat-card-icon">
+                                    <i data-lucide="book"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row 1 -->
+                    <div class="charts-grid">
+                        <div class="chart-card large">
+                            <div class="chart-header">
+                                <div>
+                                    <h3 class="chart-title">Monthly Submissions</h3>
+                                </div>
+                                <button class="icon-button-small">
+                                    <i data-lucide="more-vertical"></i>
+                                </button>
+                            </div>
+                            <div class="chart-content">
+                                <div id="barChart" style="width: 100%; height: 300px;"></div>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <div>
+                                    <h3 class="chart-title">Monthly Target</h3>
+                                    <p class="chart-subtitle">Target you've set for each month</p>
+                                </div>
+                                <button class="icon-button-small">
+                                    <i data-lucide="more-vertical"></i>
+                                </button>
+                            </div>
+                            <div class="chart-content">
+                                <div class="circular-progress-container">
+                                    <svg class="circular-progress" viewBox="0 0 100 100">
+                                        <circle class="circular-progress-bg" cx="50" cy="50" r="40"></circle>
+                                        <circle class="circular-progress-fill" cx="50" cy="50" r="40" id="progressCircle"></circle>
+                                    </svg>
+                                    <div class="circular-progress-text">
+                                        <span class="progress-percentage">75.55%</span>
+                                        <span class="progress-change positive">+10%</span>
+                                    </div>
+                                </div>
+                                <p class="progress-description">
+                                    You've indexed 3287 items this month, it's higher than last month. Keep up your good work!
+                                </p>
+                                <div class="progress-stats">
+                                    <div class="progress-stat">
+                                        <p class="progress-stat-label">Target</p>
+                                        <p class="progress-stat-value">20K</p>
+                                    </div>
+                                    <div class="progress-stat">
+                                        <p class="progress-stat-label">Indexed</p>
+                                        <p class="progress-stat-value">15K</p>
+                                    </div>
+                                    <div class="progress-stat">
+                                        <p class="progress-stat-label">Today</p>
+                                        <p class="progress-stat-value">3287</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row 2 -->
+                    <div class="charts-grid">
+                        <div class="chart-card large">
+                            <div class="chart-header">
+                                <div>
+                                    <h3 class="chart-title">Statistics</h3>
+                                    <p class="chart-subtitle">Target you've set for each month</p>
+                                </div>
+                                <div class="tabs-container">
+                                    <div class="tabs">
+                                        <button class="tab-trigger active">Monthly</button>
+                                        <button class="tab-trigger">Quarterly</button>
+                                        <button class="tab-trigger">Annually</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chart-content">
+                                <div id="areaChart" style="width: 100%; height: 300px;"></div>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Submissions by Country</h3>
+                                <p class="chart-subtitle">Number of submissions based on country</p>
+                            </div>
+                            <div class="chart-content">
+                                <div class="demographic-list">
+                                    <div class="demographic-item">
+                                        <div class="demographic-header">
+                                            <div class="demographic-info">
+                                                <div class="flag-placeholder"></div>
+                                                <div>
+                                                    <p class="demographic-name">USA</p>
+                                                    <p class="demographic-customers">2,379 Submissions</p>
+                                                </div>
+                                            </div>
+                                            <span class="demographic-percentage">79%</span>
+                                        </div>
+                                        <div class="demographic-bar">
+                                            <div class="demographic-bar-fill" style="width: 79%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="demographic-item">
+                                        <div class="demographic-header">
+                                            <div class="demographic-info">
+                                                <div class="flag-placeholder"></div>
+                                                <div>
+                                                    <p class="demographic-name">France</p>
+                                                    <p class="demographic-customers">589 Submissions</p>
+                                                </div>
+                                            </div>
+                                            <span class="demographic-percentage">23%</span>
+                                        </div>
+                                        <div class="demographic-bar">
+                                            <div class="demographic-bar-fill" style="width: 23%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Submissions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-header-content">
+                                <h3 class="card-title">Recent Submissions</h3>
+                                <button class="link-button">See all</button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Category</th>
+                                            <th>Date</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="table-product">
+                                                    <div class="product-image"></div>
+                                                    <div>
+                                                        <p class="product-name">Machine Learning in Healthcare</p>
+                                                        <p class="product-variant">Research Article</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>Medicine</td>
+                                            <td class="table-price">2024-01-15</td>
+                                            <td><span class="badge badge-default">published</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="table-product">
+                                                    <div class="product-image"></div>
+                                                    <div>
+                                                        <p class="product-name">Quantum Computing Advances</p>
+                                                        <p class="product-variant">Research Article</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>Technology</td>
+                                            <td class="table-price">2024-01-14</td>
+                                            <td><span class="badge badge-secondary">pending</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="table-product">
+                                                    <div class="product-image"></div>
+                                                    <div>
+                                                        <p class="product-name">Climate Change Research</p>
+                                                        <p class="product-variant">Research Article</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>Environmental</td>
+                                            <td class="table-price">2024-01-13</td>
+                                            <td><span class="badge badge-default">published</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="table-product">
+                                                    <div class="product-image"></div>
+                                                    <div>
+                                                        <p class="product-name">AI Ethics Framework</p>
+                                                        <p class="product-variant">Research Article</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>Social Science</td>
+                                            <td class="table-price">2024-01-12</td>
+                                            <td><span class="badge badge-destructive">rejected</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="table-product">
+                                                    <div class="product-image"></div>
+                                                    <div>
+                                                        <p class="product-name">Renewable Energy Systems</p>
+                                                        <p class="product-variant">Research Article</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>Engineering</td>
+                                            <td class="table-price">2024-01-11</td>
+                                            <td><span class="badge badge-default">published</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="{% static 'app/js/dashboard.js' %}"></script>
+    
+</body>
+</html>
+

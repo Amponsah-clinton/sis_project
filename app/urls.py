@@ -35,5 +35,6 @@ urlpatterns = [
     path('tolerance_policy/', views.tolerance_policy, name='tolerance_policy'),
     path('service_solution/', views.service_solution, name='service_solution'),
     path('policy_terms/', views.policy_terms, name='policy_terms'),
+    path('dashboard/', views.dashboard, name='dashboard'),
 ]
 

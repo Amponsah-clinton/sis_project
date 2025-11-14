@@ -474,3 +474,7 @@ def service_solution(request):
 def policy_terms(request):
     """Policy Terms and Conditions page view"""
     return render(request, 'app/policy_terms.html')
+
+def dashboard(request):
+    """Dashboard page view"""
+    return render(request, 'app/dashboard.html')
