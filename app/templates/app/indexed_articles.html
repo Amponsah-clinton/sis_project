@@ -160,7 +160,29 @@
     background-color: #b91c1c;
   }
 
+  .articles-layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .articles-main {
+    position: relative;
+    z-index: 1;
+  }
+
+  .results-header {
+    position: relative;
+    z-index: 2;
+    background-color: var(--background);
+  }
+
   @media (max-width: 968px) {
+    .articles-layout {
+      grid-template-columns: 1fr;
+    }
+
     .articles-sidebar {
       width: 100%;
       margin-bottom: 2rem;

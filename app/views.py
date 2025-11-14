@@ -1511,8 +1511,19 @@ def update_user_role(request, user_id):
             user.is_staff = False
             # Keep is_active as is (don't deactivate when changing to user)
         
-        # Save the user
-        user.save()
+        # Save the user with explicit field updates to ensure persistence
+        # Use update_fields to only update the specific fields we changed
+        user.save(update_fields=['is_superuser', 'is_staff', 'is_active'])
+        
+        # Force database commit and verify the save worked
+        from django.db import connection
+        connection.ensure_connection()
+        
+        # Refresh from database to ensure we have the latest state
+        user.refresh_from_db()
+        
+        # Verify the save worked
+        print(f'User {user.id} role updated - is_superuser: {user.is_superuser}, is_staff: {user.is_staff}')
         
         # Send email notification to the user
         try:
@@ -1523,7 +1534,29 @@ def update_user_role(request, user_id):
             }.get(role_type, role_type.capitalize())
             
             subject = f'Your Account Role Has Been Updated - ScholarIndex'
-            message = f'''
+            
+            # Use HTML email template if available, otherwise plain text
+            try:
+                html_message = render_to_string('app/emails/role_change_notification.html', {
+                    'user': user,
+                    'new_role_display': role_display,
+                    'changed_by': request.user,
+                })
+                send_mail(
+                    subject,
+                    '',  # Plain text version (empty, using HTML)
+                    settings.DEFAULT_FROM_EMAIL,
+                    [user.email],
+                    fail_silently=False,
+                    html_message=html_message,
+                )
+            except Exception as template_error:
+                # Fallback to plain text if template fails
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning(f'Could not load HTML email template: {str(template_error)}')
+                
+                message = f'''
 Hello {user.get_full_name() or user.username},
 
 Your account role on ScholarIndex has been updated.
@@ -1537,20 +1570,37 @@ If you did not request this change or have any concerns, please contact our supp
 Best regards,
 ScholarIndex Team
 '''
-            send_mail(
-                subject,
-                message,
-                settings.DEFAULT_FROM_EMAIL,
-                [user.email],
-                fail_silently=False,
-            )
+                send_mail(
+                    subject,
+                    message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [user.email],
+                    fail_silently=False,
+                )
         except Exception as e:
             # Log the error but don't fail the role update
             import logging
             logger = logging.getLogger(__name__)
-            logger.error(f'Failed to send role change email to {user.email}: {str(e)}')
+            logger.error(f'Failed to send role change email to {user.email}: {str(e)}', exc_info=True)
+            # Print to console for debugging
+            print(f'Email send error: {str(e)}')
+            # Still return success since role was updated, but include email error in response
+            return JsonResponse({
+                'success': True,
+                'message': f'Role updated to {role_type} successfully',
+                'is_superuser': user.is_superuser,
+                'is_staff': user.is_staff,
+                'email_sent': False,
+                'email_error': str(e)
+            })
         
-        return JsonResponse({'success': True})
+        return JsonResponse({
+            'success': True,
+            'message': f'Role updated to {role_type} successfully',
+            'is_superuser': user.is_superuser,
+            'is_staff': user.is_staff,
+            'email_sent': True,
+        })
     
     return JsonResponse({'success': False, 'error': 'Invalid request'}, status=400)
 

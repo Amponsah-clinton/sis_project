@@ -202,8 +202,8 @@
     }
 
     .logo-image {
-      width: 2.5rem;
-      height: 2.5rem;
+      width: 3.5rem;
+      height: 3.5rem;
       object-fit: contain;
       border-radius: 4px;
       flex-shrink: 0;
@@ -211,8 +211,8 @@
 
     @media (min-width: 768px) {
       .logo-image {
-        width: 3rem;
-        height: 3rem;
+        width: 4rem;
+        height: 4rem;
       }
     }
 

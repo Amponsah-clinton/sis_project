@@ -763,7 +763,7 @@
                        data-user-id="{{ user.id }}"
                        {% if user.is_superuser %}checked{% endif %}
                        {% if not request.user.is_superuser %}disabled{% endif %}
-                       onclick="handleRoleToggleClick({{ user.id }}, 'admin', this, event)">
+                       onmousedown="event.preventDefault(); handleRoleToggleClick({{ user.id }}, 'admin', this, event)">
                 <span class="toggle-slider"></span>
               </label>
             </div>
@@ -775,7 +775,7 @@
                        data-role="staff" 
                        data-user-id="{{ user.id }}"
                        {% if user.is_staff and not user.is_superuser %}checked{% endif %}
-                       onclick="handleRoleToggleClick({{ user.id }}, 'staff', this, event)">
+                       onmousedown="event.preventDefault(); handleRoleToggleClick({{ user.id }}, 'staff', this, event)">
                 <span class="toggle-slider"></span>
               </label>
             </div>
@@ -787,7 +787,7 @@
                        data-role="user" 
                        data-user-id="{{ user.id }}"
                        {% if not user.is_superuser and not user.is_staff %}checked{% endif %}
-                       onclick="handleRoleToggleClick({{ user.id }}, 'user', this, event)">
+                       onmousedown="event.preventDefault(); handleRoleToggleClick({{ user.id }}, 'user', this, event)">
                 <span class="toggle-slider"></span>
               </label>
             </div>
@@ -1201,49 +1201,49 @@
   }
 
   function handleRoleToggleClick(userId, roleType, toggleElement, event) {
-    event.preventDefault();
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     
     // Get all toggles for this user
     const adminToggle = document.getElementById(`admin-toggle-${userId}`);
     const staffToggle = document.getElementById(`staff-toggle-${userId}`);
     const userToggle = document.getElementById(`user-toggle-${userId}`);
     
-    // Get current state before any changes
-    const wasChecked = toggleElement.checked;
+    // Get current state BEFORE any changes (since we prevented default, state hasn't changed yet)
+    const currentlyChecked = toggleElement.checked;
     
-    // If trying to turn off the currently active role, prevent it
-    if (wasChecked) {
-      // Check if this is the only checked role
-      const checkedCount = [
-        adminToggle?.checked,
-        staffToggle?.checked,
-        userToggle?.checked
-      ].filter(Boolean).length;
-      
-      if (checkedCount === 1) {
-        // This is the only active role, don't allow turning it off
-        return;
-      }
+    // Count how many toggles are currently checked
+    const checkedCount = [
+      adminToggle?.checked,
+      staffToggle?.checked,
+      userToggle?.checked
+    ].filter(Boolean).length;
+    
+    // If this toggle is already checked and it's the only one, prevent turning it off
+    if (currentlyChecked && checkedCount === 1) {
+      // This is the only active role, don't allow turning it off
+      toggleElement.checked = true; // Keep it checked
+      return;
     }
     
-    // Toggle the clicked element
-    toggleElement.checked = !wasChecked;
-    
-    // If turning on this role, turn off all others (only one role can be active)
-    if (toggleElement.checked) {
-      if (roleType === 'admin') {
-        if (staffToggle) staffToggle.checked = false;
-        if (userToggle) userToggle.checked = false;
-      } else if (roleType === 'staff') {
-        if (adminToggle) adminToggle.checked = false;
-        if (userToggle) userToggle.checked = false;
-      } else if (roleType === 'user') {
-        if (adminToggle) adminToggle.checked = false;
-        if (staffToggle) staffToggle.checked = false;
-      }
+    // If clicking on an unchecked toggle, switch to it
+    if (!currentlyChecked) {
+      // Turn off all other toggles
+      if (adminToggle && roleType !== 'admin') adminToggle.checked = false;
+      if (staffToggle && roleType !== 'staff') staffToggle.checked = false;
+      if (userToggle && roleType !== 'user') userToggle.checked = false;
       
-      // Only proceed with database update if turning ON a role
+      // Turn on the clicked toggle
+      toggleElement.checked = true;
+      
+      // Update database with the new role
       updateRoleInDatabase(userId, roleType, toggleElement);
+    } else {
+      // Clicking on an already checked toggle when there are multiple checked
+      // This shouldn't normally happen, but if it does, keep it checked
+      toggleElement.checked = true;
     }
   }
 
