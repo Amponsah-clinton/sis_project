@@ -12,8 +12,67 @@
   }
 
   .criteria-wrapper {
-    max-width: 1000px;
+    max-width: 1200px;
     margin: 0 auto;
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .criteria-sidebar {
+    position: sticky;
+    top: 100px;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    height: fit-content;
+  }
+
+  .criteria-sidebar h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--foreground);
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .criteria-sidebar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .criteria-sidebar li {
+    margin-bottom: 0.5rem;
+  }
+
+  .criteria-sidebar a {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: var(--foreground);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-size: 0.9375rem;
+  }
+
+  .criteria-sidebar a:hover {
+    background-color: #f3f4f6;
+    color: #3b82f6;
+  }
+
+  .criteria-sidebar a.active {
+    background-color: #eff6ff;
+    color: #3b82f6;
+    font-weight: 600;
+  }
+
+  .criteria-main {
+    flex: 1;
   }
 
   .criteria-header {
@@ -143,6 +202,24 @@
     font-weight: 500;
   }
 
+  @media (max-width: 968px) {
+    .criteria-wrapper {
+      grid-template-columns: 1fr;
+    }
+
+    .criteria-sidebar {
+      position: relative;
+      top: 0;
+      margin-bottom: 2rem;
+    }
+
+    .criteria-sidebar ul {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.5rem;
+    }
+  }
+
   @media (max-width: 768px) {
     .criteria-page {
       padding: 2rem 1rem;
@@ -167,20 +244,39 @@
     .criteria-item h3 {
       font-size: 1.125rem;
     }
+
+    .criteria-sidebar ul {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
 
 <div class="criteria-page">
   <div class="container">
     <div class="criteria-wrapper">
-      <!-- Page Header -->
-      <div class="criteria-header">
-        <h1>Indexing Criteria</h1>
-        <p>Standards and requirements for research indexing and inclusion</p>
-      </div>
+      <!-- Sidebar Navigation -->
+      <aside class="criteria-sidebar">
+        <h3>About</h3>
+        <ul>
+          <li><a href="{% url 'app:about_sis' %}">About S.I.S</a></li>
+          <li><a href="{% url 'app:mission' %}">Mission</a></li>
+          <li><a href="{% url 'app:criteria' %}" class="active">Criteria</a></li>
+          <li><a href="{% url 'app:tolerance_policy' %}">Tolerance Policy</a></li>
+          <li><a href="{% url 'app:service_solution' %}">Service & Solution</a></li>
+          <li><a href="{% url 'app:policy_terms' %}">Policy Terms and Conditions</a></li>
+        </ul>
+      </aside>
 
       <!-- Main Content -->
-      <div class="criteria-content">
+      <div class="criteria-main">
+        <!-- Page Header -->
+        <div class="criteria-header">
+          <h1>Indexing Criteria</h1>
+          <p>Standards and requirements for research indexing and inclusion</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="criteria-content">
         <div class="content-section">
           <h2>General Criteria</h2>
           <p>
@@ -288,6 +384,7 @@
             If your submission is rejected, you may appeal the decision by providing additional information or clarification. Our review team will reconsider your submission based on the new information provided. Appeals should be submitted within 30 days of the initial decision.
           </p>
         </div>
+      </div>
       </div>
     </div>
   </div>

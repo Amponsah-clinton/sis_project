@@ -12,8 +12,67 @@
   }
 
   .tolerance-wrapper {
-    max-width: 1000px;
+    max-width: 1200px;
     margin: 0 auto;
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .tolerance-sidebar {
+    position: sticky;
+    top: 100px;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    height: fit-content;
+  }
+
+  .tolerance-sidebar h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--foreground);
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .tolerance-sidebar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .tolerance-sidebar li {
+    margin-bottom: 0.5rem;
+  }
+
+  .tolerance-sidebar a {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: var(--foreground);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-size: 0.9375rem;
+  }
+
+  .tolerance-sidebar a:hover {
+    background-color: #f3f4f6;
+    color: #3b82f6;
+  }
+
+  .tolerance-sidebar a.active {
+    background-color: #eff6ff;
+    color: #3b82f6;
+    font-weight: 600;
+  }
+
+  .tolerance-main {
+    flex: 1;
   }
 
   .tolerance-header {
@@ -179,6 +238,24 @@
     font-weight: 500;
   }
 
+  @media (max-width: 968px) {
+    .tolerance-wrapper {
+      grid-template-columns: 1fr;
+    }
+
+    .tolerance-sidebar {
+      position: relative;
+      top: 0;
+      margin-bottom: 2rem;
+    }
+
+    .tolerance-sidebar ul {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.5rem;
+    }
+  }
+
   @media (max-width: 768px) {
     .tolerance-page {
       padding: 2rem 1rem;
@@ -199,20 +276,39 @@
     .tolerance-levels {
       grid-template-columns: 1fr;
     }
+
+    .tolerance-sidebar ul {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
 
 <div class="tolerance-page">
   <div class="container">
     <div class="tolerance-wrapper">
-      <!-- Page Header -->
-      <div class="tolerance-header">
-        <h1>Tolerance Policy</h1>
-        <p>Our approach to plagiarism detection and similarity thresholds</p>
-      </div>
+      <!-- Sidebar Navigation -->
+      <aside class="tolerance-sidebar">
+        <h3>About</h3>
+        <ul>
+          <li><a href="{% url 'app:about_sis' %}">About S.I.S</a></li>
+          <li><a href="{% url 'app:mission' %}">Mission</a></li>
+          <li><a href="{% url 'app:criteria' %}">Criteria</a></li>
+          <li><a href="{% url 'app:tolerance_policy' %}" class="active">Tolerance Policy</a></li>
+          <li><a href="{% url 'app:service_solution' %}">Service & Solution</a></li>
+          <li><a href="{% url 'app:policy_terms' %}">Policy Terms and Conditions</a></li>
+        </ul>
+      </aside>
 
       <!-- Main Content -->
-      <div class="tolerance-content">
+      <div class="tolerance-main">
+        <!-- Page Header -->
+        <div class="tolerance-header">
+          <h1>Tolerance Policy</h1>
+          <p>Our approach to plagiarism detection and similarity thresholds</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="tolerance-content">
         <div class="content-section">
           <h2>Overview</h2>
           <p>
@@ -335,6 +431,7 @@
             </ul>
           </div>
         </div>
+      </div>
       </div>
     </div>
   </div>

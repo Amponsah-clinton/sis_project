@@ -4,6 +4,170 @@
 {% block title %}Indexed Articles - ScholarIndex{% endblock %}
 
 {% block content %}
+<style>
+  .articles-sidebar {
+    width: 320px;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1rem;
+    height: fit-content;
+  }
+
+  .filter-section {
+    margin-bottom: 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background-color: #ffffff;
+    overflow: hidden;
+  }
+
+  .filter-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    cursor: pointer;
+    background-color: #ffffff;
+    user-select: none;
+  }
+
+  .filter-section.expanded .filter-section-header {
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .filter-section-header h3 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 0;
+    text-transform: uppercase;
+  }
+
+  .filter-chevron {
+    width: 16px;
+    height: 16px;
+    color: #6b7280;
+    transition: transform 0.2s;
+  }
+
+  .filter-section.expanded .filter-chevron {
+    transform: rotate(180deg);
+  }
+
+  .filter-section.collapsed .filter-content {
+    display: none !important;
+  }
+
+  .filter-content {
+    padding: 1rem;
+  }
+
+  .filter-search-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+    color: #374151;
+  }
+
+  .filter-search-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .filter-list {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+  }
+
+  .filter-list::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .filter-list::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 3px;
+  }
+
+  .filter-list::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+  }
+
+  .filter-list::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+
+  .filter-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0;
+    cursor: pointer;
+    gap: 0.75rem;
+  }
+
+  .filter-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #3b82f6;
+    flex-shrink: 0;
+  }
+
+  .filter-item-text {
+    flex: 1;
+    font-size: 0.875rem;
+    color: #374151;
+    line-height: 1.5;
+  }
+
+  .filter-count {
+    background-color: #f97316;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.125rem 0.5rem;
+    border-radius: 12px;
+    min-width: 2rem;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .filter-reset-btn {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: #ef4444;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 1rem;
+  }
+
+  .filter-reset-btn:hover {
+    background-color: #dc2626;
+  }
+
+  .filter-reset-btn:active {
+    background-color: #b91c1c;
+  }
+
+  @media (max-width: 968px) {
+    .articles-sidebar {
+      width: 100%;
+      margin-bottom: 2rem;
+    }
+  }
+</style>
+
 <div class="indexed-articles-page">
   <div class="container">
     <!-- Page Header -->
@@ -15,71 +179,123 @@
     <div class="articles-layout">
       <!-- Sidebar Filters -->
       <aside class="articles-sidebar">
-        <div class="filter-section collapsed" id="filterSection">
-          <div class="filter-section-header">
-            <h3>Filters</h3>
-            <button class="filter-toggle-btn" onclick="toggleFilters()">
-              <span>Show Filters</span>
-              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
-            </button>
+        <!-- SUBJECT Section (Expanded) -->
+        <div class="filter-section expanded" id="subjectSection">
+          <div class="filter-section-header" onclick="toggleFilterSection('subjectSection')">
+            <h3>SUBJECT</h3>
+            <svg class="filter-chevron" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
           </div>
-          
           <div class="filter-content">
-            <!-- Search Filter -->
-            <div class="filter-group">
-            <label>Search Articles</label>
-            <input type="text" class="filter-input" placeholder="Search by title, author..." id="articleSearch">
-          </div>
-
-          <!-- Discipline Filter -->
-          <div class="filter-group">
-            <label>Discipline</label>
-            <select class="filter-select" id="disciplineFilter">
-              <option value="">All Disciplines</option>
-              <option value="computer-science">Computer Science</option>
-              <option value="mathematics">Mathematics</option>
-              <option value="physics">Physics</option>
-              <option value="chemistry">Chemistry</option>
-              <option value="biology">Biology</option>
-              <option value="medicine">Medicine</option>
-              <option value="engineering">Engineering</option>
-              <option value="social-sciences">Social Sciences</option>
-              <option value="humanities">Humanities</option>
-            </select>
-          </div>
-
-          <!-- Year Filter -->
-          <div class="filter-group">
-            <label>Publication Year</label>
-            <select class="filter-select" id="yearFilter">
-              <option value="">All Years</option>
-              <option value="2024">2024</option>
-              <option value="2023">2023</option>
-              <option value="2022">2022</option>
-              <option value="2021">2021</option>
-              <option value="2020">2020</option>
-              <option value="2019">2019</option>
-              <option value="2018">2018</option>
-            </select>
-          </div>
-
-          <!-- Sort By -->
-          <div class="filter-group">
-            <label>Sort By</label>
-            <select class="filter-select" id="sortFilter">
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-              <option value="title">Title (A-Z)</option>
-              <option value="citations">Most Cited</option>
-            </select>
-          </div>
-
-          <!-- Clear Filters -->
-          <button class="btn-filter-clear" onclick="clearFilters()">Clear All Filters</button>
+            <input type="text" class="filter-search-input" placeholder="Search subject" id="subjectSearch">
+            <div class="filter-list" id="subjectList">
+              <label class="filter-item">
+                <input type="checkbox" value="medicine-health">
+                <span class="filter-item-text">Medicine and Health</span>
+                <span class="filter-count">1822</span>
+              </label>
+              <label class="filter-item">
+                <input type="checkbox" value="technology">
+                <span class="filter-item-text">Technology</span>
+                <span class="filter-count">69</span>
+              </label>
+              <label class="filter-item">
+                <input type="checkbox" value="engineering">
+                <span class="filter-item-text">Engineering</span>
+                <span class="filter-count">6</span>
+              </label>
+              <label class="filter-item">
+                <input type="checkbox" value="computer-science">
+                <span class="filter-item-text">Computer Science</span>
+                <span class="filter-count">6</span>
+              </label>
+              <label class="filter-item">
+                <input type="checkbox" value="art-humanities">
+                <span class="filter-item-text">Art and Humanities</span>
+                <span class="filter-count">488</span>
+              </label>
+              <label class="filter-item">
+                <input type="checkbox" value="social-science">
+                <span class="filter-item-text">Social Science and Behavioral Sciences</span>
+                <span class="filter-count">824</span>
+              </label>
+              <label class="filter-item">
+                <input type="checkbox" value="chemical-engineering">
+                <span class="filter-item-text">Chemical Engineering</span>
+                <span class="filter-count">6</span>
+              </label>
+              <label class="filter-item">
+                <input type="checkbox" value="economics">
+                <span class="filter-item-text">Economics, Econometrics and Finance</span>
+                <span class="filter-count">22</span>
+              </label>
+              <label class="filter-item">
+                <input type="checkbox" value="biochemistry">
+                <span class="filter-item-text">Biochemistry, Genetics, and Molecular Biology</span>
+                <span class="filter-count">12</span>
+              </label>
+            </div>
           </div>
         </div>
+
+        <!-- JOURNAL Section (Collapsed) -->
+        <div class="filter-section collapsed" id="journalSection">
+          <div class="filter-section-header" onclick="toggleFilterSection('journalSection')">
+            <h3>JOURNAL</h3>
+            <svg class="filter-chevron" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </div>
+          <div class="filter-content" style="display: none;">
+            <input type="text" class="filter-search-input" placeholder="Search journal" id="journalSearch">
+            <div class="filter-list" id="journalList">
+              <!-- Journal items will be populated here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- YEAR OF PUBLICATION Section (Collapsed) -->
+        <div class="filter-section collapsed" id="yearSection">
+          <div class="filter-section-header" onclick="toggleFilterSection('yearSection')">
+            <h3>YEAR OF PUBLICATION</h3>
+            <svg class="filter-chevron" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </div>
+          <div class="filter-content" style="display: none;">
+            <div class="filter-list" id="yearList">
+              <label class="filter-item">
+                <input type="checkbox" value="2024">
+                <span class="filter-item-text">2024</span>
+                <span class="filter-count">450</span>
+              </label>
+              <label class="filter-item">
+                <input type="checkbox" value="2023">
+                <span class="filter-item-text">2023</span>
+                <span class="filter-count">380</span>
+              </label>
+              <label class="filter-item">
+                <input type="checkbox" value="2022">
+                <span class="filter-item-text">2022</span>
+                <span class="filter-count">320</span>
+              </label>
+              <label class="filter-item">
+                <input type="checkbox" value="2021">
+                <span class="filter-item-text">2021</span>
+                <span class="filter-count">280</span>
+              </label>
+              <label class="filter-item">
+                <input type="checkbox" value="2020">
+                <span class="filter-item-text">2020</span>
+                <span class="filter-count">250</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reset Button -->
+        <button class="filter-reset-btn" onclick="resetFilters()">Reset</button>
       </aside>
 
       <!-- Main Content -->
@@ -360,42 +576,83 @@
     }
   }
 
-  function toggleFilters() {
-    const filterSection = document.getElementById('filterSection');
-    const toggleBtn = filterSection.querySelector('.filter-toggle-btn span');
+  function toggleFilterSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    const content = section.querySelector('.filter-content');
+    const chevron = section.querySelector('.filter-chevron');
     
-    filterSection.classList.toggle('collapsed');
+    section.classList.toggle('expanded');
+    section.classList.toggle('collapsed');
     
-    if (filterSection.classList.contains('collapsed')) {
-      toggleBtn.textContent = 'Show Filters';
+    if (section.classList.contains('expanded')) {
+      content.style.display = 'block';
     } else {
-      toggleBtn.textContent = 'Hide Filters';
+      content.style.display = 'none';
     }
   }
 
-  function clearFilters() {
-    document.getElementById('articleSearch').value = '';
-    document.getElementById('disciplineFilter').value = '';
-    document.getElementById('yearFilter').value = '';
-    document.getElementById('sortFilter').value = 'newest';
+  function resetFilters() {
+    // Reset all checkboxes
+    document.querySelectorAll('.filter-item input[type="checkbox"]').forEach(checkbox => {
+      checkbox.checked = false;
+    });
+    
+    // Clear search inputs
+    document.getElementById('subjectSearch').value = '';
+    document.getElementById('journalSearch').value = '';
+    
+    // Filter articles
+    filterArticles();
   }
 
-  // Filter functionality
-  document.getElementById('articleSearch')?.addEventListener('input', function(e) {
-    filterArticles();
+  // Subject search functionality
+  document.getElementById('subjectSearch')?.addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const items = document.querySelectorAll('#subjectList .filter-item');
+    
+    items.forEach(item => {
+      const text = item.querySelector('.filter-item-text').textContent.toLowerCase();
+      if (text.includes(searchTerm)) {
+        item.style.display = 'flex';
+      } else {
+        item.style.display = 'none';
+      }
+    });
   });
 
-  document.getElementById('disciplineFilter')?.addEventListener('change', function(e) {
-    filterArticles();
+  // Journal search functionality
+  document.getElementById('journalSearch')?.addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const items = document.querySelectorAll('#journalList .filter-item');
+    
+    items.forEach(item => {
+      const text = item.querySelector('.filter-item-text').textContent.toLowerCase();
+      if (text.includes(searchTerm)) {
+        item.style.display = 'flex';
+      } else {
+        item.style.display = 'none';
+      }
+    });
   });
 
-  document.getElementById('yearFilter')?.addEventListener('change', function(e) {
-    filterArticles();
+  // Filter functionality when checkboxes change
+  document.querySelectorAll('.filter-item input[type="checkbox"]').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      filterArticles();
+    });
   });
 
   function filterArticles() {
+    // Get selected filters
+    const selectedSubjects = Array.from(document.querySelectorAll('#subjectList input[type="checkbox"]:checked'))
+      .map(cb => cb.value);
+    const selectedJournals = Array.from(document.querySelectorAll('#journalList input[type="checkbox"]:checked'))
+      .map(cb => cb.value);
+    const selectedYears = Array.from(document.querySelectorAll('#yearList input[type="checkbox"]:checked'))
+      .map(cb => cb.value);
+    
     // Filter logic would go here
-    console.log('Filtering articles...');
+    console.log('Filtering articles...', { selectedSubjects, selectedJournals, selectedYears });
   }
 </script>
 {% endblock %}

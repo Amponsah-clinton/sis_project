@@ -32,10 +32,10 @@
   <!-- Navbar -->
   <header>
     <nav>
-      <div class="logo-container">
+      <a href="{% url 'app:landing' %}" class="logo-container" style="text-decoration: none; display: flex; align-items: center; gap: 0.75rem;">
         <img src="https://res.cloudinary.com/dsypclqxk/image/upload/v1763051843/SIS_wcdf5h_31ba42.jpg" alt="ScholarIndex Logo" class="logo-image" />
         <span class="logo-text">ScholarIndex</span>
-      </div>
+      </a>
       
       <div class="nav-links">
         <div class="nav-dropdown">
@@ -187,10 +187,10 @@
     <div class="container footer-content">
       <div class="footer-grid">
         <div class="footer-brand">
-          <div class="logo-container" style="margin-bottom: 1rem;">
+          <a href="{% url 'app:landing' %}" class="logo-container" style="text-decoration: none; display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
             <img src="https://res.cloudinary.com/dsypclqxk/image/upload/v1763051843/SIS_wcdf5h_31ba42.jpg" alt="ScholarIndex Logo" class="logo-image" />
             <span class="logo-text">ScholarIndex</span>
-          </div>
+          </a>
           <p style="font-size: 0.875rem; color: var(--muted-foreground);">
             Connecting researchers worldwide through open access to scholarly publications.
           </p>

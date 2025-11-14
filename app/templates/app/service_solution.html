@@ -14,6 +14,65 @@
   .service-wrapper {
     max-width: 1200px;
     margin: 0 auto;
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .service-sidebar {
+    position: sticky;
+    top: 100px;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    height: fit-content;
+  }
+
+  .service-sidebar h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--foreground);
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .service-sidebar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .service-sidebar li {
+    margin-bottom: 0.5rem;
+  }
+
+  .service-sidebar a {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: var(--foreground);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-size: 0.9375rem;
+  }
+
+  .service-sidebar a:hover {
+    background-color: #f3f4f6;
+    color: #3b82f6;
+  }
+
+  .service-sidebar a.active {
+    background-color: #eff6ff;
+    color: #3b82f6;
+    font-weight: 600;
+  }
+
+  .service-main {
+    flex: 1;
   }
 
   .service-header {
@@ -185,6 +244,24 @@
     margin: 0;
   }
 
+  @media (max-width: 968px) {
+    .service-wrapper {
+      grid-template-columns: 1fr;
+    }
+
+    .service-sidebar {
+      position: relative;
+      top: 0;
+      margin-bottom: 2rem;
+    }
+
+    .service-sidebar ul {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.5rem;
+    }
+  }
+
   @media (max-width: 768px) {
     .service-page {
       padding: 2rem 1rem;
@@ -206,20 +283,39 @@
     .solution-grid {
       grid-template-columns: 1fr;
     }
+
+    .service-sidebar ul {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
 
 <div class="service-page">
   <div class="container">
     <div class="service-wrapper">
-      <!-- Page Header -->
-      <div class="service-header">
-        <h1>Services & Solutions</h1>
-        <p>Comprehensive research services to support your academic journey</p>
-      </div>
+      <!-- Sidebar Navigation -->
+      <aside class="service-sidebar">
+        <h3>About</h3>
+        <ul>
+          <li><a href="{% url 'app:about_sis' %}">About S.I.S</a></li>
+          <li><a href="{% url 'app:mission' %}">Mission</a></li>
+          <li><a href="{% url 'app:criteria' %}">Criteria</a></li>
+          <li><a href="{% url 'app:tolerance_policy' %}">Tolerance Policy</a></li>
+          <li><a href="{% url 'app:service_solution' %}" class="active">Service & Solution</a></li>
+          <li><a href="{% url 'app:policy_terms' %}">Policy Terms and Conditions</a></li>
+        </ul>
+      </aside>
 
-      <!-- Services Grid -->
-      <div class="services-grid">
+      <!-- Main Content -->
+      <div class="service-main">
+        <!-- Page Header -->
+        <div class="service-header">
+          <h1>Services & Solutions</h1>
+          <p>Comprehensive research services to support your academic journey</p>
+        </div>
+
+        <!-- Services Grid -->
+        <div class="services-grid">
         <!-- Service 1 -->
         <div class="service-card">
           <div class="service-icon">
@@ -356,6 +452,7 @@
             <p>Plagiarism checking, thesis services, and academic writing support for students.</p>
           </div>
         </div>
+      </div>
       </div>
     </div>
   </div>
