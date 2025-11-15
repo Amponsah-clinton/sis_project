@@ -988,6 +988,21 @@ class NewsComment(models.Model):
     def get_replies_count(self):
         return self.replies.filter(is_approved=True).count()
 
+# News Bookmark Model
+class NewsBookmark(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='news_bookmarks')
+    article = models.ForeignKey(NewsArticle, on_delete=models.CASCADE, related_name='bookmarks')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('user', 'article')
+        ordering = ['-created_at']
+        verbose_name = 'News Bookmark'
+        verbose_name_plural = 'News Bookmarks'
+    
+    def __str__(self):
+        return f"{self.user.username} bookmarked {self.article.title}"
+
 # News Tag Model
 class NewsTag(models.Model):
     name = models.CharField(max_length=100, unique=True)
