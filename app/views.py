@@ -1515,8 +1515,10 @@ def initialize_payment(request):
 
 def request_membership(request):
     """Request For SIS Member page view"""
+    from app.forms import MembershipRequestForm
+    
     if request.method == 'POST':
-        # Get form data
+        # Get form data and prepare for form
         full_name = request.POST.get('full_name', '').strip()
         email = request.POST.get('email', '').strip()
         country = request.POST.get('country', '').strip()
@@ -1549,52 +1551,156 @@ def request_membership(request):
             first_name = name_parts[0] if name_parts else ''
             last_name = name_parts[1] if len(name_parts) > 1 else ''
             
-            # Create membership request
-            from app.models import MembershipRequest
-            membership = MembershipRequest.objects.create(
-                first_name=first_name,
-                last_name=last_name,
-                email=email,
-                phone='',  # Not required in new form
-                country=country,
-                institution=institution,
-                position=aspiring_position,
-                membership_type='individual',  # Default value
-                research_interests=about_yourself,
-                profile_picture=profile_picture,
-                terms_accepted=terms,
-                submitted_by=request.user if request.user.is_authenticated else None
-            )
-            messages.success(request, 'Your membership request has been submitted successfully!')
-            return redirect('app:landing')
+            # Prepare form data
+            form_data = {
+                'first_name': first_name,
+                'last_name': last_name,
+                'email': email,
+                'phone': '',
+                'country': country,
+                'institution': institution,
+                'position': aspiring_position,
+                'membership_type': 'individual',
+                'research_interests': about_yourself,
+                'terms_accepted': terms,
+            }
+            
+            form = MembershipRequestForm(form_data, request.FILES)
+            if form.is_valid():
+                membership = form.save(commit=False)
+                membership.submitted_by = request.user if request.user.is_authenticated else None
+                membership.save()
+                messages.success(request, 'Your membership request has been submitted successfully!')
+                return redirect('app:landing')
+            else:
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        messages.error(request, f'{field}: {error}')
     
     return render(request, 'app/request_membership.html')
 
 def apply_directory(request):
-    """Apply For Directory of Researcher page view"""
-    if request.method == 'POST':
-        form = DirectoryApplicationForm(request.POST, request.FILES)
-        if form.is_valid():
-            application = form.save(commit=False)
-            if request.user.is_authenticated:
-                application.submitted_by = request.user
-            application.save()
-            messages.success(request, 'Your application has been submitted successfully!')
-            return redirect('app:directory_researchers')
-        else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f'{field}: {error}')
-    else:
-        form = DirectoryApplicationForm()
+    """Request For SIS Member - Directory Application page view"""
+    from app.forms import DirectoryApplicationForm
     
-    return render(request, 'app/apply_directory.html', {'form': form})
+    if request.method == 'POST':
+        # Get form data
+        full_name = request.POST.get('full_name', '').strip()
+        phone = request.POST.get('phone', '').strip()
+        email = request.POST.get('email', '').strip()
+        country = request.POST.get('country', '').strip()
+        institution = request.POST.get('institution', '').strip()
+        designation = request.POST.get('designation', '').strip()
+        google_scholar = request.POST.get('google_scholar', '').strip()
+        areas_of_interest = request.POST.get('areas_of_interest', '').strip()
+        terms = request.POST.get('terms') == 'on'
+        profile_picture = request.FILES.get('profile_picture')
+        cv_file = request.FILES.get('cv_file')
+        
+        # Validation
+        if not full_name:
+            messages.error(request, 'Please enter your first name and surname.')
+        elif not phone:
+            messages.error(request, 'Please enter your phone number.')
+        elif not email:
+            messages.error(request, 'Please enter your email address.')
+        elif not country:
+            messages.error(request, 'Please enter your country.')
+        elif not institution:
+            messages.error(request, 'Please enter your institution.')
+        elif not designation:
+            messages.error(request, 'Please enter your designation.')
+        elif not google_scholar:
+            messages.error(request, 'Please enter your Google Scholar Profile Link.')
+        elif not areas_of_interest:
+            messages.error(request, 'Please enter your areas of interest.')
+        elif not terms:
+            messages.error(request, 'Please agree to the Terms and Conditions and Privacy policy.')
+        elif not profile_picture:
+            messages.error(request, 'Please upload a profile picture.')
+        elif not cv_file:
+            messages.error(request, 'Please upload your CV file.')
+        else:
+            # Split full name into first and last name
+            name_parts = full_name.split(maxsplit=1)
+            first_name = name_parts[0] if name_parts else ''
+            last_name = name_parts[1] if len(name_parts) > 1 else ''
+            
+            # Prepare form data
+            form_data = {
+                'first_name': first_name,
+                'last_name': last_name,
+                'email': email,
+                'phone': phone,
+                'country': country,
+                'institution': institution,
+                'position': designation,
+                'research_areas': areas_of_interest,
+                'google_scholar_link': google_scholar,
+                'terms_accepted': terms,
+            }
+            
+            form = DirectoryApplicationForm(form_data, request.FILES)
+            if form.is_valid():
+                application = form.save(commit=False)
+                application.submitted_by = request.user if request.user.is_authenticated else None
+                application.save()
+                messages.success(request, 'Your application has been submitted successfully!')
+                return redirect('app:directory_researchers')
+            else:
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        messages.error(request, f'{field}: {error}')
+    
+    return render(request, 'app/apply_directory.html')
 
 @check_page_enabled('enable_hall_of_fame_page')
 def hall_of_fame(request):
-    """Hall of Fame listing page view"""
+    """Hall of Fame listing page view - Eminent Personalities"""
     honorees = HallOfFameApplication.objects.filter(terms_accepted=True).order_by('-created_at')
-    return render(request, 'app/hall_of_fame.html', {'honorees': honorees})
+    
+    # Get unique years from created_at (year inducted)
+    from django.db.models import Count
+    from django.db.models.functions import ExtractYear
+    years = HallOfFameApplication.objects.filter(terms_accepted=True).annotate(
+        year=ExtractYear('created_at')
+    ).values('year').annotate(count=Count('id')).order_by('-year')
+    
+    # Get unique disciplines with counts from database
+    disciplines_with_count = HallOfFameApplication.objects.filter(terms_accepted=True).values('nominee_position').annotate(
+        count=Count('id')
+    ).order_by('-count', 'nominee_position')
+    
+    # Convert to list format for template
+    disciplines_list = [{'name': item['nominee_position'], 'count': item['count']} for item in disciplines_with_count]
+    
+    # Get categories from application_type (for now, using application_type as category)
+    # In production, you might want to add a separate category field to the model
+    categories_with_count = HallOfFameApplication.objects.filter(terms_accepted=True).values('application_type').annotate(
+        count=Count('id')
+    ).order_by('-count', 'application_type')
+    
+    # Convert to list format for template
+    categories_list = [{'name': item['application_type'].replace('_', ' ').title(), 'count': item['count']} for item in categories_with_count]
+    
+    # If no categories found, use default sample data
+    if not categories_list:
+        categories_list = [
+            {'name': 'Eminent Individuals', 'count': 0},
+            {'name': 'Celebrities', 'count': 0},
+            {'name': 'Sport', 'count': 0},
+            {'name': 'Inspirational people', 'count': 0},
+            {'name': 'Famous People', 'count': 0},
+            {'name': 'Social and Behavioral Sciences', 'count': 0},
+            {'name': 'Famous Historical Figures', 'count': 0},
+        ]
+    
+    return render(request, 'app/hall_of_fame.html', {
+        'honorees': honorees,
+        'years': years,
+        'disciplines': disciplines_list,
+        'categories': categories_list,
+    })
 
 def hall_of_fame_apply(request):
     """Apply For Hall of Fame page view"""

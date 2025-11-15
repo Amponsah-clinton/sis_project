@@ -77,7 +77,9 @@ class ArticleForm(forms.ModelForm):
     class Meta:
         model = Article
         fields = ['title', 'article_type', 'discipline', 'abstract', 'keywords', 
-                  'language', 'publication_date', 'doi', 'article_file']
+                  'language', 'publication_date', 'doi', 'article_file', 'cover_image',
+                  'volume', 'issue', 'pages', 'journal_name', 'country_of_publication',
+                  'year_of_publication', 'authors_names']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'article_type': forms.Select(attrs={'class': 'form-control'}),
@@ -88,6 +90,14 @@ class ArticleForm(forms.ModelForm):
             'publication_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'doi': forms.TextInput(attrs={'class': 'form-control'}),
             'article_file': forms.FileInput(attrs={'class': 'form-control'}),
+            'cover_image': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
+            'volume': forms.TextInput(attrs={'class': 'form-control'}),
+            'issue': forms.TextInput(attrs={'class': 'form-control'}),
+            'pages': forms.TextInput(attrs={'class': 'form-control'}),
+            'journal_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'country_of_publication': forms.TextInput(attrs={'class': 'form-control'}),
+            'year_of_publication': forms.NumberInput(attrs={'class': 'form-control'}),
+            'authors_names': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
 class ArticleAuthorForm(forms.ModelForm):
@@ -189,8 +199,8 @@ class MembershipRequestForm(forms.ModelForm):
     class Meta:
         model = MembershipRequest
         fields = ['first_name', 'last_name', 'email', 'phone', 'country', 'institution',
-                  'position', 'membership_type', 'research_interests', 'cv_file',
-                  'motivation_letter', 'terms_accepted']
+                  'position', 'membership_type', 'research_interests', 'profile_picture',
+                  'cv_file', 'motivation_letter', 'terms_accepted']
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -201,6 +211,7 @@ class MembershipRequestForm(forms.ModelForm):
             'position': forms.TextInput(attrs={'class': 'form-control'}),
             'membership_type': forms.Select(attrs={'class': 'form-control'}),
             'research_interests': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'profile_picture': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
             'cv_file': forms.FileInput(attrs={'class': 'form-control'}),
             'motivation_letter': forms.FileInput(attrs={'class': 'form-control'}),
             'terms_accepted': forms.CheckboxInput(attrs={'class': 'form-check-input'}),

@@ -1,12 +1,12 @@
 {% extends 'app/base.html' %}
 {% load static %}
 
-{% block title %}Hall of Fame - ScholarIndex{% endblock %}
+{% block title %}Eminent Personalities - ScholarIndex{% endblock %}
 
 {% block content %}
 <style>
   .hall-of-fame-page {
-    padding: 3rem 1.5rem;
+    padding: 2rem;
     background-color: var(--background);
     min-height: calc(100vh - 5rem);
   }
@@ -16,581 +16,703 @@
     margin: 0 auto;
   }
 
-  .hall-header {
-    text-align: center;
-    margin-bottom: 3rem;
+  .hall-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 2rem;
+    align-items: start;
   }
 
-  .hall-header h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 0.75rem;
-    color: var(--foreground);
+  @media (max-width: 1024px) {
+    .hall-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .hall-sidebar {
+      order: 2;
+    }
   }
 
-  .hall-header p {
-    font-size: 1.125rem;
-    color: var(--muted-foreground);
+  /* Filter Sidebar */
+  .hall-sidebar {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+    max-height: calc(100vh - 140px);
+    overflow-y: auto;
   }
 
-  .hall-filters {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 3rem;
-    flex-wrap: wrap;
-  }
-
-  .filter-btn {
-    padding: 0.75rem 1.5rem;
+  .filter-section {
     background-color: #ffffff;
-    border: 2px solid #e5e7eb;
+    border: 1px solid #e5e7eb;
     border-radius: 8px;
-    color: #6b7280;
-    font-size: 0.9375rem;
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+  }
+
+  .filter-header {
+    padding: 0.75rem 1rem;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: #111827;
+    user-select: none;
+  }
+
+  .filter-header:hover {
+    background-color: #f9fafb;
+  }
+
+  .filter-header svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s;
+  }
+
+  .filter-section.collapsed .filter-header svg {
+    transform: rotate(-90deg);
+  }
+
+  .filter-content {
+    padding: 0.75rem;
+    display: block;
+  }
+
+  .filter-section.collapsed .filter-content {
+    display: none;
+  }
+
+  .filter-search {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.8125rem;
+    margin-bottom: 0.5rem;
+    background-color: #ffffff;
+  }
+
+  .filter-search:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+
+  .filter-list {
+    max-height: 200px;
+    overflow-y: auto;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .filter-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.375rem 0;
+    cursor: pointer;
+  }
+
+  .filter-item:hover {
+    background-color: #f9fafb;
+    margin: 0 -0.5rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .filter-item-label {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    cursor: pointer;
+  }
+
+  .filter-item-label input[type="checkbox"] {
+    margin-right: 0.5rem;
+    cursor: pointer;
+  }
+
+  .filter-item-label span {
+    font-size: 0.8125rem;
+    color: #374151;
+  }
+
+  .filter-count {
+    background-color: #f97316;
+    color: #ffffff;
+    padding: 0.125rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    min-width: 32px;
+    text-align: center;
+  }
+
+  .reset-button {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    background-color: #dc2626;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background-color 0.2s;
+    margin-top: 0.5rem;
   }
 
-  .filter-btn:hover {
+  .reset-button:hover {
+    background-color: #b91c1c;
+  }
+
+  /* Main Content */
+  .hall-main {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 1.5rem;
+  }
+
+  .search-bar-container {
+    margin-bottom: 1.5rem;
+  }
+
+  .search-bar {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    padding-right: 3rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.9375rem;
+    background-color: #ffffff;
+    position: relative;
+  }
+
+  .search-bar:focus {
+    outline: none;
     border-color: #3b82f6;
-    color: #3b82f6;
-    background-color: #eff6ff;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
 
-  .filter-btn.active {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    border-color: #3b82f6;
-    color: #ffffff;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  .search-bar-wrapper {
+    position: relative;
   }
 
-  .hall-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-bottom: 3rem;
+  .search-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    color: #6b7280;
+    pointer-events: none;
   }
 
-  @media (max-width: 768px) {
-    .hall-grid {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
+  .hall-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
   }
 
   .hall-card {
     background-color: #ffffff;
     border: 1px solid #e5e7eb;
-    border-radius: 16px;
-    padding: 0;
-    transition: all 0.3s ease;
-    overflow: hidden;
+    border-radius: 8px;
+    padding: 1.5rem;
     display: flex;
-    flex-direction: column;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    position: relative;
+    gap: 1.5rem;
+    transition: box-shadow 0.2s;
   }
 
   .hall-card:hover {
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
-    transform: translateY(-6px);
-    border-color: #d1d5db;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 
-  .hall-badge {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-    color: #ffffff;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    z-index: 10;
-    box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
-  }
-
-  .hall-image-wrapper {
-    width: 100%;
-    height: 320px;
-    overflow: hidden;
-    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .hall-image-wrapper img {
-    width: 100%;
-    height: 100%;
+  .hall-card-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 8px;
     object-fit: cover;
-    object-position: center;
-    display: block;
-    transition: transform 0.4s ease;
-  }
-
-  .hall-card:hover .hall-image-wrapper img {
-    transform: scale(1.05);
-  }
-
-  .hall-image-wrapper span {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 3rem;
-    font-weight: 600;
-    color: #9ca3af;
-    z-index: 1;
-  }
-
-  .hall-image-wrapper:has(img) span {
-    display: none;
+    flex-shrink: 0;
+    background-color: #f3f4f6;
   }
 
   .hall-card-content {
-    padding: 1.75rem;
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.875rem;
-    background-color: #ffffff;
+    gap: 0.5rem;
+  }
+
+  .hall-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+  }
+
+  .hall-card-id {
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .hall-card-location {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8125rem;
+    color: #6b7280;
+  }
+
+  .hall-card-location svg {
+    width: 14px;
+    height: 14px;
   }
 
   .hall-name-wrapper {
     display: flex;
     align-items: center;
-    gap: 0.625rem;
-    margin-bottom: 0.375rem;
-    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
   }
 
   .hall-name {
-    font-size: 1.375rem;
+    font-size: 1.125rem;
     font-weight: 700;
-    color: #1e40af;
+    color: #2563eb;
     margin: 0;
-    line-height: 1.3;
   }
 
   .verification-icon {
-    width: 22px;
-    height: 22px;
-    color: #3b82f6;
+    width: 18px;
+    height: 18px;
+    color: #2563eb;
     flex-shrink: 0;
-    filter: drop-shadow(0 1px 2px rgba(59, 130, 246, 0.3));
   }
 
-  .hall-title {
-    font-size: 0.9375rem;
-    color: #dc2626;
+  .hall-category {
+    font-size: 0.875rem;
+    color: #f97316;
     font-weight: 600;
-    margin-bottom: 0.5rem;
-    line-height: 1.4;
+    margin-bottom: 0.25rem;
   }
 
-  .hall-institution {
+  .hall-affiliation {
     font-size: 0.875rem;
     color: #6b7280;
-    margin-bottom: 0.75rem;
-    line-height: 1.5;
+    margin-bottom: 0.5rem;
   }
 
-  .hall-achievements {
+  .hall-bio {
     font-size: 0.875rem;
-    color: #4b5563;
-    margin-bottom: 1rem;
+    color: #374151;
     line-height: 1.6;
+    margin-bottom: 0.75rem;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
 
-  .hall-stats {
-    display: flex;
-    justify-content: space-around;
-    padding: 1rem 0;
-    border-top: 2px solid #f3f4f6;
-    border-bottom: 2px solid #f3f4f6;
-    margin: 0.5rem 0;
+  .hall-bio-full {
+    display: none;
   }
 
-  .hall-stat {
-    text-align: center;
+  .read-more {
+    color: #2563eb;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
   }
 
-  .stat-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #1e40af;
-    display: block;
+  .read-more:hover {
+    text-decoration: underline;
   }
 
-  .stat-label {
-    font-size: 0.75rem;
-    color: #6b7280;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .hall-actions {
-    display: flex;
-    gap: 0.75rem;
-    margin-top: 0.5rem;
-  }
-
-  .btn-view-profile {
-    flex: 1;
-    padding: 0.75rem 1rem;
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  .btn-download {
+    background-color: #10b981;
     color: #ffffff;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
+    padding: 0.625rem 1.25rem;
     font-size: 0.875rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: center;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+    transition: background-color 0.2s;
+    align-self: flex-start;
   }
 
-  .btn-view-profile:hover {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+  .btn-download:hover {
+    background-color: #059669;
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
     .hall-of-fame-page {
-      padding: 2rem 1rem;
+      padding: 1rem;
     }
 
-    .hall-header h1 {
-      font-size: 2rem;
+    .hall-card {
+      flex-direction: column;
     }
 
-    .hall-header p {
-      font-size: 1rem;
-    }
-
-    .hall-image-wrapper {
-      height: 280px;
-    }
-
-    .hall-card-content {
-      padding: 1.5rem;
-    }
-
-    .hall-name {
-      font-size: 1.25rem;
+    .hall-card-image {
+      width: 100%;
+      height: 200px;
     }
   }
 </style>
 
 <div class="hall-of-fame-page">
-  <div class="container">
-    <div class="hall-wrapper">
-      <!-- Page Header -->
-      <div class="hall-header">
-        <h1>Hall of Fame</h1>
-        <p>Celebrating exceptional researchers and scholars who have made outstanding contributions to their fields</p>
-        
-        <!-- Filter Buttons -->
-        <div class="hall-filters">
-          <button class="filter-btn active" data-filter="all" onclick="filterHall('all')">All</button>
-          <button class="filter-btn" data-filter="2024" onclick="filterHall('2024')">2024</button>
-          <button class="filter-btn" data-filter="2023" onclick="filterHall('2023')">2023</button>
-          <button class="filter-btn" data-filter="2022" onclick="filterHall('2022')">2022</button>
-          <button class="filter-btn" data-filter="2021" onclick="filterHall('2021')">2021</button>
+  <div class="hall-wrapper">
+    <div class="hall-layout">
+      <!-- Filter Sidebar -->
+      <aside class="hall-sidebar">
+        <!-- Year Inducted Filter -->
+        <div class="filter-section" id="year-filter">
+          <div class="filter-header" onclick="toggleFilter('year-filter')">
+            <span>YEAR INDUCTED</span>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </div>
+          <div class="filter-content">
+            <input type="text" class="filter-search" id="year-search" placeholder="Search Year Inducted" onkeyup="filterYears()">
+            <ul class="filter-list" id="year-list">
+              {% for year in years %}
+              <li class="filter-item">
+                <label class="filter-item-label">
+                  <input type="checkbox" class="filter-checkbox" data-type="year" data-value="{{ year.year }}" onchange="applyFilters()">
+                  <span>{{ year.year }}</span>
+                </label>
+                <span class="filter-count">{{ year.count }}</span>
+              </li>
+              {% empty %}
+              <li class="filter-item">
+                <label class="filter-item-label">
+                  <input type="checkbox" class="filter-checkbox" data-type="year" data-value="2022" onchange="applyFilters()">
+                  <span>2022</span>
+                </label>
+                <span class="filter-count">11</span>
+              </li>
+              <li class="filter-item">
+                <label class="filter-item-label">
+                  <input type="checkbox" class="filter-checkbox" data-type="year" data-value="2023" onchange="applyFilters()">
+                  <span>2023</span>
+                </label>
+                <span class="filter-count">5</span>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
         </div>
-      </div>
 
-      <!-- Hall of Fame Grid -->
-      <div class="hall-grid" id="hallContainer">
-        <!-- Inductee 1 -->
-        <article class="hall-card" data-year="2024">
-          <div class="hall-badge">2024</div>
-          <div class="hall-image-wrapper">
-            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face" alt="Prof. Robert Anderson">
-            <span>RA</span>
+        <!-- Discipline Filter -->
+        <div class="filter-section collapsed" id="discipline-filter">
+          <div class="filter-header" onclick="toggleFilter('discipline-filter')">
+            <span>DISCIPLINE</span>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
           </div>
-          <div class="hall-card-content">
-            <div class="hall-name-wrapper">
-              <h3 class="hall-name">Prof. Robert Anderson</h3>
-              <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-              </svg>
-            </div>
-            <p class="hall-title">Distinguished Professor of Physics</p>
-            <p class="hall-institution">Harvard University</p>
-            <p class="hall-achievements">Pioneered groundbreaking research in quantum mechanics and received the Nobel Prize in Physics for revolutionary contributions to quantum computing.</p>
-            <div class="hall-stats">
-              <div class="hall-stat">
-                <span class="stat-value">250+</span>
-                <span class="stat-label">Publications</span>
-              </div>
-              <div class="hall-stat">
-                <span class="stat-value">45K</span>
-                <span class="stat-label">Citations</span>
-              </div>
-              <div class="hall-stat">
-                <span class="stat-value">15</span>
-                <span class="stat-label">Awards</span>
-              </div>
-            </div>
-            <div class="hall-actions">
-              <a href="#" class="btn-view-profile">View Profile</a>
-            </div>
+          <div class="filter-content">
+            <input type="text" class="filter-search" id="discipline-search" placeholder="Search discipline" onkeyup="filterDisciplines()">
+            <ul class="filter-list" id="discipline-list">
+              {% for discipline in disciplines %}
+              <li class="filter-item">
+                <label class="filter-item-label">
+                  <input type="checkbox" class="filter-checkbox" data-type="discipline" data-value="{{ discipline.name }}" onchange="applyFilters()">
+                  <span>{{ discipline.name }}</span>
+                </label>
+                <span class="filter-count">{{ discipline.count }}</span>
+              </li>
+              {% endfor %}
+            </ul>
           </div>
-        </article>
+        </div>
 
-        <!-- Inductee 2 -->
-        <article class="hall-card" data-year="2024">
-          <div class="hall-badge">2024</div>
-          <div class="hall-image-wrapper">
-            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face" alt="Dr. Maria Garcia">
-            <span>MG</span>
+        <!-- Category Filter -->
+        <div class="filter-section collapsed" id="category-filter">
+          <div class="filter-header" onclick="toggleFilter('category-filter')">
+            <span>CATEGORY</span>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
           </div>
-          <div class="hall-card-content">
-            <div class="hall-name-wrapper">
-              <h3 class="hall-name">Dr. Maria Garcia</h3>
-              <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-              </svg>
-            </div>
-            <p class="hall-title">Leading Researcher in Biomedical Sciences</p>
-            <p class="hall-institution">Stanford University</p>
-            <p class="hall-achievements">Developed innovative treatments for rare diseases and established international research collaborations that have saved thousands of lives.</p>
-            <div class="hall-stats">
-              <div class="hall-stat">
-                <span class="stat-value">180+</span>
-                <span class="stat-label">Publications</span>
-              </div>
-              <div class="hall-stat">
-                <span class="stat-value">32K</span>
-                <span class="stat-label">Citations</span>
-              </div>
-              <div class="hall-stat">
-                <span class="stat-value">12</span>
-                <span class="stat-label">Awards</span>
-              </div>
-            </div>
-            <div class="hall-actions">
-              <a href="#" class="btn-view-profile">View Profile</a>
-            </div>
+          <div class="filter-content">
+            <input type="text" class="filter-search" id="category-search" placeholder="Search category" onkeyup="filterCategories()">
+            <ul class="filter-list" id="category-list">
+              {% for category in categories %}
+              <li class="filter-item">
+                <label class="filter-item-label">
+                  <input type="checkbox" class="filter-checkbox" data-type="category" data-value="{{ category.name }}" onchange="applyFilters()">
+                  <span>{{ category.name }}</span>
+                </label>
+                <span class="filter-count">{{ category.count }}</span>
+              </li>
+              {% endfor %}
+            </ul>
           </div>
-        </article>
+        </div>
 
-        <!-- Inductee 3 -->
-        <article class="hall-card" data-year="2023">
-          <div class="hall-badge">2023</div>
-          <div class="hall-image-wrapper">
-            <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=face" alt="Prof. James Wilson">
-            <span>JW</span>
-          </div>
-          <div class="hall-card-content">
-            <div class="hall-name-wrapper">
-              <h3 class="hall-name">Prof. James Wilson</h3>
-              <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-              </svg>
-            </div>
-            <p class="hall-title">Renowned Computer Scientist</p>
-            <p class="hall-institution">MIT</p>
-            <p class="hall-achievements">Revolutionized artificial intelligence and machine learning with breakthrough algorithms that power modern technology systems worldwide.</p>
-            <div class="hall-stats">
-              <div class="hall-stat">
-                <span class="stat-value">220+</span>
-                <span class="stat-label">Publications</span>
-              </div>
-              <div class="hall-stat">
-                <span class="stat-value">38K</span>
-                <span class="stat-label">Citations</span>
-              </div>
-              <div class="hall-stat">
-                <span class="stat-value">18</span>
-                <span class="stat-label">Awards</span>
-              </div>
-            </div>
-            <div class="hall-actions">
-              <a href="#" class="btn-view-profile">View Profile</a>
-            </div>
-          </div>
-        </article>
+        <button class="reset-button" onclick="resetFilters()">Reset</button>
+      </aside>
 
-        <!-- Inductee 4 -->
-        <article class="hall-card" data-year="2023">
-          <div class="hall-badge">2023</div>
-          <div class="hall-image-wrapper">
-            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face" alt="Dr. Sarah Chen">
-            <span>SC</span>
+      <!-- Main Content -->
+      <main class="hall-main">
+        <!-- Search Bar -->
+        <div class="search-bar-container">
+          <div class="search-bar-wrapper">
+            <input type="text" class="search-bar" id="personality-search" placeholder="Search Eminent Personalities" onkeyup="filterPersonalities()">
+            <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
           </div>
-          <div class="hall-card-content">
-            <div class="hall-name-wrapper">
-              <h3 class="hall-name">Dr. Sarah Chen</h3>
-              <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-              </svg>
-            </div>
-            <p class="hall-title">Expert in Environmental Science</p>
-            <p class="hall-institution">Oxford University</p>
-            <p class="hall-achievements">Led groundbreaking climate research initiatives and developed sustainable solutions that have influenced global environmental policies.</p>
-            <div class="hall-stats">
-              <div class="hall-stat">
-                <span class="stat-value">165+</span>
-                <span class="stat-label">Publications</span>
-              </div>
-              <div class="hall-stat">
-                <span class="stat-value">28K</span>
-                <span class="stat-label">Citations</span>
-              </div>
-              <div class="hall-stat">
-                <span class="stat-value">10</span>
-                <span class="stat-label">Awards</span>
-              </div>
-            </div>
-            <div class="hall-actions">
-              <a href="#" class="btn-view-profile">View Profile</a>
-            </div>
-          </div>
-        </article>
+        </div>
 
-        <!-- Inductee 5 -->
-        <article class="hall-card" data-year="2022">
-          <div class="hall-badge">2022</div>
-          <div class="hall-image-wrapper">
-            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face" alt="Prof. David Kim">
-            <span>DK</span>
-          </div>
-          <div class="hall-card-content">
-            <div class="hall-name-wrapper">
-              <h3 class="hall-name">Prof. David Kim</h3>
-              <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-              </svg>
-            </div>
-            <p class="hall-title">Pioneer in Renewable Energy</p>
-            <p class="hall-institution">Cambridge University</p>
-            <p class="hall-achievements">Developed innovative solar energy technologies and sustainable power systems that have transformed the renewable energy landscape.</p>
-            <div class="hall-stats">
-              <div class="hall-stat">
-                <span class="stat-value">195+</span>
-                <span class="stat-label">Publications</span>
+        <!-- Hall of Fame Cards -->
+        <div class="hall-cards" id="hallCards">
+          {% for honoree in honorees %}
+          <article class="hall-card" data-year="{{ honoree.created_at|date:'Y' }}" data-discipline="{{ honoree.nominee_position }}" data-category="Eminent Individuals">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face" alt="{{ honoree.nominee_first_name }} {{ honoree.nominee_last_name }}" class="hall-card-image" onerror="this.src='https://via.placeholder.com/120x120?text={{ honoree.nominee_first_name|first }}{{ honoree.nominee_last_name|first }}'">
+            <div class="hall-card-content">
+              <div class="hall-card-header">
+                <div class="hall-card-id">SIS{{ honoree.id|stringformat:"04d" }}HF{{ honoree.created_at|date:"y" }}</div>
+                <div class="hall-card-location">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                  <span>{{ honoree.nominee_institution|default:"United States" }}</span>
+                </div>
               </div>
-              <div class="hall-stat">
-                <span class="stat-value">30K</span>
-                <span class="stat-label">Citations</span>
+              <div class="hall-name-wrapper">
+                <h3 class="hall-name">{{ honoree.nominee_first_name }} {{ honoree.nominee_last_name }}</h3>
+                <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
               </div>
-              <div class="hall-stat">
-                <span class="stat-value">14</span>
-                <span class="stat-label">Awards</span>
+              <div class="hall-category">Eminent Individuals: {{ honoree.nominee_position|default:"Computer Science" }}</div>
+              <div class="hall-affiliation">{{ honoree.nominee_institution }}</div>
+              <div class="hall-bio">
+                <span class="hall-bio-short">{{ honoree.research_achievements|truncatewords:30 }}</span>
+                <span class="hall-bio-full">{{ honoree.research_achievements }}</span>
+                <a href="#" class="read-more" onclick="toggleBio(this); return false;">read more</a>
               </div>
+              <button class="btn-download" onclick="downloadProfile({{ honoree.id }})">Download Profile</button>
             </div>
-            <div class="hall-actions">
-              <a href="#" class="btn-view-profile">View Profile</a>
+          </article>
+          {% empty %}
+          <!-- Sample cards for demonstration -->
+          <article class="hall-card" data-year="2022" data-discipline="Computer Science" data-category="Eminent Individuals">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face" alt="Professor Michael D. Smith" class="hall-card-image">
+            <div class="hall-card-content">
+              <div class="hall-card-header">
+                <div class="hall-card-id">SIS8264HF124</div>
+                <div class="hall-card-location">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                  <span>United States</span>
+                </div>
+              </div>
+              <div class="hall-name-wrapper">
+                <h3 class="hall-name">Professor Michael D. Smith</h3>
+                <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <div class="hall-category">Eminent Individuals: Computer Science</div>
+              <div class="hall-affiliation">Harvard University</div>
+              <div class="hall-bio">
+                <span class="hall-bio-short">John H. Finley, Jr. Professor of Engineering and Applied Sciences; Distinguished Service Professor at Harvard University Michael D. Smith is the...</span>
+                <span class="hall-bio-full">John H. Finley, Jr. Professor of Engineering and Applied Sciences; Distinguished Service Professor at Harvard University Michael D. Smith is the John H. Finley, Jr. Professor of Engineering and Applied Sciences and Distinguished Service Professor at Harvard University. He has made significant contributions to computer science and engineering education.</span>
+                <a href="#" class="read-more" onclick="toggleBio(this); return false;">read more</a>
+              </div>
+              <button class="btn-download" onclick="downloadProfile(8264)">Download Profile</button>
             </div>
-          </div>
-        </article>
+          </article>
 
-        <!-- Inductee 6 -->
-        <article class="hall-card" data-year="2022">
-          <div class="hall-badge">2022</div>
-          <div class="hall-image-wrapper">
-            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=face" alt="Dr. Lisa Thompson">
-            <span>LT</span>
-          </div>
-          <div class="hall-card-content">
-            <div class="hall-name-wrapper">
-              <h3 class="hall-name">Dr. Lisa Thompson</h3>
-              <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-              </svg>
-            </div>
-            <p class="hall-title">Leading Neuroscientist</p>
-            <p class="hall-institution">ETH Zurich</p>
-            <p class="hall-achievements">Made significant discoveries in brain research and developed advanced neuroimaging techniques that have advanced our understanding of the human brain.</p>
-            <div class="hall-stats">
-              <div class="hall-stat">
-                <span class="stat-value">175+</span>
-                <span class="stat-label">Publications</span>
+          <article class="hall-card" data-year="2023" data-discipline="Political Leader" data-category="Inspirational People">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face" alt="Jacinda Ardern" class="hall-card-image">
+            <div class="hall-card-content">
+              <div class="hall-card-header">
+                <div class="hall-card-id">SIS2591HF92</div>
+                <div class="hall-card-location">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                  <span>New Zealand</span>
+                </div>
               </div>
-              <div class="hall-stat">
-                <span class="stat-value">26K</span>
-                <span class="stat-label">Citations</span>
+              <div class="hall-name-wrapper">
+                <h3 class="hall-name">Jacinda Ardern</h3>
+                <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
               </div>
-              <div class="hall-stat">
-                <span class="stat-value">11</span>
-                <span class="stat-label">Awards</span>
+              <div class="hall-category">Inspirational People: Political Leader</div>
+              <div class="hall-affiliation">Prime Minister Of New Zealand</div>
+              <div class="hall-bio">
+                <span class="hall-bio-short">Jacinda Ardern is the current Prime Minister of New Zealand. She became the youngest female head of state, assuming office on 26 October 2017. She is...</span>
+                <span class="hall-bio-full">Jacinda Ardern is the current Prime Minister of New Zealand. She became the youngest female head of state, assuming office on 26 October 2017. She is known for her compassionate leadership and progressive policies that have made a significant impact on New Zealand and the world.</span>
+                <a href="#" class="read-more" onclick="toggleBio(this); return false;">read more</a>
               </div>
+              <button class="btn-download" onclick="downloadProfile(2591)">Download Profile</button>
             </div>
-            <div class="hall-actions">
-              <a href="#" class="btn-view-profile">View Profile</a>
-            </div>
-          </div>
-        </article>
-      </div>
+          </article>
+          {% endfor %}
+        </div>
+      </main>
     </div>
   </div>
 </div>
 
 <script>
-  function filterHall(year) {
-    const cards = document.querySelectorAll('.hall-card');
-    const buttons = document.querySelectorAll('.filter-btn');
-    
-    // Update active button
-    buttons.forEach(btn => {
-      if (btn.dataset.filter === year) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
+  // Store all personalities data
+  const allPersonalities = Array.from(document.querySelectorAll('.hall-card')).map(card => ({
+    id: card.querySelector('.hall-card-id')?.textContent || '',
+    name: card.querySelector('.hall-name')?.textContent || '',
+    category: card.querySelector('.hall-category')?.textContent || '',
+    affiliation: card.querySelector('.hall-affiliation')?.textContent || '',
+    bio: card.querySelector('.hall-bio-short')?.textContent || '',
+    year: card.dataset.year || '',
+    discipline: card.dataset.discipline || '',
+    categoryType: card.dataset.category || '',
+  }));
+
+  function toggleFilter(filterId) {
+    const section = document.getElementById(filterId);
+    section.classList.toggle('collapsed');
+  }
+
+  function filterYears() {
+    const searchTerm = document.getElementById('year-search').value.toLowerCase();
+    const items = document.querySelectorAll('#year-list .filter-item');
+    items.forEach(item => {
+      const text = item.textContent.toLowerCase();
+      item.style.display = text.includes(searchTerm) ? 'flex' : 'none';
     });
-    
-    // Filter cards
-    cards.forEach(card => {
-      if (year === 'all' || card.dataset.year === year) {
+  }
+
+  function filterDisciplines() {
+    const searchTerm = document.getElementById('discipline-search').value.toLowerCase();
+    const items = document.querySelectorAll('#discipline-list .filter-item');
+    items.forEach(item => {
+      const text = item.textContent.toLowerCase();
+      item.style.display = text.includes(searchTerm) ? 'flex' : 'none';
+    });
+  }
+
+  function filterCategories() {
+    const searchTerm = document.getElementById('category-search').value.toLowerCase();
+    const items = document.querySelectorAll('#category-list .filter-item');
+    items.forEach(item => {
+      const text = item.textContent.toLowerCase();
+      item.style.display = text.includes(searchTerm) ? 'flex' : 'none';
+    });
+  }
+
+  function applyFilters() {
+    const selectedYears = Array.from(document.querySelectorAll('input[data-type="year"]:checked')).map(cb => cb.dataset.value);
+    const selectedDisciplines = Array.from(document.querySelectorAll('input[data-type="discipline"]:checked')).map(cb => cb.dataset.value);
+    const selectedCategories = Array.from(document.querySelectorAll('input[data-type="category"]:checked')).map(cb => cb.dataset.value);
+    const searchTerm = document.getElementById('personality-search').value.toLowerCase();
+
+    const cards = document.querySelectorAll('.hall-card');
+    let visibleCount = 0;
+
+    cards.forEach((card, index) => {
+      if (index >= allPersonalities.length) return;
+      
+      const personality = allPersonalities[index];
+      let visible = true;
+
+      // Filter by search term
+      if (searchTerm) {
+        const matchesSearch = 
+          (personality.name || '').toLowerCase().includes(searchTerm) ||
+          (personality.affiliation || '').toLowerCase().includes(searchTerm) ||
+          (personality.category || '').toLowerCase().includes(searchTerm) ||
+          (personality.bio || '').toLowerCase().includes(searchTerm);
+        if (!matchesSearch) visible = false;
+      }
+
+      // Filter by year
+      if (selectedYears.length > 0) {
+        if (!selectedYears.includes(personality.year)) visible = false;
+      }
+
+      // Filter by discipline
+      if (selectedDisciplines.length > 0) {
+        const matchesDiscipline = selectedDisciplines.some(d => 
+          (personality.discipline || '').toLowerCase().includes(d.toLowerCase())
+        );
+        if (!matchesDiscipline) visible = false;
+      }
+
+      // Filter by category
+      if (selectedCategories.length > 0) {
+        if (!selectedCategories.includes(personality.categoryType)) visible = false;
+      }
+
+      if (visible) {
         card.style.display = 'flex';
-        setTimeout(() => {
-          card.style.opacity = '1';
-          card.style.transform = 'scale(1)';
-        }, 10);
+        visibleCount++;
       } else {
-        card.style.opacity = '0';
-        card.style.transform = 'scale(0.9)';
-        setTimeout(() => {
-          card.style.display = 'none';
-        }, 300);
+        card.style.display = 'none';
       }
     });
   }
 
-  // Hide initials when images load
-  document.querySelectorAll('.hall-image-wrapper img').forEach(img => {
-    img.addEventListener('load', function() {
-      const span = this.nextElementSibling;
-      if (span && span.tagName === 'SPAN') {
-        span.style.display = 'none';
-      }
-    });
-    img.addEventListener('error', function() {
-      const span = this.nextElementSibling;
-      if (span && span.tagName === 'SPAN') {
-        span.style.display = 'block';
-      }
-      this.style.display = 'none';
-    });
-  });
+  function filterPersonalities() {
+    applyFilters();
+  }
+
+  function resetFilters() {
+    document.getElementById('personality-search').value = '';
+    document.getElementById('year-search').value = '';
+    document.getElementById('discipline-search').value = '';
+    document.getElementById('category-search').value = '';
+    document.querySelectorAll('.filter-checkbox').forEach(cb => cb.checked = false);
+    document.querySelectorAll('.hall-card').forEach(card => card.style.display = 'flex');
+    filterYears();
+    filterDisciplines();
+    filterCategories();
+  }
+
+  function toggleBio(element) {
+    const bioDiv = element.closest('.hall-bio');
+    const short = bioDiv.querySelector('.hall-bio-short');
+    const full = bioDiv.querySelector('.hall-bio-full');
+    
+    if (short.style.display === 'none') {
+      short.style.display = '-webkit-box';
+      full.style.display = 'none';
+      element.textContent = 'read more';
+    } else {
+      short.style.display = 'none';
+      full.style.display = 'block';
+      element.textContent = 'read less';
+    }
+  }
+
+  function downloadProfile(id) {
+    // Implement download functionality
+    alert('Downloading profile for ID: ' + id);
+  }
 </script>
 {% endblock %}
+
+
+
 

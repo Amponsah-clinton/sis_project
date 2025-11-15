@@ -153,7 +153,7 @@ class MembershipRequestAdmin(admin.ModelAdmin):
             'fields': ('institution', 'position', 'membership_type', 'research_interests')
         }),
         ('Documents', {
-            'fields': ('cv_file', 'motivation_letter', 'terms_accepted')
+            'fields': ('profile_picture', 'cv_file', 'motivation_letter', 'terms_accepted')
         }),
         ('Metadata', {
             'fields': ('submitted_by', 'created_at', 'updated_at')
