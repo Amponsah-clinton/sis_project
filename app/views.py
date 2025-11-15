@@ -4,10 +4,11 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.contrib.auth.models import User
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseNotFound
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.conf import settings
+from app.decorators import check_page_enabled
 import time
 import csv
 import io
@@ -26,12 +27,21 @@ from .models import (
 
 def landing(request):
     """Landing page view"""
+    from app.models import SiteSettings
+    site_settings = SiteSettings.get_settings()
+    
+    # Check if landing page is enabled
+    if not site_settings.enable_landing_page:
+        from django.http import HttpResponseNotFound
+        return HttpResponseNotFound("Page not found")
+    
     search_form = SearchForm()
     # Get latest articles for the landing page
     latest_articles = Article.objects.filter(status='approved').order_by('-created_at')[:6]
     return render(request, 'app/landing.html', {
         'search_form': search_form,
         'latest_articles': latest_articles,
+        'site_settings': site_settings,
     })
 
 def browse(request):
@@ -160,6 +170,7 @@ def logout_view(request):
     messages.success(request, 'You have been logged out successfully.')
     return redirect('app:landing')
 
+@check_page_enabled('enable_indexed_articles_page')
 def indexed_articles(request):
     """Indexed Articles page view"""
     articles = Article.objects.all().order_by('-created_at')
@@ -344,11 +355,13 @@ def article_detail(request, article_id):
         'is_dummy': is_dummy,
     })
 
+@check_page_enabled('enable_indexed_journals_page')
 def indexed_journals(request):
     """Indexed Journals page view"""
     journals = Journal.objects.all().order_by('-created_at')
     return render(request, 'app/indexed_journals.html', {'journals': journals})
 
+@check_page_enabled('enable_project_archive_page')
 def project_archive(request):
     """Project | Research Archive page view"""
     projects = Project.objects.all()
@@ -588,6 +601,7 @@ def register_journal(request):
     
     return render(request, 'app/register_journal.html', {'form': form})
 
+@check_page_enabled('enable_directory_researchers_page')
 def directory_researchers(request):
     """Directory of Researchers page view"""
     researchers = DirectoryApplication.objects.filter(terms_accepted=True)
@@ -683,14 +697,17 @@ def upload_project(request):
     
     return render(request, 'app/upload_project.html', {'form': form})
 
+@check_page_enabled('enable_council_members_page')
 def council_members(request):
     """Council Members page view"""
     return render(request, 'app/council_members.html')
 
+@check_page_enabled('enable_team_members_page')
 def team_members(request):
     """Team Members page view"""
     return render(request, 'app/team_members.html')
 
+@check_page_enabled('enable_sponsors_page')
 def sponsors(request):
     """Sponsors page view"""
     from django.conf import settings
@@ -801,6 +818,7 @@ def apply_directory(request):
     
     return render(request, 'app/apply_directory.html', {'form': form})
 
+@check_page_enabled('enable_hall_of_fame_page')
 def hall_of_fame(request):
     """Hall of Fame listing page view"""
     honorees = HallOfFameApplication.objects.filter(terms_accepted=True).order_by('-created_at')
@@ -826,6 +844,7 @@ def hall_of_fame_apply(request):
     
     return render(request, 'app/hall_of_fame_apply.html', {'form': form})
 
+@check_page_enabled('enable_check_turnitin_page')
 def check_turnitin(request):
     """Check Turnitin Plagiarism page view"""
     if request.method == 'POST':
@@ -846,6 +865,7 @@ def check_turnitin(request):
     
     return render(request, 'app/check_turnitin.html', {'form': form})
 
+@check_page_enabled('enable_work_plagiarism_page')
 def work_plagiarism(request):
     """Work My Plagiarism page view"""
     if request.method == 'POST':
@@ -866,6 +886,7 @@ def work_plagiarism(request):
     
     return render(request, 'app/work_plagiarism.html', {'form': form})
 
+@check_page_enabled('enable_thesis_to_article_page')
 def thesis_to_article(request):
     """Thesis To Article page view"""
     if request.method == 'POST':
@@ -886,6 +907,7 @@ def thesis_to_article(request):
     
     return render(request, 'app/thesis_to_article.html', {'form': form})
 
+@check_page_enabled('enable_thesis_to_book_page')
 def thesis_to_book(request):
     """Thesis To Book page view"""
     if request.method == 'POST':
@@ -906,6 +928,7 @@ def thesis_to_book(request):
     
     return render(request, 'app/thesis_to_book.html', {'form': form})
 
+@check_page_enabled('enable_thesis_to_book_chapter_page')
 def thesis_to_book_chapter(request):
     """Thesis To Book Chapter page view"""
     if request.method == 'POST':
@@ -926,6 +949,7 @@ def thesis_to_book_chapter(request):
     
     return render(request, 'app/thesis_to_book_chapter.html', {'form': form})
 
+@check_page_enabled('enable_powerpoint_preparation_page')
 def powerpoint_preparation(request):
     """Power Point Preparation page view"""
     if request.method == 'POST':
@@ -946,29 +970,111 @@ def powerpoint_preparation(request):
     
     return render(request, 'app/powerpoint_preparation.html', {'form': form})
 
+@check_page_enabled('enable_about_sis_page')
 def about_sis(request):
     """About S.I.S page view"""
     return render(request, 'app/about_sis.html')
 
+@check_page_enabled('enable_mission_page')
 def mission(request):
     """Mission page view"""
     return render(request, 'app/mission.html')
 
+@check_page_enabled('enable_criteria_page')
 def criteria(request):
     """Criteria page view"""
     return render(request, 'app/criteria.html')
 
+@check_page_enabled('enable_tolerance_policy_page')
 def tolerance_policy(request):
     """Tolerance Policy page view"""
     return render(request, 'app/tolerance_policy.html')
 
+@check_page_enabled('enable_service_solution_page')
 def service_solution(request):
     """Service & Solution page view"""
     return render(request, 'app/service_solution.html')
 
+@check_page_enabled('enable_policy_terms_page')
 def policy_terms(request):
     """Policy Terms and Conditions page view"""
     return render(request, 'app/policy_terms.html')
+
+@login_required
+def news_list(request):
+    """Published blogs/news listing page"""
+    from app.models import Blog
+    blogs = Blog.objects.filter(is_published=True).order_by('-published_date', '-order_priority')
+    return render(request, 'app/news_list.html', {'blogs': blogs})
+
+@login_required
+def news_add(request):
+    """Add new blog/news page"""
+    from app.models import Blog
+    from django.contrib import messages
+    
+    if request.method == 'POST':
+        blog = Blog.objects.create(
+            title=request.POST.get('blog_title', ''),
+            content=request.POST.get('blog_content', ''),
+            tag=request.POST.get('blog_tag', ''),
+            category=request.POST.get('blog_category', 'general'),
+            order_priority=int(request.POST.get('blog_order_priority', 5)),
+            created_by=request.user,
+        )
+        if 'blog_image' in request.FILES:
+            blog.image = request.FILES['blog_image']
+        blog.save()
+        messages.success(request, 'Blog created successfully!')
+        return redirect('app:news_list')
+    
+    return render(request, 'app/news_add.html')
+
+@login_required
+def news_edit(request, blog_id):
+    """Edit blog/news page"""
+    from app.models import Blog
+    from django.contrib import messages
+    from django.shortcuts import get_object_or_404
+    
+    blog = get_object_or_404(Blog, id=blog_id)
+    
+    if request.method == 'POST':
+        blog.title = request.POST.get('blog_title', '')
+        blog.content = request.POST.get('blog_content', '')
+        blog.tag = request.POST.get('blog_tag', '')
+        blog.category = request.POST.get('blog_category', 'general')
+        blog.order_priority = int(request.POST.get('blog_order_priority', 5))
+        if 'blog_image' in request.FILES:
+            blog.image = request.FILES['blog_image']
+        blog.save()
+        messages.success(request, 'Blog updated successfully!')
+        return redirect('app:news_list')
+    
+    return render(request, 'app/news_edit.html', {'blog': blog})
+
+@login_required
+def news_delete(request, blog_id):
+    """Delete blog/news"""
+    from app.models import Blog
+    from django.http import JsonResponse
+    from django.shortcuts import get_object_or_404
+    
+    blog = get_object_or_404(Blog, id=blog_id)
+    blog.delete()
+    return JsonResponse({'success': True, 'message': 'Blog deleted successfully!'})
+
+@login_required
+def news_toggle_publish(request, blog_id):
+    """Toggle blog publish status"""
+    from app.models import Blog
+    from django.http import JsonResponse
+    from django.shortcuts import get_object_or_404
+    
+    blog = get_object_or_404(Blog, id=blog_id)
+    blog.is_published = not blog.is_published
+    blog.save()
+    return JsonResponse({'success': True, 'message': 'Blog status updated successfully!'})
 
 def dashboard(request):
     """Dashboard page view"""
@@ -1081,6 +1187,292 @@ def dashboard(request):
         'registered_members_count': registered_members_count,
         'recent_users': recent_users,
         'recent_blogs': recent_blogs,
+    })
+
+@login_required
+def settings(request):
+    """Settings page view"""
+    user = request.user
+    try:
+        profile = user.profile
+    except UserProfile.DoesNotExist:
+        profile = UserProfile.objects.create(user=user)
+    
+    if request.method == 'POST':
+        section = request.POST.get('section', 'profile')
+        
+        if section == 'profile':
+            # Update profile information
+            user.first_name = request.POST.get('first_name', '')
+            user.last_name = request.POST.get('last_name', '')
+            user.email = request.POST.get('email', '')
+            user.save()
+            
+            profile.phone = request.POST.get('phone', '')
+            profile.country = request.POST.get('country', '')
+            if 'profile_photo' in request.FILES:
+                profile.profile_photo = request.FILES['profile_photo']
+            profile.save()
+            
+            messages.success(request, 'Profile updated successfully!')
+            
+        elif section == 'account':
+            # Update account settings
+            username = request.POST.get('username', '')
+            if username and username != user.username:
+                if User.objects.filter(username=username).exclude(id=user.id).exists():
+                    messages.error(request, 'Username already exists.')
+                else:
+                    user.username = username
+                    user.save()
+                    messages.success(request, 'Account settings updated successfully!')
+            else:
+                messages.success(request, 'Account settings updated successfully!')
+                
+        elif section == 'security':
+            # Update password
+            current_password = request.POST.get('current_password', '')
+            new_password = request.POST.get('new_password', '')
+            confirm_password = request.POST.get('confirm_password', '')
+            
+            if new_password:
+                if not user.check_password(current_password):
+                    messages.error(request, 'Current password is incorrect.')
+                elif new_password != confirm_password:
+                    messages.error(request, 'New passwords do not match.')
+                elif len(new_password) < 8:
+                    messages.error(request, 'Password must be at least 8 characters long.')
+                else:
+                    user.set_password(new_password)
+                    user.save()
+                    from django.contrib.auth import update_session_auth_hash
+                    update_session_auth_hash(request, user)
+                    messages.success(request, 'Password updated successfully!')
+        
+        elif section == 'general':
+            # Update general settings - Theme
+            from app.models import SiteSettings
+            site_settings = SiteSettings.get_settings()
+            
+            if 'banner_image' in request.FILES:
+                site_settings.default_banner_image = request.FILES['banner_image']
+            
+            font_size = request.POST.get('font_size')
+            if font_size:
+                try:
+                    site_settings.default_app_font_size = int(font_size)
+                except ValueError:
+                    pass
+            
+            site_settings.save()
+            messages.success(request, 'General settings updated successfully!')
+            
+        elif section == 'address':
+            # Update address & contact settings
+            from app.models import SiteSettings
+            site_settings = SiteSettings.get_settings()
+            
+            site_settings.phone = request.POST.get('phone', '')
+            site_settings.office_location_address = request.POST.get('office_address', '')
+            site_settings.email_address = request.POST.get('email_address', '')
+            site_settings.whatsapp_url = request.POST.get('whatsapp', '')
+            site_settings.youtube_url = request.POST.get('youtube', '')
+            site_settings.twitter_url = request.POST.get('twitter', '')
+            site_settings.facebook_url = request.POST.get('facebook', '')
+            
+            site_settings.save()
+            messages.success(request, 'Address & Contact settings updated successfully!')
+            
+        elif section == 'payment_gate':
+            # Update payment gate settings
+            from app.models import SiteSettings
+            site_settings = SiteSettings.get_settings()
+            
+            site_settings.api_secret_key = request.POST.get('api_secret_key', '')
+            site_settings.api_public_key = request.POST.get('api_public_key', '')
+            
+            site_settings.save()
+            messages.success(request, 'Payment gate settings updated successfully!')
+            
+        elif section == 'map_address':
+            # Update map address
+            from app.models import SiteSettings
+            site_settings = SiteSettings.get_settings()
+            
+            site_settings.map_index = request.POST.get('map_index', '')
+            
+            site_settings.save()
+            messages.success(request, 'Map address updated successfully!')
+            
+        elif section == 'sponsorship_pricing':
+            # Update sponsorship pricing
+            from app.models import SiteSettings
+            site_settings = SiteSettings.get_settings()
+            
+            # Update all sponsorship prices
+            for field in ['premier', 'sustaining', 'basic', 'power', 'double', 'single', 'compact', 'inspired', 'charity_homes']:
+                price = request.POST.get(f'{field}_price', '')
+                if price:
+                    try:
+                        setattr(site_settings, f'{field}_price', float(price))
+                    except ValueError:
+                        pass
+            
+            site_settings.save()
+            messages.success(request, 'Sponsorship pricing updated successfully!')
+            
+        elif section == 'registrations_pricing':
+            # Update registrations pricing
+            from app.models import SiteSettings
+            site_settings = SiteSettings.get_settings()
+            
+            # Update all registration prices
+            price_fields = {
+                'article_indexing_price': 'article_indexing_price',
+                'journal_indexing_price': 'journal_indexing_price',
+                'project_archive_hosting_price': 'project_archive_hosting_price',
+                'directory_researcher_price': 'directory_researcher_price',
+                'hall_of_fame_price': 'hall_of_fame_price',
+                'check_plagiarism_price': 'check_plagiarism_price',
+                'work_plagiarism_price': 'work_plagiarism_price',
+                'thesis_to_article_price': 'thesis_to_article_price',
+                'thesis_to_book_price': 'thesis_to_book_price',
+                'thesis_to_book_chapter_price': 'thesis_to_book_chapter_price',
+                'powerpoint_preparation_price': 'powerpoint_preparation_price',
+            }
+            
+            for form_field, model_field in price_fields.items():
+                price = request.POST.get(form_field, '')
+                if price:
+                    try:
+                        setattr(site_settings, model_field, float(price))
+                    except ValueError:
+                        pass
+            
+            site_settings.save()
+            messages.success(request, 'Registrations pricing updated successfully!')
+            
+        elif section == 'navigators_documents':
+            # Update navigators - documents
+            from app.models import SiteSettings
+            site_settings = SiteSettings.get_settings()
+            
+            if 'documentations_nav_image' in request.FILES:
+                site_settings.documentations_nav_image = request.FILES['documentations_nav_image']
+            site_settings.documentations_nav_title = request.POST.get('documentations_nav_title', '')
+            site_settings.documentations_nav_subtitle = request.POST.get('documentations_nav_subtitle', '')
+            
+            site_settings.save()
+            messages.success(request, 'Documents navigator settings updated successfully!')
+            
+        elif section == 'navigators_communities':
+            # Update navigators - communities
+            from app.models import SiteSettings
+            site_settings = SiteSettings.get_settings()
+            
+            if 'communities_nav_image' in request.FILES:
+                site_settings.communities_nav_image = request.FILES['communities_nav_image']
+            site_settings.communities_nav_title = request.POST.get('communities_nav_title', '')
+            site_settings.communities_nav_subtitle = request.POST.get('communities_nav_subtitle', '')
+            
+            site_settings.save()
+            messages.success(request, 'Communities navigator settings updated successfully!')
+            
+        elif section == 'navigators_requests':
+            # Update navigators - requests
+            from app.models import SiteSettings
+            site_settings = SiteSettings.get_settings()
+            
+            if 'requests_nav_image' in request.FILES:
+                site_settings.requests_nav_image = request.FILES['requests_nav_image']
+            site_settings.requests_nav_title = request.POST.get('requests_nav_title', '')
+            site_settings.requests_nav_subtitle = request.POST.get('requests_nav_subtitle', '')
+            
+            site_settings.save()
+            messages.success(request, 'Requests navigator settings updated successfully!')
+            
+        elif section == 'navigators_about':
+            # Update navigators - about
+            from app.models import SiteSettings
+            site_settings = SiteSettings.get_settings()
+            
+            if 'about_nav_image' in request.FILES:
+                site_settings.about_nav_image = request.FILES['about_nav_image']
+            site_settings.about_nav_title = request.POST.get('about_nav_title', '')
+            site_settings.about_nav_subtitle = request.POST.get('about_nav_subtitle', '')
+            
+            site_settings.save()
+            messages.success(request, 'About navigator settings updated successfully!')
+            
+        elif section == 'landing_page':
+            # Update landing page settings
+            from app.models import SiteSettings
+            site_settings = SiteSettings.get_settings()
+            
+            site_settings.banner_title = request.POST.get('banner_title', '')
+            site_settings.banner_subtitle = request.POST.get('banner_subtitle', '')
+            site_settings.footer_video = request.POST.get('footer_video', '')
+            site_settings.enable_service_features = request.POST.get('enable_service_features') == 'enabled'
+            
+            site_settings.save()
+            messages.success(request, 'Landing page settings updated successfully!')
+        
+        elif section == 'toggle_page':
+            # Toggle page enable/disable
+            from app.models import SiteSettings
+            site_settings = SiteSettings.get_settings()
+            
+            page_name = request.POST.get('page_name', '')
+            is_enabled = request.POST.get('is_enabled', 'false') == 'true'
+            
+            page_mapping = {
+                'landing': 'enable_landing_page',
+                'indexed_articles': 'enable_indexed_articles_page',
+                'indexed_journals': 'enable_indexed_journals_page',
+                'project_archive': 'enable_project_archive_page',
+                'directory_researchers': 'enable_directory_researchers_page',
+                'hall_of_fame': 'enable_hall_of_fame_page',
+                'council_members': 'enable_council_members_page',
+                'team_members': 'enable_team_members_page',
+                'sponsors': 'enable_sponsors_page',
+                'about_sis': 'enable_about_sis_page',
+                'mission': 'enable_mission_page',
+                'criteria': 'enable_criteria_page',
+                'tolerance_policy': 'enable_tolerance_policy_page',
+                'service_solution': 'enable_service_solution_page',
+                'policy_terms': 'enable_policy_terms_page',
+                'check_turnitin': 'enable_check_turnitin_page',
+                'work_plagiarism': 'enable_work_plagiarism_page',
+                'thesis_to_article': 'enable_thesis_to_article_page',
+                'thesis_to_book': 'enable_thesis_to_book_page',
+                'thesis_to_book_chapter': 'enable_thesis_to_book_chapter_page',
+                'powerpoint_preparation': 'enable_powerpoint_preparation_page',
+            }
+            
+            if page_name in page_mapping:
+                setattr(site_settings, page_mapping[page_name], is_enabled)
+                site_settings.save()
+                return JsonResponse({'success': True, 'message': f'Page {page_name} {"enabled" if is_enabled else "disabled"} successfully!'})
+            else:
+                return JsonResponse({'success': False, 'message': 'Invalid page name'})
+        
+        return redirect('app:settings')
+    
+    # Get all users for permissions management
+    all_users = User.objects.all().order_by('username')
+    # For now, we'll use a simple approach - in a real app, you'd have a Permission model
+    users_with_permissions = all_users[:10]  # Limit to first 10 for display
+    
+    # Get site settings
+    from app.models import SiteSettings
+    site_settings = SiteSettings.get_settings()
+    
+    return render(request, 'app/settings.html', {
+        'user': user,
+        'profile': profile,
+        'all_users': all_users,
+        'users_with_permissions': users_with_permissions,
+        'site_settings': site_settings,
     })
 
 @login_required

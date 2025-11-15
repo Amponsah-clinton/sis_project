@@ -258,8 +258,18 @@ a{
             <span class="logo-text">ScholarIndex</span>
           </a>
           <p style="font-size: 0.875rem; color: var(--muted-foreground);">
-            Connecting researchers worldwide through open access to scholarly publications.
+            {% if site_settings.office_location_address %}{{ site_settings.office_location_address }}{% else %}Connecting researchers worldwide through open access to scholarly publications.{% endif %}
           </p>
+          {% if site_settings.phone %}
+          <p style="font-size: 0.875rem; color: var(--muted-foreground); margin-top: 0.5rem;">
+            <strong>Phone:</strong> {{ site_settings.phone }}
+          </p>
+          {% endif %}
+          {% if site_settings.email_address %}
+          <p style="font-size: 0.875rem; color: var(--muted-foreground); margin-top: 0.5rem;">
+            <strong>Email:</strong> <a href="mailto:{{ site_settings.email_address }}" style="color: var(--muted-foreground);">{{ site_settings.email_address }}</a>
+          </p>
+          {% endif %}
         </div>
         
         <div>
@@ -308,9 +318,10 @@ a{
           © 2025 ScholarIndex. All rights reserved.
         </p>
         <div class="footer-social">
-          <a href="#">Twitter</a>
-          <a href="#">LinkedIn</a>
-          <a href="#">GitHub</a>
+          {% if site_settings.twitter_url %}<a href="{{ site_settings.twitter_url }}" target="_blank">Twitter</a>{% endif %}
+          {% if site_settings.facebook_url %}<a href="{{ site_settings.facebook_url }}" target="_blank">Facebook</a>{% endif %}
+          {% if site_settings.youtube_url %}<a href="{{ site_settings.youtube_url }}" target="_blank">YouTube</a>{% endif %}
+          {% if site_settings.whatsapp_url %}<a href="{{ site_settings.whatsapp_url }}" target="_blank">WhatsApp</a>{% endif %}
         </div>
       </div>
     </div>

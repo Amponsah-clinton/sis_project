@@ -1,0 +1,2537 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - ScholarIndex</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'app/css/dashboard.css' %}">
+    <style>
+        /* CSS Variables */
+        :root {
+            --background: 0 0% 98%;
+            --foreground: 217 33% 17%;
+            --card: 0 0% 100%;
+            --card-foreground: 217 33% 17%;
+            --primary: 221 83% 53%;
+            --primary-foreground: 0 0% 100%;
+            --secondary: 210 40% 96%;
+            --secondary-foreground: 217 33% 17%;
+            --muted: 220 14% 96%;
+            --muted-foreground: 217 10% 55%;
+            --border: 220 13% 91%;
+            --sidebar-background: 0 0% 100%;
+            --sidebar-foreground: 217 33% 17%;
+            --sidebar-border: 220 13% 91%;
+            --success: 142 71% 45%;
+            --destructive: 0 84% 60%;
+            --coral: #ff6b6b;
+        }
+        /* Override Tailwind reset */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif !important;
+            background-color: hsl(var(--background)) !important;
+            color: hsl(var(--foreground)) !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .sidebar-wrapper {
+            display: flex !important;
+            min-height: 100vh !important;
+            width: 100% !important;
+        }
+        
+        /* Settings Page Styles */
+        .settings-page-container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+            background: #f9fafb;
+        }
+        
+        .settings-nav-sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+        }
+        
+        .settings-nav-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .settings-nav-back {
+            cursor: pointer;
+            color: #64748b;
+            font-size: 1.25rem;
+            text-decoration: none;
+        }
+        
+        .settings-nav-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #111827;
+        }
+        
+        .settings-nav-list {
+            flex: 1;
+            padding: 1rem 0;
+            overflow-y: auto;
+        }
+        
+        .settings-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1.5rem;
+            color: #64748b;
+            text-decoration: none;
+            transition: all 0.2s;
+            position: relative;
+            font-size: 0.9375rem;
+        }
+        
+        .settings-nav-item:hover {
+            background: #f9fafb;
+            color: #3b82f6;
+        }
+        
+        .settings-nav-item.active {
+            color: #3b82f6;
+            background: #f0f9ff;
+        }
+        
+        .settings-nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #3b82f6;
+        }
+        
+        .settings-nav-item i {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+        
+        .settings-nav-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #e5e7eb;
+            color: #9ca3af;
+            font-size: 0.875rem;
+            text-align: center;
+        }
+        
+        .settings-content-area {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        .settings-section {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .settings-section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 0.5rem;
+        }
+        
+        .settings-subsection-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--coral);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .settings-divider {
+            height: 1px;
+            background: #e5e7eb;
+            margin: 1.5rem 0;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.625rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--coral);
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+        }
+        
+        .image-preview {
+            width: 100%;
+            max-width: 600px;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            margin-top: 0.5rem;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        
+        .slider-wrapper {
+            flex: 1;
+            position: relative;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e5e7eb;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--coral);
+            cursor: pointer;
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--coral);
+            cursor: pointer;
+            border: none;
+        }
+        
+        .slider-value {
+            min-width: 50px;
+            padding: 0.5rem;
+            background: var(--coral);
+            color: white;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .btn-save {
+            background: white;
+            color: #22c55e;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            height: fit-content;
+        }
+        
+        .btn-save:hover {
+            background: #f9fafb;
+            border-color: #22c55e;
+        }
+        
+        .btn-save i {
+            width: 1rem;
+            height: 1rem;
+            color: #22c55e;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            min-height: 44px;
+            background-color: white;
+        }
+        
+        .form-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #374151;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-secondary:hover {
+            background: #f9fafb;
+        }
+        
+        .tag-tab.active {
+            color: #111827 !important;
+            border-bottom-color: #3b82f6 !important;
+        }
+        
+        .tag-tab:hover {
+            color: #111827;
+        }
+        
+        .navigator-tab.active {
+            color: #111827 !important;
+            border-bottom-color: #3b82f6 !important;
+        }
+        
+        .navigator-tab:hover {
+            color: #111827;
+        }
+        
+        .page-tab.active {
+            color: #111827 !important;
+            border-bottom-color: #3b82f6 !important;
+        }
+        
+        .page-tab:hover {
+            color: #111827;
+        }
+        
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: #22c55e;
+        }
+        
+        .toggle-switch input:checked + .toggle-slider span {
+            transform: translateX(1.5rem);
+        }
+        
+        .toggle-switch input:not(:checked) + .toggle-slider {
+            background-color: #d1d5db;
+        }
+        
+        .toggle-switch input:not(:checked) + .toggle-slider span {
+            transform: translateX(0);
+        }
+    </style>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="sidebar-wrapper" id="sidebarWrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar" data-state="expanded">
+            <div class="sidebar-content">
+                <div class="sidebar-header">
+                    <div class="logo-container">
+                        <div class="logo-icon">S</div>
+                        <span class="logo-text" id="logoText">ScholarIndex</span>
+                    </div>
+                </div>
+
+                <div class="sidebar-menu-section">
+                    <div class="menu-group">
+                        <div class="menu-label">MENU</div>
+                        <ul class="menu-list">
+                            <li class="menu-item">
+                                <a href="{% url 'app:dashboard' %}" class="menu-link" data-tooltip="Dashboard">
+                                    <i data-lucide="layout-dashboard"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="menu-item collapsible">
+                                <button class="menu-link collapsible-trigger" data-tooltip="Articles">
+                                    <i data-lucide="file-text"></i>
+                                    <span>Articles</span>
+                                    <i data-lucide="chevron-down" class="chevron"></i>
+                                </button>
+                                <ul class="menu-sub">
+                                    <li><a href="{% url 'app:indexed_articles' %}" class="menu-sub-link">Articles</a></li>
+                                    <li><a href="{% url 'app:indexed_journals' %}" class="menu-sub-link">Journals</a></li>
+                                    <li><a href="{% url 'app:project_archive' %}" class="menu-sub-link">Research and project archive</a></li>
+                                    <li><a href="{% url 'app:register_journal' %}" class="menu-sub-link">Add a journal</a></li>
+                                    <li><a href="{% url 'app:upload_article' %}" class="menu-sub-link">Add an article</a></li>
+                                    <li><a href="{% url 'app:upload_project' %}" class="menu-sub-link">Add project archive</a></li>
+                                </ul>
+                            </li>
+                            <li class="menu-item collapsible">
+                                <button class="menu-link collapsible-trigger" data-tooltip="Documents">
+                                    <i data-lucide="file-text"></i>
+                                    <span>Documents</span>
+                                    <i data-lucide="chevron-down" class="chevron"></i>
+                                </button>
+                                <ul class="menu-sub">
+                                    <li><a href="{% url 'app:dashboard' %}" class="menu-sub-link">All Request</a></li>
+                                    <li><a href="{% url 'app:check_turnitin' %}" class="menu-sub-link">Check plagiarism</a></li>
+                                    <li><a href="{% url 'app:work_plagiarism' %}" class="menu-sub-link">Work plagiarism</a></li>
+                                    <li><a href="{% url 'app:thesis_to_article' %}" class="menu-sub-link">Thesis to article</a></li>
+                                    <li><a href="{% url 'app:thesis_to_book' %}" class="menu-sub-link">Thesis to book</a></li>
+                                    <li><a href="{% url 'app:thesis_to_book_chapter' %}" class="menu-sub-link">Thesis to book chapter</a></li>
+                                    <li><a href="{% url 'app:powerpoint_preparation' %}" class="menu-sub-link">Power point preparation</a></li>
+                                </ul>
+                            </li>
+                            <li class="menu-item collapsible">
+                                <button class="menu-link collapsible-trigger" data-tooltip="Roles Eminent personalities">
+                                    <i data-lucide="award"></i>
+                                    <span>Roles Eminent personalities</span>
+                                    <i data-lucide="chevron-down" class="chevron"></i>
+                                </button>
+                                <ul class="menu-sub">
+                                    <li><a href="{% url 'app:directory_researchers' %}" class="menu-sub-link">Directory of researchers</a></li>
+                                    <li><a href="{% url 'app:council_members' %}" class="menu-sub-link">Council members</a></li>
+                                    <li><a href="{% url 'app:team_members' %}" class="menu-sub-link">Team members</a></li>
+                                    <li><a href="{% url 'app:request_membership' %}" class="menu-sub-link">Reg Institutions</a></li>
+                                    <li><a href="{% url 'app:account_detail' %}" class="menu-sub-link">Accounts</a></li>
+                                    <li><a href="{% url 'app:sponsors' %}" class="menu-sub-link">Sponsors</a></li>
+                                </ul>
+                            </li>
+                            <li class="menu-item collapsible">
+                                <button class="menu-link collapsible-trigger" data-tooltip="News">
+                                    <i data-lucide="newspaper"></i>
+                                    <span>News</span>
+                                    <i data-lucide="chevron-down" class="chevron"></i>
+                                </button>
+                                <ul class="menu-sub">
+                                    <li><a href="{% url 'app:news_list' %}" class="menu-sub-link">Published records</a></li>
+                                    <li><a href="{% url 'app:news_add' %}" class="menu-sub-link">Write | create new blog</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="menu-group">
+                        <ul class="menu-list">
+                            <li class="menu-item">
+                                <a href="{% url 'app:sponsors' %}" class="menu-link" data-tooltip="Payment">
+                                    <i data-lucide="credit-card"></i>
+                                    <span>Payment</span>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="{% url 'app:settings' %}" class="menu-link active" data-tooltip="Settings">
+                                    <i data-lucide="settings"></i>
+                                    <span>Settings</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Navigation -->
+            <header class="top-nav">
+                <div class="top-nav-left">
+                    <button class="sidebar-trigger" id="sidebarTrigger">
+                        <i data-lucide="panel-left"></i>
+                    </button>
+                    <div class="search-container">
+                        <i data-lucide="search" class="search-icon"></i>
+                        <input type="text" placeholder="Search or type command..." class="search-input">
+                        <kbd class="search-kbd">⌘K</kbd>
+                    </div>
+                </div>
+                <div class="top-nav-right">
+                    <button class="icon-button" id="themeToggle">
+                        <i data-lucide="moon" id="themeIcon"></i>
+                    </button>
+                    <div class="notification-menu">
+                        <button class="icon-button notification-button" id="notificationTrigger">
+                            <i data-lucide="bell"></i>
+                            <span class="notification-badge">3</span>
+                        </button>
+                        <div class="notification-backdrop" id="notificationBackdrop"></div>
+                        <div class="notification-dropdown" id="notificationDropdown">
+                            <div class="notification-header">
+                                <h3 class="notification-title">Notifications</h3>
+                                <div class="notification-header-actions">
+                                    <button class="notification-mark-all">Mark all as read</button>
+                                    <button class="notification-close" id="notificationClose" aria-label="Close notifications">
+                                        <i data-lucide="x"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="notification-list">
+                                <div class="notification-item unread">
+                                    <div class="notification-icon">
+                                        <i data-lucide="user-plus"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p class="notification-text"><strong>New article submitted</strong></p>
+                                        <p class="notification-time">2 minutes ago</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="notification-footer">
+                                <a href="#" class="notification-view-all">View all notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-menu">
+                        <button class="user-menu-trigger" id="userMenuTrigger">
+                            <div class="avatar">
+                                {% if user.is_authenticated and profile.profile_photo %}
+                                    <img src="{{ profile.profile_photo.url }}" alt="{{ user.get_full_name|default:user.username }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                                {% else %}
+                                    {% if user.is_authenticated %}
+                                        {{ user.first_name|first|default:user.username|first|upper }}{{ user.last_name|first|default:""|upper }}
+                                    {% else %}
+                                        U
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            <span class="user-name">
+                                {% if user.is_authenticated %}
+                                    {{ user.get_full_name|default:user.username }}
+                                {% else %}
+                                    User
+                                {% endif %}
+                            </span>
+                        </button>
+                        <div class="dropdown-menu" id="userDropdown">
+                            <a href="{% url 'app:account_detail' %}" class="dropdown-item">
+                                <i data-lucide="user"></i>
+                                Manage Account profile
+                            </a>
+                            <div class="dropdown-separator"></div>
+                            <a href="{% url 'app:auth' %}" class="dropdown-item" style="color: #dc2626;">
+                                <i data-lucide="log-out"></i>
+                                Log out
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Settings Content -->
+            <main class="dashboard-main">
+                <div class="settings-page-container">
+                    <!-- Settings Navigation Sidebar -->
+                    <div class="settings-nav-sidebar">
+                        <div class="settings-nav-header">
+                            <a href="{% url 'app:dashboard' %}" class="settings-nav-back">←</a>
+                            <h2 class="settings-nav-title">Settings</h2>
+                        </div>
+                        <div class="settings-nav-list">
+                            <a href="#general" class="settings-nav-item active" data-section="general">
+                                <i data-lucide="pen-tool"></i>
+                                <span>General</span>
+                            </a>
+                            <a href="#pages" class="settings-nav-item" data-section="pages">
+                                <i data-lucide="grid"></i>
+                                <span>Pages</span>
+                            </a>
+                            <a href="#navigators" class="settings-nav-item" data-section="navigators">
+                                <i data-lucide="grid"></i>
+                                <span>Navigators</span>
+                            </a>
+                            <a href="#tags" class="settings-nav-item" data-section="tags">
+                                <i data-lucide="key"></i>
+                                <span>Tags & Categories</span>
+                            </a>
+                            <a href="#pricing" class="settings-nav-item" data-section="pricing">
+                                <i data-lucide="dollar-sign"></i>
+                                <span>Pricing</span>
+                            </a>
+                            <a href="#roles" class="settings-nav-item" data-section="roles">
+                                <i data-lucide="users"></i>
+                                <span>Role & Permissions</span>
+                            </a>
+                            <a href="#plugins" class="settings-nav-item" data-section="plugins">
+                                <i data-lucide="plug"></i>
+                                <span>Plugins & Api</span>
+                            </a>
+                            <a href="#terms" class="settings-nav-item" data-section="terms">
+                                <i data-lucide="shield"></i>
+                                <span>Terms and policies</span>
+                            </a>
+                        </div>
+                        <div class="settings-nav-footer">
+                            Powered by S.I.S
+                        </div>
+                    </div>
+
+                    <!-- Settings Content Area -->
+                    <div class="settings-content-area">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div style="padding: 0.75rem 1rem; border-radius: 0.375rem; margin-bottom: 1rem; background: {% if message.tags == 'error' %}#fee2e2; color: #991b1b;{% else %}#d1fae5; color: #065f46;{% endif %};">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <!-- General Section -->
+                        <div id="general-section" class="settings-section">
+                            <h2 class="settings-section-title">General</h2>
+                            
+                            <h3 class="settings-subsection-title">THEME</h3>
+                            <div class="settings-divider"></div>
+                            
+                            <form method="POST" action="{% url 'app:settings' %}" enctype="multipart/form-data" id="theme-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="section" value="general">
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Default Banner Image</label>
+                                    <input type="file" name="banner_image" accept="image/*" class="form-input" onchange="previewImage(this)">
+                                    <img id="banner-preview" src="{% if site_settings.default_banner_image %}{{ site_settings.default_banner_image.url }}{% else %}https://res.cloudinary.com/dmqizfpyz/image/upload/v1763149807/bg1_svob3l.png{% endif %}" alt="Banner Preview" class="image-preview" style="display: block;">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Default App Font Size (Px)</label>
+                                    <input type="number" name="font_size" id="font-size-input" value="{{ site_settings.default_app_font_size|default:20 }}" min="8" max="72" class="form-input" style="width: 100px; display: inline-block; margin-right: 1rem;">
+                                    <div class="slider-container">
+                                        <div class="slider-wrapper">
+                                            <input type="range" id="font-size-slider" min="8" max="72" value="{{ site_settings.default_app_font_size|default:20 }}" class="slider" oninput="updateFontSize(this.value)">
+                                        </div>
+                                        <div class="slider-value" id="font-size-value">{{ site_settings.default_app_font_size|default:20 }}</div>
+                                        <button type="submit" class="btn-save">
+                                            <i data-lucide="check"></i>
+                                            Save
+                                        </button>
+                                    </div>
+                                    <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">changes from here will affect other users</p>
+                                </div>
+                            </form>
+                            
+                            <h3 class="settings-subsection-title" style="margin-top: 3rem;">ADDRESS & CONTACTA</h3>
+                            <div class="settings-divider"></div>
+                            
+                            <form method="POST" action="{% url 'app:settings' %}" id="address-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="section" value="address">
+                                
+                                <div class="form-group">
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <div style="flex: 1;">
+                                            <label class="form-label">Phone</label>
+                                            <input type="text" name="phone" value="{{ site_settings.phone|default:'+19517275906' }}" class="form-input">
+                                        </div>
+                                        <button type="submit" class="btn-save" style="margin-top: 1.75rem;">
+                                            <i data-lucide="check"></i>
+                                            Save
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <div style="flex: 1;">
+                                            <label class="form-label">Office Location Address</label>
+                                            <input type="text" name="office_address" value="{{ site_settings.office_location_address|default:'University of California, Experiment Station,1000 Martin Luther King Blvd. Riverside Ca 92507' }}" class="form-input">
+                                        </div>
+                                        <button type="submit" class="btn-save" style="margin-top: 1.75rem;">
+                                            <i data-lucide="check"></i>
+                                            Save
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <div style="flex: 1;">
+                                            <label class="form-label">Email Address</label>
+                                            <input type="email" name="email_address" value="{{ site_settings.email_address|default:'xcholarindesing@gmail.com' }}" class="form-input">
+                                        </div>
+                                        <button type="submit" class="btn-save" style="margin-top: 1.75rem;">
+                                            <i data-lucide="check"></i>
+                                            Save
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <h4 style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-top: 2rem; margin-bottom: 1rem;">Social Contact</h4>
+                                
+                                <div class="form-group">
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <div style="flex: 1;">
+                                            <label class="form-label">Whatsapp</label>
+                                            <input type="url" name="whatsapp" value="{{ site_settings.whatsapp_url|default:'https://chat.whatsapp.com/KINOMMUWJ9YQzI0J5Zpm' }}" class="form-input">
+                                        </div>
+                                        <button type="submit" class="btn-save" style="margin-top: 1.75rem;">
+                                            <i data-lucide="check"></i>
+                                            Save
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <div style="flex: 1;">
+                                            <label class="form-label">Youtube</label>
+                                            <input type="url" name="youtube" value="{{ site_settings.youtube_url|default:'https://www.youtube.com/@scholararchive021' }}" class="form-input">
+                                        </div>
+                                        <button type="submit" class="btn-save" style="margin-top: 1.75rem;">
+                                            <i data-lucide="check"></i>
+                                            Save
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <div style="flex: 1;">
+                                            <label class="form-label">Twitter</label>
+                                            <input type="url" name="twitter" value="{{ site_settings.twitter_url|default:'' }}" class="form-input">
+                                        </div>
+                                        <button type="submit" class="btn-save" style="margin-top: 1.75rem;">
+                                            <i data-lucide="check"></i>
+                                            Save
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <div style="flex: 1;">
+                                            <label class="form-label">Facebook</label>
+                                            <input type="url" name="facebook" value="{{ site_settings.facebook_url|default:'https://facebook.com/scholarindexing' }}" class="form-input">
+                                        </div>
+                                        <button type="submit" class="btn-save" style="margin-top: 1.75rem;">
+                                            <i data-lucide="check"></i>
+                                            Save
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Pages Section -->
+                        <div id="pages-section" class="settings-section" style="display: none;">
+                            <h2 class="settings-section-title">Front | Parent Pages</h2>
+                            
+                            <div class="pages-nav-tabs" style="display: flex; gap: 2rem; margin-top: 2rem; border-bottom: 1px solid #e5e7eb; position: relative; overflow-x: auto;">
+                                <button class="page-tab active" data-tab="all" onclick="switchPageTab('all')" style="background: none; border: none; padding: 0.75rem 0; font-size: 0.9375rem; font-weight: 600; color: #111827; cursor: pointer; position: relative; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap;">
+                                    All
+                                </button>
+                                <button class="page-tab" data-tab="landing-page" onclick="switchPageTab('landing-page')" style="background: none; border: none; padding: 0.75rem 0; font-size: 0.9375rem; font-weight: 600; color: #6b7280; cursor: pointer; position: relative; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap;">
+                                    Landing Page
+                                </button>
+                                <button class="page-tab" data-tab="documents" onclick="switchPageTab('documents')" style="background: none; border: none; padding: 0.75rem 0; font-size: 0.9375rem; font-weight: 600; color: #6b7280; cursor: pointer; position: relative; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap;">
+                                    Documents
+                                </button>
+                                <button class="page-tab" data-tab="communities" onclick="switchPageTab('communities')" style="background: none; border: none; padding: 0.75rem 0; font-size: 0.9375rem; font-weight: 600; color: #6b7280; cursor: pointer; position: relative; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap;">
+                                    Communities
+                                </button>
+                                <button class="page-tab" data-tab="blog" onclick="switchPageTab('blog')" style="background: none; border: none; padding: 0.75rem 0; font-size: 0.9375rem; font-weight: 600; color: #6b7280; cursor: pointer; position: relative; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap;">
+                                    Blog
+                                </button>
+                                <button class="page-tab" data-tab="about" onclick="switchPageTab('about')" style="background: none; border: none; padding: 0.75rem 0; font-size: 0.9375rem; font-weight: 600; color: #6b7280; cursor: pointer; position: relative; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap;">
+                                    About
+                                </button>
+                                <button class="page-tab" data-tab="login" onclick="switchPageTab('login')" style="background: none; border: none; padding: 0.75rem 0; font-size: 0.9375rem; font-weight: 600; color: #6b7280; cursor: pointer; position: relative; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap;">
+                                    Login
+                                </button>
+                            </div>
+                            
+                            <!-- All Tab Content -->
+                            <div id="all-tab-content" class="page-tab-content" style="margin-top: 2rem;">
+                                <div class="page-toggle-list">
+                                    <div class="page-toggle-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="font-size: 0.9375rem; color: #111827;">Enable Landing Page</span>
+                                        <label class="toggle-switch" style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
+                                            <input type="checkbox" name="enable_landing" {% if site_settings.enable_landing_page %}checked{% endif %} onchange="togglePage(this, 'landing')" style="opacity: 0; width: 0; height: 0;">
+                                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; {% if site_settings.enable_landing_page %}background-color: #22c55e;{% else %}background-color: #d1d5db;{% endif %} transition: .4s; border-radius: 1.5rem;">
+                                                <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: 0.1875rem; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%; {% if site_settings.enable_landing_page %}transform: translateX(1.5rem);{% else %}transform: translateX(0);{% endif %}"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="page-toggle-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="font-size: 0.9375rem; color: #111827;">Enable Indexed Articles Page</span>
+                                        <label class="toggle-switch" style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
+                                            <input type="checkbox" name="enable_indexed_articles" {% if site_settings.enable_indexed_articles_page %}checked{% endif %} onchange="togglePage(this, 'indexed_articles')" style="opacity: 0; width: 0; height: 0;">
+                                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; {% if site_settings.enable_indexed_articles_page %}background-color: #22c55e;{% else %}background-color: #d1d5db;{% endif %} transition: .4s; border-radius: 1.5rem;">
+                                                <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: 0.1875rem; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%; {% if site_settings.enable_indexed_articles_page %}transform: translateX(1.5rem);{% else %}transform: translateX(0);{% endif %}"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="page-toggle-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="font-size: 0.9375rem; color: #111827;">Enable Indexed Journals Page</span>
+                                        <label class="toggle-switch" style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
+                                            <input type="checkbox" name="enable_indexed_journals" {% if site_settings.enable_indexed_journals_page %}checked{% endif %} onchange="togglePage(this, 'indexed_journals')" style="opacity: 0; width: 0; height: 0;">
+                                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; {% if site_settings.enable_indexed_journals_page %}background-color: #22c55e;{% else %}background-color: #d1d5db;{% endif %} transition: .4s; border-radius: 1.5rem;">
+                                                <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: 0.1875rem; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%; {% if site_settings.enable_indexed_journals_page %}transform: translateX(1.5rem);{% else %}transform: translateX(0);{% endif %}"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="page-toggle-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="font-size: 0.9375rem; color: #111827;">Enable Project Archive Page</span>
+                                        <label class="toggle-switch" style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
+                                            <input type="checkbox" name="enable_project_archive" {% if site_settings.enable_project_archive_page %}checked{% endif %} onchange="togglePage(this, 'project_archive')" style="opacity: 0; width: 0; height: 0;">
+                                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; {% if site_settings.enable_project_archive_page %}background-color: #22c55e;{% else %}background-color: #d1d5db;{% endif %} transition: .4s; border-radius: 1.5rem;">
+                                                <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: 0.1875rem; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%; {% if site_settings.enable_project_archive_page %}transform: translateX(1.5rem);{% else %}transform: translateX(0);{% endif %}"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="page-toggle-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="font-size: 0.9375rem; color: #111827;">Enable Directory Researchers Page</span>
+                                        <label class="toggle-switch" style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
+                                            <input type="checkbox" name="enable_directory_researchers" {% if site_settings.enable_directory_researchers_page %}checked{% endif %} onchange="togglePage(this, 'directory_researchers')" style="opacity: 0; width: 0; height: 0;">
+                                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; {% if site_settings.enable_directory_researchers_page %}background-color: #22c55e;{% else %}background-color: #d1d5db;{% endif %} transition: .4s; border-radius: 1.5rem;">
+                                                <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: 0.1875rem; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%; {% if site_settings.enable_directory_researchers_page %}transform: translateX(1.5rem);{% else %}transform: translateX(0);{% endif %}"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="page-toggle-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="font-size: 0.9375rem; color: #111827;">Enable Hall Of Fame Page</span>
+                                        <label class="toggle-switch" style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
+                                            <input type="checkbox" name="enable_hall_of_fame" {% if site_settings.enable_hall_of_fame_page %}checked{% endif %} onchange="togglePage(this, 'hall_of_fame')" style="opacity: 0; width: 0; height: 0;">
+                                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; {% if site_settings.enable_hall_of_fame_page %}background-color: #22c55e;{% else %}background-color: #d1d5db;{% endif %} transition: .4s; border-radius: 1.5rem;">
+                                                <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: 0.1875rem; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%; {% if site_settings.enable_hall_of_fame_page %}transform: translateX(1.5rem);{% else %}transform: translateX(0);{% endif %}"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="page-toggle-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="font-size: 0.9375rem; color: #111827;">Enable Council Members Page</span>
+                                        <label class="toggle-switch" style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
+                                            <input type="checkbox" name="enable_council_members" {% if site_settings.enable_council_members_page %}checked{% endif %} onchange="togglePage(this, 'council_members')" style="opacity: 0; width: 0; height: 0;">
+                                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; {% if site_settings.enable_council_members_page %}background-color: #22c55e;{% else %}background-color: #d1d5db;{% endif %} transition: .4s; border-radius: 1.5rem;">
+                                                <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: 0.1875rem; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%; {% if site_settings.enable_council_members_page %}transform: translateX(1.5rem);{% else %}transform: translateX(0);{% endif %}"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="page-toggle-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="font-size: 0.9375rem; color: #111827;">Enable Team Members Page</span>
+                                        <label class="toggle-switch" style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
+                                            <input type="checkbox" name="enable_team_members" {% if site_settings.enable_team_members_page %}checked{% endif %} onchange="togglePage(this, 'team_members')" style="opacity: 0; width: 0; height: 0;">
+                                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; {% if site_settings.enable_team_members_page %}background-color: #22c55e;{% else %}background-color: #d1d5db;{% endif %} transition: .4s; border-radius: 1.5rem;">
+                                                <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: 0.1875rem; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%; {% if site_settings.enable_team_members_page %}transform: translateX(1.5rem);{% else %}transform: translateX(0);{% endif %}"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="page-toggle-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="font-size: 0.9375rem; color: #111827;">Enable Sponsors Page</span>
+                                        <label class="toggle-switch" style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
+                                            <input type="checkbox" name="enable_sponsors" {% if site_settings.enable_sponsors_page %}checked{% endif %} onchange="togglePage(this, 'sponsors')" style="opacity: 0; width: 0; height: 0;">
+                                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; {% if site_settings.enable_sponsors_page %}background-color: #22c55e;{% else %}background-color: #d1d5db;{% endif %} transition: .4s; border-radius: 1.5rem;">
+                                                <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: 0.1875rem; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%; {% if site_settings.enable_sponsors_page %}transform: translateX(1.5rem);{% else %}transform: translateX(0);{% endif %}"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="page-toggle-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="font-size: 0.9375rem; color: #111827;">Enable About SIS Page</span>
+                                        <label class="toggle-switch" style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
+                                            <input type="checkbox" name="enable_about_sis" {% if site_settings.enable_about_sis_page %}checked{% endif %} onchange="togglePage(this, 'about_sis')" style="opacity: 0; width: 0; height: 0;">
+                                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; {% if site_settings.enable_about_sis_page %}background-color: #22c55e;{% else %}background-color: #d1d5db;{% endif %} transition: .4s; border-radius: 1.5rem;">
+                                                <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: 0.1875rem; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%; {% if site_settings.enable_about_sis_page %}transform: translateX(1.5rem);{% else %}transform: translateX(0);{% endif %}"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="page-toggle-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="font-size: 0.9375rem; color: #111827;">Enable Mission Page</span>
+                                        <label class="toggle-switch" style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
+                                            <input type="checkbox" name="enable_mission" {% if site_settings.enable_mission_page %}checked{% endif %} onchange="togglePage(this, 'mission')" style="opacity: 0; width: 0; height: 0;">
+                                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; {% if site_settings.enable_mission_page %}background-color: #22c55e;{% else %}background-color: #d1d5db;{% endif %} transition: .4s; border-radius: 1.5rem;">
+                                                <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: 0.1875rem; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%; {% if site_settings.enable_mission_page %}transform: translateX(1.5rem);{% else %}transform: translateX(0);{% endif %}"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="page-toggle-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="font-size: 0.9375rem; color: #111827;">Enable Criteria Page</span>
+                                        <label class="toggle-switch" style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
+                                            <input type="checkbox" name="enable_criteria" {% if site_settings.enable_criteria_page %}checked{% endif %} onchange="togglePage(this, 'criteria')" style="opacity: 0; width: 0; height: 0;">
+                                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; {% if site_settings.enable_criteria_page %}background-color: #22c55e;{% else %}background-color: #d1d5db;{% endif %} transition: .4s; border-radius: 1.5rem;">
+                                                <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: 0.1875rem; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%; {% if site_settings.enable_criteria_page %}transform: translateX(1.5rem);{% else %}transform: translateX(0);{% endif %}"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="page-toggle-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="font-size: 0.9375rem; color: #111827;">Enable Tolerance Policy Page</span>
+                                        <label class="toggle-switch" style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
+                                            <input type="checkbox" name="enable_tolerance_policy" {% if site_settings.enable_tolerance_policy_page %}checked{% endif %} onchange="togglePage(this, 'tolerance_policy')" style="opacity: 0; width: 0; height: 0;">
+                                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; {% if site_settings.enable_tolerance_policy_page %}background-color: #22c55e;{% else %}background-color: #d1d5db;{% endif %} transition: .4s; border-radius: 1.5rem;">
+                                                <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: 0.1875rem; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%; {% if site_settings.enable_tolerance_policy_page %}transform: translateX(1.5rem);{% else %}transform: translateX(0);{% endif %}"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="page-toggle-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="font-size: 0.9375rem; color: #111827;">Enable Service Solution Page</span>
+                                        <label class="toggle-switch" style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
+                                            <input type="checkbox" name="enable_service_solution" {% if site_settings.enable_service_solution_page %}checked{% endif %} onchange="togglePage(this, 'service_solution')" style="opacity: 0; width: 0; height: 0;">
+                                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; {% if site_settings.enable_service_solution_page %}background-color: #22c55e;{% else %}background-color: #d1d5db;{% endif %} transition: .4s; border-radius: 1.5rem;">
+                                                <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: 0.1875rem; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%; {% if site_settings.enable_service_solution_page %}transform: translateX(1.5rem);{% else %}transform: translateX(0);{% endif %}"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="page-toggle-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="font-size: 0.9375rem; color: #111827;">Enable Policy Terms Page</span>
+                                        <label class="toggle-switch" style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
+                                            <input type="checkbox" name="enable_policy_terms" {% if site_settings.enable_policy_terms_page %}checked{% endif %} onchange="togglePage(this, 'policy_terms')" style="opacity: 0; width: 0; height: 0;">
+                                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; {% if site_settings.enable_policy_terms_page %}background-color: #22c55e;{% else %}background-color: #d1d5db;{% endif %} transition: .4s; border-radius: 1.5rem;">
+                                                <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: 0.1875rem; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%; {% if site_settings.enable_policy_terms_page %}transform: translateX(1.5rem);{% else %}transform: translateX(0);{% endif %}"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="page-toggle-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="font-size: 0.9375rem; color: #111827;">Enable Check Turnitin Page</span>
+                                        <label class="toggle-switch" style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
+                                            <input type="checkbox" name="enable_check_turnitin" {% if site_settings.enable_check_turnitin_page %}checked{% endif %} onchange="togglePage(this, 'check_turnitin')" style="opacity: 0; width: 0; height: 0;">
+                                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; {% if site_settings.enable_check_turnitin_page %}background-color: #22c55e;{% else %}background-color: #d1d5db;{% endif %} transition: .4s; border-radius: 1.5rem;">
+                                                <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: 0.1875rem; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%; {% if site_settings.enable_check_turnitin_page %}transform: translateX(1.5rem);{% else %}transform: translateX(0);{% endif %}"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="page-toggle-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="font-size: 0.9375rem; color: #111827;">Enable Work Plagiarism Page</span>
+                                        <label class="toggle-switch" style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
+                                            <input type="checkbox" name="enable_work_plagiarism" {% if site_settings.enable_work_plagiarism_page %}checked{% endif %} onchange="togglePage(this, 'work_plagiarism')" style="opacity: 0; width: 0; height: 0;">
+                                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; {% if site_settings.enable_work_plagiarism_page %}background-color: #22c55e;{% else %}background-color: #d1d5db;{% endif %} transition: .4s; border-radius: 1.5rem;">
+                                                <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: 0.1875rem; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%; {% if site_settings.enable_work_plagiarism_page %}transform: translateX(1.5rem);{% else %}transform: translateX(0);{% endif %}"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="page-toggle-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="font-size: 0.9375rem; color: #111827;">Enable Thesis To Article Page</span>
+                                        <label class="toggle-switch" style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
+                                            <input type="checkbox" name="enable_thesis_to_article" {% if site_settings.enable_thesis_to_article_page %}checked{% endif %} onchange="togglePage(this, 'thesis_to_article')" style="opacity: 0; width: 0; height: 0;">
+                                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; {% if site_settings.enable_thesis_to_article_page %}background-color: #22c55e;{% else %}background-color: #d1d5db;{% endif %} transition: .4s; border-radius: 1.5rem;">
+                                                <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: 0.1875rem; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%; {% if site_settings.enable_thesis_to_article_page %}transform: translateX(1.5rem);{% else %}transform: translateX(0);{% endif %}"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="page-toggle-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="font-size: 0.9375rem; color: #111827;">Enable Thesis To Book Page</span>
+                                        <label class="toggle-switch" style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
+                                            <input type="checkbox" name="enable_thesis_to_book" {% if site_settings.enable_thesis_to_book_page %}checked{% endif %} onchange="togglePage(this, 'thesis_to_book')" style="opacity: 0; width: 0; height: 0;">
+                                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; {% if site_settings.enable_thesis_to_book_page %}background-color: #22c55e;{% else %}background-color: #d1d5db;{% endif %} transition: .4s; border-radius: 1.5rem;">
+                                                <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: 0.1875rem; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%; {% if site_settings.enable_thesis_to_book_page %}transform: translateX(1.5rem);{% else %}transform: translateX(0);{% endif %}"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="page-toggle-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="font-size: 0.9375rem; color: #111827;">Enable Thesis To Book Chapter Page</span>
+                                        <label class="toggle-switch" style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
+                                            <input type="checkbox" name="enable_thesis_to_book_chapter" {% if site_settings.enable_thesis_to_book_chapter_page %}checked{% endif %} onchange="togglePage(this, 'thesis_to_book_chapter')" style="opacity: 0; width: 0; height: 0;">
+                                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; {% if site_settings.enable_thesis_to_book_chapter_page %}background-color: #22c55e;{% else %}background-color: #d1d5db;{% endif %} transition: .4s; border-radius: 1.5rem;">
+                                                <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: 0.1875rem; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%; {% if site_settings.enable_thesis_to_book_chapter_page %}transform: translateX(1.5rem);{% else %}transform: translateX(0);{% endif %}"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="page-toggle-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                        <span style="font-size: 0.9375rem; color: #111827;">Enable PowerPoint Preparation Page</span>
+                                        <label class="toggle-switch" style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
+                                            <input type="checkbox" name="enable_powerpoint_preparation" {% if site_settings.enable_powerpoint_preparation_page %}checked{% endif %} onchange="togglePage(this, 'powerpoint_preparation')" style="opacity: 0; width: 0; height: 0;">
+                                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; {% if site_settings.enable_powerpoint_preparation_page %}background-color: #22c55e;{% else %}background-color: #d1d5db;{% endif %} transition: .4s; border-radius: 1.5rem;">
+                                                <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: 0.1875rem; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%; {% if site_settings.enable_powerpoint_preparation_page %}transform: translateX(1.5rem);{% else %}transform: translateX(0);{% endif %}"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Landing Page Tab Content -->
+                            <div id="landing-page-tab-content" class="page-tab-content" style="display: none; margin-top: 2rem;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+                                    <h3 style="font-size: 1.25rem; font-weight: 600; color: #ff6b6b; margin: 0;">Landing Page</h3>
+                                    <button type="button" onclick="modifyPage('landing-page')" style="background: #3b82f6; color: white; border: none; border-radius: 0.375rem; padding: 0.625rem 1rem; font-size: 0.875rem; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                        Modify
+                                        <i data-lucide="pencil" style="width: 1rem; height: 1rem;"></i>
+                                    </button>
+                                </div>
+                                
+                                <form method="POST" action="{% url 'app:settings' %}" id="landing-page-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="section" value="landing_page">
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-weight: 600;">Banner Title</label>
+                                        <div style="display: flex; align-items: center; gap: 1rem;">
+                                            <input type="text" name="banner_title" class="form-input" value="Welcome! Accelerate Your Discovery" placeholder="Welcome! Accelerate Your Discovery" style="flex: 1;">
+                                            <i data-lucide="chevron-down" style="width: 1.25rem; height: 1.25rem; color: #6b7280;"></i>
+                                            <button type="submit" class="btn-save" style="margin-top: 0;">
+                                                <i data-lucide="check"></i>
+                                                Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-weight: 600;">Banner Subtitle</label>
+                                        <div style="display: flex; align-items: center; gap: 1rem;">
+                                            <input type="text" name="banner_subtitle" class="form-input" value="{{ site_settings.banner_subtitle|default:'Be a part of a committed society that is shaping the future of knowledge' }}" placeholder="Be a part of a committed society that is shaping the future of knowledge" style="flex: 1;">
+                                            <i data-lucide="chevron-down" style="width: 1.25rem; height: 1.25rem; color: #6b7280;"></i>
+                                            <button type="submit" class="btn-save" style="margin-top: 0;">
+                                                <i data-lucide="check"></i>
+                                                Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-weight: 600;">Footer Video</label>
+                                        <div style="display: flex; align-items: center; gap: 1rem;">
+                                            <input type="text" name="footer_video" class="form-input" value="{{ site_settings.footer_video|default:'JhV6DQUQsDY' }}" placeholder="JhV6DQUQsDY" style="flex: 1;">
+                                            <i data-lucide="chevron-down" style="width: 1.25rem; height: 1.25rem; color: #6b7280;"></i>
+                                            <button type="submit" class="btn-save" style="margin-top: 0;">
+                                                <i data-lucide="check"></i>
+                                                Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-weight: 600;">Enable Service & Features</label>
+                                        <div style="display: flex; align-items: center; gap: 1rem;">
+                                            <select name="enable_service_features" class="form-select" style="flex: 1;">
+                                                <option value="">Select option ...</option>
+                                                <option value="enabled">Enabled</option>
+                                                <option value="disabled">Disabled</option>
+                                            </select>
+                                            <i data-lucide="chevron-down" style="width: 1.25rem; height: 1.25rem; color: #6b7280;"></i>
+                                            <button type="submit" class="btn-save" style="margin-top: 0;">
+                                                <i data-lucide="check"></i>
+                                                Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            
+                            <!-- Documents Tab Content -->
+                            <div id="documents-tab-content" class="page-tab-content" style="display: none; margin-top: 2rem;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+                                    <h3 style="font-size: 1.25rem; font-weight: 600; color: #ff6b6b; margin: 0;">Documents Page</h3>
+                                    <button type="button" onclick="modifyPage('documents')" style="background: #3b82f6; color: white; border: none; border-radius: 0.375rem; padding: 0.625rem 1rem; font-size: 0.875rem; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                        Modify
+                                        <i data-lucide="pencil" style="width: 1rem; height: 1rem;"></i>
+                                    </button>
+                                </div>
+                                <p style="color: #6b7280;">Configure Documents page settings here.</p>
+                            </div>
+                            
+                            <!-- Communities Tab Content -->
+                            <div id="communities-tab-content" class="page-tab-content" style="display: none; margin-top: 2rem;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+                                    <h3 style="font-size: 1.25rem; font-weight: 600; color: #ff6b6b; margin: 0;">Communities Page</h3>
+                                    <button type="button" onclick="modifyPage('communities')" style="background: #3b82f6; color: white; border: none; border-radius: 0.375rem; padding: 0.625rem 1rem; font-size: 0.875rem; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                        Modify
+                                        <i data-lucide="pencil" style="width: 1rem; height: 1rem;"></i>
+                                    </button>
+                                </div>
+                                <p style="color: #6b7280;">Configure Communities page settings here.</p>
+                            </div>
+                            
+                            <!-- Blog Tab Content -->
+                            <div id="blog-tab-content" class="page-tab-content" style="display: none; margin-top: 2rem;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+                                    <h3 style="font-size: 1.25rem; font-weight: 600; color: #ff6b6b; margin: 0;">Blog Page</h3>
+                                    <button type="button" onclick="modifyPage('blog')" style="background: #3b82f6; color: white; border: none; border-radius: 0.375rem; padding: 0.625rem 1rem; font-size: 0.875rem; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                        Modify
+                                        <i data-lucide="pencil" style="width: 1rem; height: 1rem;"></i>
+                                    </button>
+                                </div>
+                                <p style="color: #6b7280;">Configure Blog page settings here.</p>
+                            </div>
+                            
+                            <!-- About Tab Content -->
+                            <div id="about-tab-content" class="page-tab-content" style="display: none; margin-top: 2rem;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+                                    <h3 style="font-size: 1.25rem; font-weight: 600; color: #ff6b6b; margin: 0;">About Page</h3>
+                                    <button type="button" onclick="modifyPage('about')" style="background: #3b82f6; color: white; border: none; border-radius: 0.375rem; padding: 0.625rem 1rem; font-size: 0.875rem; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                        Modify
+                                        <i data-lucide="pencil" style="width: 1rem; height: 1rem;"></i>
+                                    </button>
+                                </div>
+                                <p style="color: #6b7280;">Configure About page settings here.</p>
+                            </div>
+                            
+                            <!-- Login Tab Content -->
+                            <div id="login-tab-content" class="page-tab-content" style="display: none; margin-top: 2rem;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+                                    <h3 style="font-size: 1.25rem; font-weight: 600; color: #ff6b6b; margin: 0;">Login Page</h3>
+                                    <button type="button" onclick="modifyPage('login')" style="background: #3b82f6; color: white; border: none; border-radius: 0.375rem; padding: 0.625rem 1rem; font-size: 0.875rem; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                        Modify
+                                        <i data-lucide="pencil" style="width: 1rem; height: 1rem;"></i>
+                                    </button>
+                                </div>
+                                <p style="color: #6b7280;">Configure Login page settings here.</p>
+                            </div>
+                        </div>
+
+                        <!-- Navigators Section -->
+                        <div id="navigators-section" class="settings-section" style="display: none;">
+                            <h2 class="settings-section-title">Navigators</h2>
+                            
+                            <div class="navigators-nav-tabs" style="display: flex; gap: 2rem; margin-top: 2rem; border-bottom: 1px solid #e5e7eb; position: relative; overflow-x: auto;">
+                                <button class="navigator-tab active" data-tab="documents" onclick="switchNavigatorTab('documents')" style="background: none; border: none; padding: 0.75rem 0; font-size: 0.9375rem; font-weight: 600; color: #111827; cursor: pointer; position: relative; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap;">
+                                    Documents
+                                </button>
+                                <button class="navigator-tab" data-tab="communities" onclick="switchNavigatorTab('communities')" style="background: none; border: none; padding: 0.75rem 0; font-size: 0.9375rem; font-weight: 600; color: #6b7280; cursor: pointer; position: relative; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap;">
+                                    Communities
+                                </button>
+                                <button class="navigator-tab" data-tab="requests" onclick="switchNavigatorTab('requests')" style="background: none; border: none; padding: 0.75rem 0; font-size: 0.9375rem; font-weight: 600; color: #6b7280; cursor: pointer; position: relative; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap;">
+                                    Requests
+                                </button>
+                                <button class="navigator-tab" data-tab="about" onclick="switchNavigatorTab('about')" style="background: none; border: none; padding: 0.75rem 0; font-size: 0.9375rem; font-weight: 600; color: #6b7280; cursor: pointer; position: relative; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap;">
+                                    About
+                                </button>
+                            </div>
+                            
+                            <!-- Documents Tab Content -->
+                            <div id="documents-tab-content" class="navigator-tab-content" style="margin-top: 2rem;">
+                                <form method="POST" action="{% url 'app:settings' %}" enctype="multipart/form-data" id="documents-nav-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="section" value="navigators_documents">
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-weight: 600;">Documentations Nav Image</label>
+                                        <input type="file" name="documentations_nav_image" accept="image/*" class="form-input" onchange="previewNavigatorImage(this, 'documentations-preview')">
+                                        <div class="image-preview-container" style="margin-top: 1rem;">
+                                            <img id="documentations-preview" src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=600&fit=crop" alt="Documentations Preview" class="image-preview" style="display: block; max-height: 300px;">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-weight: 600;">Documentations Nav Title</label>
+                                        <div style="display: flex; align-items: center; gap: 1rem;">
+                                            <input type="text" name="documentations_nav_title" class="form-input" placeholder="Check if you have access through your sign in credentials or via your institution." style="flex: 1;">
+                                            <button type="submit" class="btn-save" style="margin-top: 0;">
+                                                <i data-lucide="check"></i>
+                                                Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-weight: 600;">Documentations Nav Subtitle</label>
+                                        <div style="display: flex; align-items: center; gap: 1rem;">
+                                            <input type="text" name="documentations_nav_subtitle" class="form-input" placeholder="Connect different areas of knowledge and form an exploratory network. SIS mission is to make every scholarly and scientif" style="flex: 1;">
+                                            <button type="submit" class="btn-save" style="margin-top: 0;">
+                                                <i data-lucide="check"></i>
+                                                Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            
+                            <!-- Communities Tab Content -->
+                            <div id="communities-tab-content" class="navigator-tab-content" style="display: none; margin-top: 2rem;">
+                                <form method="POST" action="{% url 'app:settings' %}" enctype="multipart/form-data" id="communities-nav-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="section" value="navigators_communities">
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-weight: 600;">Communities Nav Image</label>
+                                        <input type="file" name="communities_nav_image" accept="image/*" class="form-input" onchange="previewNavigatorImage(this, 'communities-preview')">
+                                        <div class="image-preview-container" style="margin-top: 1rem;">
+                                            <img id="communities-preview" src="{% if site_settings.communities_nav_image %}{{ site_settings.communities_nav_image.url }}{% endif %}" alt="Communities Preview" class="image-preview" style="{% if site_settings.communities_nav_image %}display: block;{% else %}display: none;{% endif %} max-height: 300px;">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-weight: 600;">Communities Nav Title</label>
+                                        <div style="display: flex; align-items: center; gap: 1rem;">
+                                            <input type="text" name="communities_nav_title" class="form-input" value="{{ site_settings.communities_nav_title|default:'Sharing knowledge can seem like a burden to some but on the contrary, it is a reflection of teamwork and leadership' }}" placeholder="Sharing knowledge can seem like a burden to some but on the contrary, it is a reflection of teamwork and leadership" style="flex: 1;">
+                                            <button type="submit" class="btn-save" style="margin-top: 0;">
+                                                <i data-lucide="check"></i>
+                                                Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-weight: 600;">Communities Nav Subtitle</label>
+                                        <div style="display: flex; align-items: center; gap: 1rem;">
+                                            <input type="text" name="communities_nav_subtitle" class="form-input" value="{{ site_settings.communities_nav_subtitle|default:'Researchers, teachers, students, healthcare and information professionals use SIS to improve the way they search, discove' }}" placeholder="Researchers, teachers, students, healthcare and information professionals use SIS to improve the way they search, discove" style="flex: 1;">
+                                            <button type="submit" class="btn-save" style="margin-top: 0;">
+                                                <i data-lucide="check"></i>
+                                                Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            
+                            <!-- Requests Tab Content -->
+                            <div id="requests-tab-content" class="navigator-tab-content" style="display: none; margin-top: 2rem;">
+                                <form method="POST" action="{% url 'app:settings' %}" enctype="multipart/form-data" id="requests-nav-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="section" value="navigators_requests">
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-weight: 600;">Request Nav Image</label>
+                                        <input type="file" name="requests_nav_image" accept="image/*" class="form-input" onchange="previewNavigatorImage(this, 'requests-preview')">
+                                        <div class="image-preview-container" style="margin-top: 1rem;">
+                                            <img id="requests-preview" src="{% if site_settings.requests_nav_image %}{{ site_settings.requests_nav_image.url }}{% else %}https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=400&h=400&fit=crop{% endif %}" alt="Request Preview" class="image-preview" style="display: block; max-height: 300px;">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-weight: 600;">Request Nav Title</label>
+                                        <div style="display: flex; align-items: center; gap: 1rem;">
+                                            <input type="text" name="requests_nav_title" class="form-input" value="{{ site_settings.requests_nav_title|default:'Knowledge is like money: to be of value it must circulate, and in circulating it can increase in quantity and, hopefully, in valu' }}" placeholder="Knowledge is like money: to be of value it must circulate, and in circulating it can increase in quantity and, hopefully, in valu" style="flex: 1;">
+                                            <button type="submit" class="btn-save" style="margin-top: 0;">
+                                                <i data-lucide="check"></i>
+                                                Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-weight: 600;">Request Nav Subtitle</label>
+                                        <div style="display: flex; align-items: center; gap: 1rem;">
+                                            <input type="text" name="requests_nav_subtitle" class="form-input" value="{{ site_settings.requests_nav_subtitle|default:'We are committed to promote the integrity of research through a range of activities and initiatives like offering free author 1' }}" placeholder="We are committed to promote the integrity of research through a range of activities and initiatives like offering free author 1" style="flex: 1;">
+                                            <button type="submit" class="btn-save" style="margin-top: 0;">
+                                                <i data-lucide="check"></i>
+                                                Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            
+                            <!-- About Tab Content -->
+                            <div id="about-tab-content" class="navigator-tab-content" style="display: none; margin-top: 2rem;">
+                                <form method="POST" action="{% url 'app:settings' %}" enctype="multipart/form-data" id="about-nav-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="section" value="navigators_about">
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-weight: 600;">About Us Nav Image</label>
+                                        <input type="file" name="about_nav_image" accept="image/*" class="form-input" onchange="previewNavigatorImage(this, 'about-preview')">
+                                        <div class="image-preview-container" style="margin-top: 1rem;">
+                                            <img id="about-preview" src="{% if site_settings.about_nav_image %}{{ site_settings.about_nav_image.url }}{% else %}https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=600&fit=crop{% endif %}" alt="About Preview" class="image-preview" style="display: block; max-height: 300px;">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-weight: 600;">About Us Nav Title</label>
+                                        <div style="display: flex; align-items: center; gap: 1rem;">
+                                            <input type="text" name="about_nav_title" class="form-input" value="{{ site_settings.about_nav_title|default:'' }}" placeholder="Enter About Us Nav Title" style="flex: 1;">
+                                            <button type="submit" class="btn-save" style="margin-top: 0;">
+                                                <i data-lucide="check"></i>
+                                                Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-weight: 600;">About Us Nav Subtitle</label>
+                                        <div style="display: flex; align-items: center; gap: 1rem;">
+                                            <input type="text" name="about_nav_subtitle" class="form-input" value="{{ site_settings.about_nav_subtitle|default:'' }}" placeholder="Enter About Us Nav Subtitle" style="flex: 1;">
+                                            <button type="submit" class="btn-save" style="margin-top: 0;">
+                                                <i data-lucide="check"></i>
+                                                Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Tags & Categories Section -->
+                        <div id="tags-section" class="settings-section" style="display: none;">
+                            <h2 class="settings-section-title">Tags & Categories</h2>
+                            
+                            <div class="tags-nav-tabs" style="display: flex; gap: 2rem; margin-top: 2rem; border-bottom: 1px solid #e5e7eb; position: relative;">
+                                <button class="tag-tab active" data-tab="journals" onclick="switchTagTab('journals')" style="background: none; border: none; padding: 0.75rem 0; font-size: 0.9375rem; font-weight: 600; color: #111827; cursor: pointer; position: relative; border-bottom: 2px solid transparent; margin-bottom: -1px;">
+                                    Journals
+                                </button>
+                                <button class="tag-tab" data-tab="articles" onclick="switchTagTab('articles')" style="background: none; border: none; padding: 0.75rem 0; font-size: 0.9375rem; font-weight: 600; color: #6b7280; cursor: pointer; position: relative; border-bottom: 2px solid transparent; margin-bottom: -1px;">
+                                    Articles
+                                </button>
+                                <button class="tag-tab" data-tab="project-archive" onclick="switchTagTab('project-archive')" style="background: none; border: none; padding: 0.75rem 0; font-size: 0.9375rem; font-weight: 600; color: #6b7280; cursor: pointer; position: relative; border-bottom: 2px solid transparent; margin-bottom: -1px;">
+                                    Project Archive
+                                </button>
+                                <button class="tag-tab" data-tab="hof" onclick="switchTagTab('hof')" style="background: none; border: none; padding: 0.75rem 0; font-size: 0.9375rem; font-weight: 600; color: #6b7280; cursor: pointer; position: relative; border-bottom: 2px solid transparent; margin-bottom: -1px;">
+                                    H.O.F
+                                </button>
+                                <button class="tag-tab" data-tab="members" onclick="switchTagTab('members')" style="background: none; border: none; padding: 0.75rem 0; font-size: 0.9375rem; font-weight: 600; color: #6b7280; cursor: pointer; position: relative; border-bottom: 2px solid transparent; margin-bottom: -1px;">
+                                    Members
+                                </button>
+                                <button class="tag-tab" data-tab="requests" onclick="switchTagTab('requests')" style="background: none; border: none; padding: 0.75rem 0; font-size: 0.9375rem; font-weight: 600; color: #6b7280; cursor: pointer; position: relative; border-bottom: 2px solid transparent; margin-bottom: -1px;">
+                                    requests
+                                </button>
+                                <button class="tag-tab" data-tab="blog" onclick="switchTagTab('blog')" style="background: none; border: none; padding: 0.75rem 0; font-size: 0.9375rem; font-weight: 600; color: #6b7280; cursor: pointer; position: relative; border-bottom: 2px solid transparent; margin-bottom: -1px;">
+                                    Blog
+                                </button>
+                            </div>
+                            
+                            <!-- Journals Tab Content -->
+                            <div id="journals-tab-content" class="tag-tab-content" style="margin-top: 2rem;">
+                                <div class="tag-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                    <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
+                                        <i data-lucide="chevron-right" style="width: 1.25rem; height: 1.25rem; color: #6b7280;"></i>
+                                        <span style="font-size: 0.9375rem; color: #111827;">Journal Categories</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <button type="button" onclick="openAddTagModal('journal-categories')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0.5rem;">
+                                            <i data-lucide="plus" style="width: 1.25rem; height: 1.25rem;"></i>
+                                        </button>
+                                        <button type="button" onclick="openTagMenu('journal-categories')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0.5rem;">
+                                            <i data-lucide="menu" style="width: 1.25rem; height: 1.25rem;"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="tag-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                    <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
+                                        <i data-lucide="chevron-right" style="width: 1.25rem; height: 1.25rem; color: #6b7280;"></i>
+                                        <span style="font-size: 0.9375rem; color: #111827;">Journal Type</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <button type="button" onclick="openAddTagModal('journal-type')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0.5rem;">
+                                            <i data-lucide="plus" style="width: 1.25rem; height: 1.25rem;"></i>
+                                        </button>
+                                        <button type="button" onclick="openTagMenu('journal-type')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0.5rem;">
+                                            <i data-lucide="menu" style="width: 1.25rem; height: 1.25rem;"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="tag-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                    <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
+                                        <i data-lucide="chevron-right" style="width: 1.25rem; height: 1.25rem; color: #6b7280;"></i>
+                                        <span style="font-size: 0.9375rem; color: #111827;">Journal Format</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <button type="button" onclick="openAddTagModal('journal-format')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0.5rem;">
+                                            <i data-lucide="plus" style="width: 1.25rem; height: 1.25rem;"></i>
+                                        </button>
+                                        <button type="button" onclick="openTagMenu('journal-format')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0.5rem;">
+                                            <i data-lucide="menu" style="width: 1.25rem; height: 1.25rem;"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Articles Tab Content -->
+                            <div id="articles-tab-content" class="tag-tab-content" style="display: none; margin-top: 2rem;">
+                                <div class="tag-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                    <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
+                                        <i data-lucide="chevron-right" style="width: 1.25rem; height: 1.25rem; color: #6b7280;"></i>
+                                        <span style="font-size: 0.9375rem; color: #111827;">Article Categories</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <button type="button" onclick="openAddTagModal('article-categories')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0.5rem;">
+                                            <i data-lucide="plus" style="width: 1.25rem; height: 1.25rem;"></i>
+                                        </button>
+                                        <button type="button" onclick="openTagMenu('article-categories')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0.5rem;">
+                                            <i data-lucide="menu" style="width: 1.25rem; height: 1.25rem;"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Project Archive Tab Content -->
+                            <div id="project-archive-tab-content" class="tag-tab-content" style="display: none; margin-top: 2rem;">
+                                <div class="tag-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                    <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
+                                        <i data-lucide="chevron-right" style="width: 1.25rem; height: 1.25rem; color: #6b7280;"></i>
+                                        <span style="font-size: 0.9375rem; color: #111827;">Project Archive Categories</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <button type="button" onclick="openAddTagModal('project-archive-categories')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0.5rem;">
+                                            <i data-lucide="plus" style="width: 1.25rem; height: 1.25rem;"></i>
+                                        </button>
+                                        <button type="button" onclick="openTagMenu('project-archive-categories')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0.5rem;">
+                                            <i data-lucide="menu" style="width: 1.25rem; height: 1.25rem;"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- H.O.F Tab Content -->
+                            <div id="hof-tab-content" class="tag-tab-content" style="display: none; margin-top: 2rem;">
+                                <div class="tag-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                    <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
+                                        <i data-lucide="chevron-right" style="width: 1.25rem; height: 1.25rem; color: #6b7280;"></i>
+                                        <span style="font-size: 0.9375rem; color: #111827;">Hall of Fame Categories</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <button type="button" onclick="openAddTagModal('hof-categories')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0.5rem;">
+                                            <i data-lucide="plus" style="width: 1.25rem; height: 1.25rem;"></i>
+                                        </button>
+                                        <button type="button" onclick="openTagMenu('hof-categories')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0.5rem;">
+                                            <i data-lucide="menu" style="width: 1.25rem; height: 1.25rem;"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Members Tab Content -->
+                            <div id="members-tab-content" class="tag-tab-content" style="display: none; margin-top: 2rem;">
+                                <div class="tag-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                    <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
+                                        <i data-lucide="chevron-right" style="width: 1.25rem; height: 1.25rem; color: #6b7280;"></i>
+                                        <span style="font-size: 0.9375rem; color: #111827;">Member Categories</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <button type="button" onclick="openAddTagModal('member-categories')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0.5rem;">
+                                            <i data-lucide="plus" style="width: 1.25rem; height: 1.25rem;"></i>
+                                        </button>
+                                        <button type="button" onclick="openTagMenu('member-categories')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0.5rem;">
+                                            <i data-lucide="menu" style="width: 1.25rem; height: 1.25rem;"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Requests Tab Content -->
+                            <div id="requests-tab-content" class="tag-tab-content" style="display: none; margin-top: 2rem;">
+                                <div class="tag-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                    <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
+                                        <i data-lucide="chevron-right" style="width: 1.25rem; height: 1.25rem; color: #6b7280;"></i>
+                                        <span style="font-size: 0.9375rem; color: #111827;">Request Categories</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <button type="button" onclick="openAddTagModal('request-categories')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0.5rem;">
+                                            <i data-lucide="plus" style="width: 1.25rem; height: 1.25rem;"></i>
+                                        </button>
+                                        <button type="button" onclick="openTagMenu('request-categories')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0.5rem;">
+                                            <i data-lucide="menu" style="width: 1.25rem; height: 1.25rem;"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Blog Tab Content -->
+                            <div id="blog-tab-content" class="tag-tab-content" style="display: none; margin-top: 2rem;">
+                                <div class="tag-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+                                    <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
+                                        <i data-lucide="chevron-right" style="width: 1.25rem; height: 1.25rem; color: #6b7280;"></i>
+                                        <span style="font-size: 0.9375rem; color: #111827;">Blog Categories</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <button type="button" onclick="openAddTagModal('blog-categories')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0.5rem;">
+                                            <i data-lucide="plus" style="width: 1.25rem; height: 1.25rem;"></i>
+                                        </button>
+                                        <button type="button" onclick="openTagMenu('blog-categories')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0.5rem;">
+                                            <i data-lucide="menu" style="width: 1.25rem; height: 1.25rem;"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Add Tag/Category Modal -->
+                            <div id="add-tag-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
+                                <div style="background: white; border-radius: 8px; padding: 2rem; max-width: 500px; width: 90%; position: relative;">
+                                    <button type="button" onclick="closeAddTagModal()" style="position: absolute; top: 1rem; right: 1rem; background: #dc2626; color: white; border: none; border-radius: 4px; width: 2rem; height: 2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 300;">
+                                        ×
+                                    </button>
+                                    
+                                    <h3 style="font-size: 1.25rem; font-weight: 600; color: #111827; margin: 0 0 1.5rem 0;">New Settings Option</h3>
+                                    
+                                    <form method="POST" action="{% url 'app:settings' %}" id="add-tag-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="section" value="add_tag" id="tag-category-type">
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label" style="font-weight: 600;">value</label>
+                                            <textarea name="value" class="form-input" placeholder="Enter value" rows="3" style="resize: vertical; min-height: 80px;" required></textarea>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label" style="font-weight: 600;">Label</label>
+                                            <input type="text" name="label" class="form-input" placeholder="Enter Label" required>
+                                        </div>
+                                        
+                                        <div style="margin-top: 2rem; text-align: center;">
+                                            <button type="submit" style="background: #ff6b6b; color: white; border: none; border-radius: 0.375rem; padding: 0.75rem 1.5rem; font-size: 0.875rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                                Submit
+                                                <i data-lucide="send" style="width: 1rem; height: 1rem;"></i>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            <!-- Tag/Category Menu Modal -->
+                            <div id="tag-menu-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
+                                <div style="background: white; border-radius: 8px; padding: 2rem; max-width: 900px; width: 90%; max-height: 90vh; overflow-y: auto; position: relative;">
+                                    <button type="button" onclick="closeTagMenuModal()" style="position: absolute; top: 1rem; right: 1rem; background: #dc2626; color: white; border: none; border-radius: 4px; width: 2rem; height: 2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 300;">
+                                        ×
+                                    </button>
+                                    
+                                    <h3 id="tag-menu-title" style="font-size: 1.25rem; font-weight: 600; color: #111827; margin: 0 0 1.5rem 0;">Journal Categories</h3>
+                                    
+                                    <div style="overflow-x: auto;">
+                                        <table style="width: 100%; border-collapse: collapse;">
+                                            <thead>
+                                                <tr style="border-bottom: 2px solid #e5e7eb;">
+                                                    <th style="padding: 0.75rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151; width: 40px;">
+                                                        <input type="checkbox" id="select-all-categories" onchange="toggleAllCategories(this)">
+                                                    </th>
+                                                    <th style="padding: 0.75rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151; width: 60px;">#</th>
+                                                    <th style="padding: 0.75rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">Value</th>
+                                                    <th style="padding: 0.75rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">Label</th>
+                                                    <th style="padding: 0.75rem; text-align: right; font-size: 0.875rem; font-weight: 600; color: #374151; width: 60px;">
+                                                        <button type="button" onclick="deleteSelectedCategories()" style="background: #dc2626; color: white; border: none; border-radius: 4px; width: 2rem; height: 2rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 300;">
+                                                            ×
+                                                        </button>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tag-menu-items">
+                                                <!-- Sample data - in production, this would be populated from the backend -->
+                                                <tr style="border-bottom: 1px solid #f3f4f6;">
+                                                    <td style="padding: 0.75rem;">
+                                                        <input type="checkbox" class="category-checkbox" value="1">
+                                                    </td>
+                                                    <td style="padding: 0.75rem; font-weight: 600; color: #111827;">1</td>
+                                                    <td style="padding: 0.75rem; color: #111827;">Physical Sciences and Mathematics</td>
+                                                    <td style="padding: 0.75rem;">
+                                                        <span style="text-decoration: underline; color: #111827;">Physical Sciences and Mathematics</span>
+                                                    </td>
+                                                    <td style="padding: 0.75rem; text-align: right;">
+                                                        <button type="button" onclick="deleteCategory(1)" style="background: #dc2626; color: white; border: none; border-radius: 4px; width: 2rem; height: 2rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 300;">
+                                                            ×
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr style="border-bottom: 1px solid #f3f4f6;">
+                                                    <td style="padding: 0.75rem;">
+                                                        <input type="checkbox" class="category-checkbox" value="2">
+                                                    </td>
+                                                    <td style="padding: 0.75rem; font-weight: 600; color: #111827;">2</td>
+                                                    <td style="padding: 0.75rem; color: #111827;">Micromachines</td>
+                                                    <td style="padding: 0.75rem;">
+                                                        <span style="text-decoration: underline; color: #111827;">Micromachines</span>
+                                                    </td>
+                                                    <td style="padding: 0.75rem; text-align: right;">
+                                                        <button type="button" onclick="deleteCategory(2)" style="background: #dc2626; color: white; border: none; border-radius: 4px; width: 2rem; height: 2rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 300;">
+                                                            ×
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr style="border-bottom: 1px solid #f3f4f6;">
+                                                    <td style="padding: 0.75rem;">
+                                                        <input type="checkbox" class="category-checkbox" value="3">
+                                                    </td>
+                                                    <td style="padding: 0.75rem; font-weight: 600; color: #111827;">3</td>
+                                                    <td style="padding: 0.75rem; color: #111827;">Interdisciplinary</td>
+                                                    <td style="padding: 0.75rem;">
+                                                        <span style="text-decoration: underline; color: #111827;">Interdisciplinary</span>
+                                                    </td>
+                                                    <td style="padding: 0.75rem; text-align: right;">
+                                                        <button type="button" onclick="deleteCategory(3)" style="background: #dc2626; color: white; border: none; border-radius: 4px; width: 2rem; height: 2rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 300;">
+                                                            ×
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr style="border-bottom: 1px solid #f3f4f6;">
+                                                    <td style="padding: 0.75rem;">
+                                                        <input type="checkbox" class="category-checkbox" value="4">
+                                                    </td>
+                                                    <td style="padding: 0.75rem; font-weight: 600; color: #111827;">4</td>
+                                                    <td style="padding: 0.75rem; color: #111827;">Multidisciplinary</td>
+                                                    <td style="padding: 0.75rem;">
+                                                        <span style="text-decoration: underline; color: #111827;">Multidisciplinary</span>
+                                                    </td>
+                                                    <td style="padding: 0.75rem; text-align: right;">
+                                                        <button type="button" onclick="deleteCategory(4)" style="background: #dc2626; color: white; border: none; border-radius: 4px; width: 2rem; height: 2rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 300;">
+                                                            ×
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr style="border-bottom: 1px solid #f3f4f6;">
+                                                    <td style="padding: 0.75rem;">
+                                                        <input type="checkbox" class="category-checkbox" value="5">
+                                                    </td>
+                                                    <td style="padding: 0.75rem; font-weight: 600; color: #111827;">5</td>
+                                                    <td style="padding: 0.75rem; color: #111827;">Psychology</td>
+                                                    <td style="padding: 0.75rem;">
+                                                        <span style="text-decoration: underline; color: #111827;">Psychology</span>
+                                                    </td>
+                                                    <td style="padding: 0.75rem; text-align: right;">
+                                                        <button type="button" onclick="deleteCategory(5)" style="background: #dc2626; color: white; border: none; border-radius: 4px; width: 2rem; height: 2rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 300;">
+                                                            ×
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr style="border-bottom: 1px solid #f3f4f6;">
+                                                    <td style="padding: 0.75rem;">
+                                                        <input type="checkbox" class="category-checkbox" value="6">
+                                                    </td>
+                                                    <td style="padding: 0.75rem; font-weight: 600; color: #111827;">6</td>
+                                                    <td style="padding: 0.75rem; color: #111827;">Pharmacology, Toxicology and Pharmaceutics</td>
+                                                    <td style="padding: 0.75rem;">
+                                                        <span style="text-decoration: underline; color: #111827;">Pharmacology, Toxicology and Pharmaceutics</span>
+                                                    </td>
+                                                    <td style="padding: 0.75rem; text-align: right;">
+                                                        <button type="button" onclick="deleteCategory(6)" style="background: #dc2626; color: white; border: none; border-radius: 4px; width: 2rem; height: 2rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 300;">
+                                                            ×
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr style="border-bottom: 1px solid #f3f4f6;">
+                                                    <td style="padding: 0.75rem;">
+                                                        <input type="checkbox" class="category-checkbox" value="7">
+                                                    </td>
+                                                    <td style="padding: 0.75rem; font-weight: 600; color: #111827;">7</td>
+                                                    <td style="padding: 0.75rem; color: #111827;">Materials Science</td>
+                                                    <td style="padding: 0.75rem;">
+                                                        <span style="text-decoration: underline; color: #111827;">Materials Science</span>
+                                                    </td>
+                                                    <td style="padding: 0.75rem; text-align: right;">
+                                                        <button type="button" onclick="deleteCategory(7)" style="background: #dc2626; color: white; border: none; border-radius: 4px; width: 2rem; height: 2rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 300;">
+                                                            ×
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr style="border-bottom: 1px solid #f3f4f6;">
+                                                    <td style="padding: 0.75rem;">
+                                                        <input type="checkbox" class="category-checkbox" value="8">
+                                                    </td>
+                                                    <td style="padding: 0.75rem; font-weight: 600; color: #111827;">8</td>
+                                                    <td style="padding: 0.75rem; color: #111827;">Immunology and Microbiology</td>
+                                                    <td style="padding: 0.75rem;">
+                                                        <span style="text-decoration: underline; color: #111827;">Immunology and Microbiology</span>
+                                                    </td>
+                                                    <td style="padding: 0.75rem; text-align: right;">
+                                                        <button type="button" onclick="deleteCategory(8)" style="background: #dc2626; color: white; border: none; border-radius: 4px; width: 2rem; height: 2rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 300;">
+                                                            ×
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr style="border-bottom: 1px solid #f3f4f6;">
+                                                    <td style="padding: 0.75rem;">
+                                                        <input type="checkbox" class="category-checkbox" value="9">
+                                                    </td>
+                                                    <td style="padding: 0.75rem; font-weight: 600; color: #111827;">9</td>
+                                                    <td style="padding: 0.75rem; color: #111827;">Environmental Science</td>
+                                                    <td style="padding: 0.75rem;">
+                                                        <span style="text-decoration: underline; color: #111827;">Environmental Science</span>
+                                                    </td>
+                                                    <td style="padding: 0.75rem; text-align: right;">
+                                                        <button type="button" onclick="deleteCategory(9)" style="background: #dc2626; color: white; border: none; border-radius: 4px; width: 2rem; height: 2rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 300;">
+                                                            ×
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr style="border-bottom: 1px solid #f3f4f6;">
+                                                    <td style="padding: 0.75rem;">
+                                                        <input type="checkbox" class="category-checkbox" value="10">
+                                                    </td>
+                                                    <td style="padding: 0.75rem; font-weight: 600; color: #111827;">10</td>
+                                                    <td style="padding: 0.75rem; color: #111827;">Engineering</td>
+                                                    <td style="padding: 0.75rem;">
+                                                        <span style="text-decoration: underline; color: #111827;">Engineering</span>
+                                                    </td>
+                                                    <td style="padding: 0.75rem; text-align: right;">
+                                                        <button type="button" onclick="deleteCategory(10)" style="background: #dc2626; color: white; border: none; border-radius: 4px; width: 2rem; height: 2rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 300;">
+                                                            ×
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr style="border-bottom: 1px solid #f3f4f6;">
+                                                    <td style="padding: 0.75rem;">
+                                                        <input type="checkbox" class="category-checkbox" value="11">
+                                                    </td>
+                                                    <td style="padding: 0.75rem; font-weight: 600; color: #111827;">11</td>
+                                                    <td style="padding: 0.75rem; color: #111827;">Energy</td>
+                                                    <td style="padding: 0.75rem;">
+                                                        <span style="text-decoration: underline; color: #111827;">Energy</span>
+                                                    </td>
+                                                    <td style="padding: 0.75rem; text-align: right;">
+                                                        <button type="button" onclick="deleteCategory(11)" style="background: #dc2626; color: white; border: none; border-radius: 4px; width: 2rem; height: 2rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 300;">
+                                                            ×
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr style="border-bottom: 1px solid #f3f4f6;">
+                                                    <td style="padding: 0.75rem;">
+                                                        <input type="checkbox" class="category-checkbox" value="12">
+                                                    </td>
+                                                    <td style="padding: 0.75rem; font-weight: 600; color: #111827;">12</td>
+                                                    <td style="padding: 0.75rem; color: #111827;">Economics, Econometrics and Finance</td>
+                                                    <td style="padding: 0.75rem;">
+                                                        <span style="text-decoration: underline; color: #111827;">Economics, Econometrics and Finance</span>
+                                                    </td>
+                                                    <td style="padding: 0.75rem; text-align: right;">
+                                                        <button type="button" onclick="deleteCategory(12)" style="background: #dc2626; color: white; border: none; border-radius: 4px; width: 2rem; height: 2rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 300;">
+                                                            ×
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pricing Section -->
+                        <div id="pricing-section" class="settings-section" style="display: none;">
+                            <h2 class="settings-section-title">Services Price</h2>
+                            
+                            <h3 class="settings-subsection-title">SPONSORSHIP</h3>
+                            <div class="settings-divider"></div>
+                            
+                            <div style="margin-bottom: 2rem;">
+                                <button type="button" onclick="openAddSponsorshipModal()" style="display: flex; align-items: center; gap: 0.5rem; background: #3b82f6; color: white; border: none; border-radius: 0.375rem; padding: 0.625rem 1rem; font-size: 0.875rem; font-weight: 500; cursor: pointer;">
+                                    <span>+</span>
+                                    <span>Add New Sponsorship Price</span>
+                                </button>
+                            </div>
+                            
+                            <!-- Add Sponsorship Modal -->
+                            <div id="add-sponsorship-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
+                                <div style="background: white; border-radius: 8px; padding: 2rem; max-width: 500px; width: 90%; position: relative;">
+                                    <button type="button" onclick="closeAddSponsorshipModal()" style="position: absolute; top: 1rem; right: 1rem; background: #dc2626; color: white; border: none; border-radius: 4px; width: 2rem; height: 2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 300;">
+                                        ×
+                                    </button>
+                                    
+                                    <h3 style="font-size: 1.25rem; font-weight: 600; color: #111827; margin: 0 0 1.5rem 0;">New Settings Option</h3>
+                                    
+                                    <form method="POST" action="{% url 'app:settings' %}" id="add-sponsorship-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="section" value="add_sponsorship">
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label" style="font-weight: 600;">Subscription_amount</label>
+                                            <div style="position: relative;">
+                                                <input type="text" name="subscription_amount" class="form-input" placeholder="Enter Subscription_amount" required>
+                                                <div style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); display: flex; gap: 0.5rem;">
+                                                    <i data-lucide="lightbulb" style="width: 1rem; height: 1rem; color: #22c55e;"></i>
+                                                    <i data-lucide="g" style="width: 1rem; height: 1rem; color: #22c55e;"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label" style="font-weight: 600;">Subscription_title</label>
+                                            <input type="text" name="subscription_title" class="form-input" placeholder="Enter Subscription_title" required>
+                                        </div>
+                                        
+                                        <div style="margin-top: 2rem;">
+                                            <button type="submit" style="background: #ff6b6b; color: white; border: none; border-radius: 0.375rem; padding: 0.75rem 1.5rem; font-size: 0.875rem; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                                Submit
+                                                <i data-lucide="send" style="width: 1rem; height: 1rem;"></i>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            <form method="POST" action="{% url 'app:settings' %}" id="sponsorship-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="section" value="sponsorship_pricing">
+                                
+                                <div class="form-group">
+                                    <label class="form-label">01. Premier $</label>
+                                    <input type="number" name="premier_price" value="{% if site_settings.premier_price %}{{ site_settings.premier_price }}{% endif %}" step="0.01" class="form-input" placeholder="0.00">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">02. Sustaining $</label>
+                                    <input type="number" name="sustaining_price" value="{% if site_settings.sustaining_price %}{{ site_settings.sustaining_price }}{% endif %}" step="0.01" class="form-input" placeholder="0.00">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">03. Basic $</label>
+                                    <input type="number" name="basic_price" value="{% if site_settings.basic_price %}{{ site_settings.basic_price }}{% endif %}" step="0.01" class="form-input" placeholder="0.00">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">04. Power $</label>
+                                    <input type="number" name="power_price" value="{% if site_settings.power_price %}{{ site_settings.power_price }}{% endif %}" step="0.01" class="form-input" placeholder="0.00">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">05. Double $</label>
+                                    <input type="number" name="double_price" value="{% if site_settings.double_price %}{{ site_settings.double_price }}{% endif %}" step="0.01" class="form-input" placeholder="0.00">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">06. Single $</label>
+                                    <input type="number" name="single_price" value="{% if site_settings.single_price %}{{ site_settings.single_price }}{% endif %}" step="0.01" class="form-input" placeholder="0.00">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">07. Compact $</label>
+                                    <input type="number" name="compact_price" value="{% if site_settings.compact_price %}{{ site_settings.compact_price }}{% endif %}" step="0.01" class="form-input" placeholder="0.00">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">08. Inspired $</label>
+                                    <input type="number" name="inspired_price" value="{% if site_settings.inspired_price %}{{ site_settings.inspired_price }}{% endif %}" step="0.01" class="form-input" placeholder="0.00">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">09. Charity Homes $</label>
+                                    <input type="number" name="charity_homes_price" value="{% if site_settings.charity_homes_price %}{{ site_settings.charity_homes_price }}{% endif %}" step="0.01" class="form-input" placeholder="0.00">
+                                </div>
+                                
+                                <div style="margin-top: 2rem;">
+                                    <button type="submit" class="btn-primary">Save Changes</button>
+                                </div>
+                            </form>
+                            
+                            <h3 class="settings-subsection-title" style="margin-top: 3rem;">REGISTRATIONS</h3>
+                            <div class="settings-divider"></div>
+                            
+                            <form method="POST" action="{% url 'app:settings' %}" id="registrations-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="section" value="registrations_pricing">
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Article Indexing Price</label>
+                                    <input type="number" name="article_indexing_price" value="" step="0.01" class="form-input" placeholder="0.00">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Journal Indexing Price</label>
+                                    <input type="number" name="journal_indexing_price" value="" step="0.01" class="form-input" placeholder="0.00">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Project Archive Hosting Price</label>
+                                    <input type="number" name="project_archive_hosting_price" value="" step="0.01" class="form-input" placeholder="0.00">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Directory Of Researcher Registration Price</label>
+                                    <input type="number" name="directory_researcher_price" value="" step="0.01" class="form-input" placeholder="0.00">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Hall Of Fame Price</label>
+                                    <input type="number" name="hall_of_fame_price" value="" step="0.01" class="form-input" placeholder="0.00">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Check Plagiarism Price</label>
+                                    <input type="number" name="check_plagiarism_price" value="" step="0.01" class="form-input" placeholder="0.00">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Work Plagiarism Price</label>
+                                    <input type="number" name="work_plagiarism_price" value="" step="0.01" class="form-input" placeholder="0.00">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Thesis To Article Price</label>
+                                    <input type="number" name="thesis_to_article_price" value="" step="0.01" class="form-input" placeholder="0.00">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Thesis To Book Price</label>
+                                    <input type="number" name="thesis_to_book_price" value="" step="0.01" class="form-input" placeholder="0.00">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Thesis To Book Chapter Price</label>
+                                    <input type="number" name="thesis_to_book_chapter_price" value="" step="0.01" class="form-input" placeholder="0.00">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Power Point Preparation Price</label>
+                                    <input type="number" name="powerpoint_preparation_price" value="" step="0.01" class="form-input" placeholder="0.00">
+                                </div>
+                                
+                                <div style="margin-top: 2rem;">
+                                    <button type="submit" class="btn-primary">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Role & Permissions Section -->
+                        <div id="roles-section" class="settings-section" style="display: none;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+                                <h2 class="settings-section-title" style="margin-bottom: 0;">Roles & Permissions</h2>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <button type="button" class="btn-create-permission" onclick="openAddPermissionModal()" style="display: flex; align-items: center; gap: 0.5rem; background: #3b82f6; color: white; border: none; border-radius: 50%; width: 2.5rem; height: 2.5rem; cursor: pointer; justify-content: center; font-size: 1.25rem; font-weight: 300;">
+                                        <span>+</span>
+                                    </button>
+                                    <span style="font-size: 0.875rem; color: #6b7280;">Create new permission</span>
+                                </div>
+                            </div>
+                            <p style="margin-bottom: 2rem; color: #6b7280;">Manage roles and permissions here.</p>
+                            
+                            <div id="permissions-list">
+                                {% for perm_user in users_with_permissions %}
+                                <div class="permission-entry" style="padding: 1.5rem 0; border-bottom: 1px solid #e5e7eb;">
+                                    <div style="display: flex; align-items: flex-start; gap: 1rem;">
+                                        <div style="width: 2.5rem; height: 2.5rem; border-radius: 50%; background: #f3f4f6; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                            <i data-lucide="user" style="width: 1.25rem; height: 1.25rem; color: #9ca3af;"></i>
+                                        </div>
+                                        <div style="flex: 1;">
+                                            <h3 style="font-size: 1rem; font-weight: 600; color: #111827; margin: 0 0 0.25rem 0;">{{ perm_user.get_full_name|default:perm_user.username }}</h3>
+                                            <p style="font-size: 0.875rem; color: #6b7280; margin: 0 0 1rem 0;">{{ perm_user.email|default:"No email" }}</p>
+                                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;" id="permissions-{{ perm_user.id }}">
+                                                <span class="permission-tag" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #f3f4f6; color: #374151; padding: 0.375rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem;">
+                                                    Project and research archive
+                                                    <button type="button" onclick="removePermission({{ perm_user.id }}, 'project_archive')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0; display: flex; align-items: center;">
+                                                        <i data-lucide="x" style="width: 0.875rem; height: 0.875rem;"></i>
+                                                    </button>
+                                                </span>
+                                                <span class="permission-tag" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #f3f4f6; color: #374151; padding: 0.375rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem;">
+                                                    Article Indexing
+                                                    <button type="button" onclick="removePermission({{ perm_user.id }}, 'article_indexing')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0; display: flex; align-items: center;">
+                                                        <i data-lucide="x" style="width: 0.875rem; height: 0.875rem;"></i>
+                                                    </button>
+                                                </span>
+                                                <span class="permission-tag" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #f3f4f6; color: #374151; padding: 0.375rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem;">
+                                                    Blog
+                                                    <button type="button" onclick="removePermission({{ perm_user.id }}, 'blog')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0; display: flex; align-items: center;">
+                                                        <i data-lucide="x" style="width: 0.875rem; height: 0.875rem;"></i>
+                                                    </button>
+                                                </span>
+                                                <span class="permission-tag" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #f3f4f6; color: #374151; padding: 0.375rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem;">
+                                                    Members
+                                                    <button type="button" onclick="removePermission({{ perm_user.id }}, 'members')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0; display: flex; align-items: center;">
+                                                        <i data-lucide="x" style="width: 0.875rem; height: 0.875rem;"></i>
+                                                    </button>
+                                                </span>
+                                                <span class="permission-tag" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #f3f4f6; color: #374151; padding: 0.375rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem;">
+                                                    Check plagiarism
+                                                    <button type="button" onclick="removePermission({{ perm_user.id }}, 'check_plagiarism')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0; display: flex; align-items: center;">
+                                                        <i data-lucide="x" style="width: 0.875rem; height: 0.875rem;"></i>
+                                                    </button>
+                                                </span>
+                                                <span class="permission-tag" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #f3f4f6; color: #374151; padding: 0.375rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem;">
+                                                    Journal Indexing
+                                                    <button type="button" onclick="removePermission({{ perm_user.id }}, 'journal_indexing')" style="background: none; border: none; cursor: pointer; color: #6b7280; padding: 0; display: flex; align-items: center;">
+                                                        <i data-lucide="x" style="width: 0.875rem; height: 0.875rem;"></i>
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div style="text-align: center; padding: 3rem 0; color: #6b7280;">
+                                    <p>No users found.</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Add Permission Modal -->
+                        <div id="add-permission-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
+                            <div style="background: white; border-radius: 8px; padding: 2rem; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                                    <h3 style="font-size: 1.25rem; font-weight: 600; color: #111827; margin: 0;">Add New Settings</h3>
+                                    <button type="button" onclick="closeAddPermissionModal()" style="background: none; border: none; cursor: pointer; color: #6b7280; font-size: 1.5rem; line-height: 1;">×</button>
+                                </div>
+                                
+                                <form method="POST" action="{% url 'app:settings' %}" id="add-permission-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="section" value="add_permission">
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Assign To <span style="color: #dc2626;">*</span></label>
+                                        <select name="assign_to" class="form-select" required>
+                                            <option value="">Select user</option>
+                                            {% for user in all_users %}
+                                            <option value="{{ user.id }}">{{ user.get_full_name|default:user.username }} ({{ user.email }})</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Permissions <span style="color: #dc2626;">*</span></label>
+                                        <select name="permissions" class="form-select" multiple required style="min-height: 200px;">
+                                            <option value="article_indexing">Article indexing</option>
+                                            <option value="journal_indexing">Journal indexing</option>
+                                            <option value="project_archive">Project achive</option>
+                                            <option value="check_plagiarism">check plagiarism</option>
+                                            <option value="work_plagiarism">work plagiarism</option>
+                                            <option value="thesis_to_article">thesis to article</option>
+                                            <option value="thesis_to_book_chapter">thesis to book chapter</option>
+                                            <option value="thesis_to_book">thesis to book</option>
+                                            <option value="powerpoint_preparation">power point preparation</option>
+                                            <option value="blog">blog</option>
+                                            <option value="member">member</option>
+                                            <option value="directory_researchers">directory of researchers</option>
+                                            <option value="hall_of_fame">hall of fame</option>
+                                            <option value="sponsors">sponsors</option>
+                                            <option value="accounts">accounts</option>
+                                        </select>
+                                        <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">Hold Ctrl (Windows) or Cmd (Mac) to select multiple permissions</p>
+                                    </div>
+                                    
+                                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                                        <button type="button" onclick="closeAddPermissionModal()" class="btn-secondary">Cancel</button>
+                                        <button type="submit" class="btn-primary">Save</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Plugins & Api Section -->
+                        <div id="plugins-section" class="settings-section" style="display: none;">
+                            <h2 class="settings-section-title">API & Plugins</h2>
+                            <div class="settings-divider"></div>
+                            
+                            <h3 class="settings-subsection-title">PAYMENT GATE</h3>
+                            <div class="settings-divider"></div>
+                            
+                            <form method="POST" action="{% url 'app:settings' %}" id="payment-gate-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="section" value="payment_gate">
+                                
+                                <div class="form-group">
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <div style="flex: 1; position: relative;">
+                                            <label class="form-label">Enter API Secret Key</label>
+                                            <input type="text" name="api_secret_key" value="sk_live_bbae3f1074bf22ceb0a1733abd08ec691d57b60d" class="form-input" style="padding-right: 100px;">
+                                            <button type="submit" class="btn-save" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); margin-top: 0;">
+                                                <i data-lucide="check"></i>
+                                                Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <div style="flex: 1; position: relative;">
+                                            <label class="form-label">Enter API Public Key</label>
+                                            <input type="text" name="api_public_key" value="{{ site_settings.api_public_key|default:'pk_live_b7da432989e4be82875d8a5c3e7b6dbbdf1c2c90' }}" class="form-input" style="padding-right: 100px;">
+                                            <button type="submit" class="btn-save" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); margin-top: 0;">
+                                                <i data-lucide="check"></i>
+                                                Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            
+                            <h3 class="settings-subsection-title" style="margin-top: 3rem;">Map Address</h3>
+                            <div class="settings-divider"></div>
+                            
+                            <form method="POST" action="{% url 'app:settings' %}" id="map-address-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="section" value="map_address">
+                                
+                                <div class="form-group">
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <div style="flex: 1; position: relative;">
+                                            <label class="form-label">Index</label>
+                                            <input type="url" name="map_index" value="{{ site_settings.map_index|default:'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.0005654309066!2d-2.390053985548167!3d7.3538' }}" class="form-input" style="padding-right: 100px;">
+                                            <button type="submit" class="btn-save" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); margin-top: 0;">
+                                                <i data-lucide="check"></i>
+                                                Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Terms and policies Section -->
+                        <div id="terms-section" class="settings-section" style="display: none;">
+                            <h2 class="settings-section-title">Terms & Policies</h2>
+                            
+                            <h3 class="settings-subsection-title">GENERAL</h3>
+                            <div class="settings-divider"></div>
+                            
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.75rem 0; font-size: 0.9375rem; color: #111827;">
+                                    <input type="radio" name="general_policy" value="cookies" style="width: 1.25rem; height: 1.25rem; cursor: pointer;">
+                                    <span>Cookies</span>
+                                </label>
+                            </div>
+                            
+                            <h3 class="settings-subsection-title" style="margin-top: 3rem;">REGISTRATIONS</h3>
+                            <div class="settings-divider"></div>
+                            
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.75rem 0; font-size: 0.9375rem; color: #111827;">
+                                    <input type="radio" name="registration_policy" value="article_indexing" style="width: 1.25rem; height: 1.25rem; cursor: pointer;">
+                                    <span>Article Indexing Terms</span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.75rem 0; font-size: 0.9375rem; color: #111827;">
+                                    <input type="radio" name="registration_policy" value="journal_indexing" style="width: 1.25rem; height: 1.25rem; cursor: pointer;">
+                                    <span>Journal Indexing Terms</span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.75rem 0; font-size: 0.9375rem; color: #111827;">
+                                    <input type="radio" name="registration_policy" value="project_archive" style="width: 1.25rem; height: 1.25rem; cursor: pointer;">
+                                    <span>Project Archive Hosting Terms</span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.75rem 0; font-size: 0.9375rem; color: #111827;">
+                                    <input type="radio" name="registration_policy" value="membership" style="width: 1.25rem; height: 1.25rem; cursor: pointer;">
+                                    <span>Membership Terms</span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.75rem 0; font-size: 0.9375rem; color: #111827;">
+                                    <input type="radio" name="registration_policy" value="hall_of_fame" style="width: 1.25rem; height: 1.25rem; cursor: pointer;">
+                                    <span>Hall of Fame Registration Terms</span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.75rem 0; font-size: 0.9375rem; color: #111827;">
+                                    <input type="radio" name="registration_policy" value="directory_researcher" style="width: 1.25rem; height: 1.25rem; cursor: pointer;">
+                                    <span>Directory of Researcher Registration Terms</span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.75rem 0; font-size: 0.9375rem; color: #111827;">
+                                    <input type="radio" name="registration_policy" value="plagiarism_thesis" style="width: 1.25rem; height: 1.25rem; cursor: pointer;">
+                                    <span>Plagiarism, Thesis & PowerPoint Request Terms</span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.75rem 0; font-size: 0.9375rem; color: #111827;">
+                                    <input type="radio" name="registration_policy" value="sponsors" style="width: 1.25rem; height: 1.25rem; cursor: pointer;">
+                                    <span>sponsors terms</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="{% static 'app/js/dashboard.js' %}"></script>
+    <script>
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+        
+        // Settings navigation
+        document.querySelectorAll('.settings-nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const section = this.getAttribute('data-section');
+                
+                // Update active state
+                document.querySelectorAll('.settings-nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Show/hide sections
+                document.querySelectorAll('.settings-section').forEach(sec => {
+                    sec.style.display = 'none';
+                });
+                document.getElementById(section + '-section').style.display = 'block';
+                
+                // Reinitialize icons
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            });
+        });
+        
+        // Font size slider
+        function updateFontSize(value) {
+            document.getElementById('font-size-input').value = value;
+            document.getElementById('font-size-value').textContent = value;
+        }
+        
+        // Image preview
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('banner-preview').src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        // Navigator image preview
+        function previewNavigatorImage(input, previewId) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById(previewId);
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        // Switch page tabs
+        function switchPageTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.page-tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.page-tab').forEach(tab => {
+                tab.classList.remove('active');
+                tab.style.color = '#6b7280';
+                tab.style.borderBottomColor = 'transparent';
+            });
+            
+            // Show selected tab content
+            const selectedContent = document.getElementById(tabName + '-tab-content');
+            if (selectedContent) {
+                selectedContent.style.display = 'block';
+            }
+            
+            // Add active class to selected tab
+            const selectedTab = document.querySelector(`.page-tab[data-tab="${tabName}"]`);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+                selectedTab.style.color = '#111827';
+                selectedTab.style.borderBottomColor = '#3b82f6';
+            }
+            
+            // Reinitialize icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        
+        // Toggle page
+        function togglePage(checkbox, pageName) {
+            const isEnabled = checkbox.checked;
+            
+            // Update visual state immediately
+            const slider = checkbox.nextElementSibling;
+            if (isEnabled) {
+                slider.style.backgroundColor = '#22c55e';
+                slider.querySelector('span').style.transform = 'translateX(1.5rem)';
+            } else {
+                slider.style.backgroundColor = '#d1d5db';
+                slider.querySelector('span').style.transform = 'translateX(0)';
+            }
+            
+            // Save to database via AJAX
+            fetch('{% url "app:settings" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: new URLSearchParams({
+                    'section': 'toggle_page',
+                    'page_name': pageName,
+                    'is_enabled': isEnabled
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log(data.message);
+                } else {
+                    // Revert on error
+                    checkbox.checked = !isEnabled;
+                    togglePage(checkbox, pageName);
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Revert on error
+                checkbox.checked = !isEnabled;
+                togglePage(checkbox, pageName);
+                alert('Error saving page state');
+            });
+        }
+        
+        // Modify page
+        function modifyPage(pageName) {
+            // This would typically open a modal or navigate to edit page
+            alert('Modify ' + pageName + ' - to be implemented');
+        }
+        
+        // Switch navigator tabs
+        function switchNavigatorTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.navigator-tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.navigator-tab').forEach(tab => {
+                tab.classList.remove('active');
+                tab.style.color = '#6b7280';
+                tab.style.borderBottomColor = 'transparent';
+            });
+            
+            // Show selected tab content
+            const selectedContent = document.getElementById(tabName + '-tab-content');
+            if (selectedContent) {
+                selectedContent.style.display = 'block';
+            }
+            
+            // Add active class to selected tab
+            const selectedTab = document.querySelector(`.navigator-tab[data-tab="${tabName}"]`);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+                selectedTab.style.color = '#111827';
+                selectedTab.style.borderBottomColor = '#3b82f6';
+            }
+            
+            // Reinitialize icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        
+        // Add Permission Modal
+        function openAddPermissionModal() {
+            document.getElementById('add-permission-modal').style.display = 'flex';
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        
+        function closeAddPermissionModal() {
+            document.getElementById('add-permission-modal').style.display = 'none';
+            document.getElementById('add-permission-form').reset();
+        }
+        
+        // Close modal on backdrop click
+        document.getElementById('add-permission-modal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddPermissionModal();
+            }
+        });
+        
+        // Remove permission
+        function removePermission(userId, permissionId) {
+            if (confirm('Are you sure you want to remove this permission?')) {
+                // This would typically make an AJAX call to remove the permission
+                console.log('Remove permission', userId, permissionId);
+            }
+        }
+        
+        // Add new sponsorship modal
+        function openAddSponsorshipModal() {
+            document.getElementById('add-sponsorship-modal').style.display = 'flex';
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        
+        function closeAddSponsorshipModal() {
+            document.getElementById('add-sponsorship-modal').style.display = 'none';
+            document.getElementById('add-sponsorship-form').reset();
+        }
+        
+        // Close modal on backdrop click
+        document.getElementById('add-sponsorship-modal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddSponsorshipModal();
+            }
+        });
+        
+        // Switch tag tabs
+        function switchTagTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tag-tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tag-tab').forEach(tab => {
+                tab.classList.remove('active');
+                tab.style.color = '#6b7280';
+                tab.style.borderBottomColor = 'transparent';
+            });
+            
+            // Show selected tab content
+            const selectedContent = document.getElementById(tabName + '-tab-content');
+            if (selectedContent) {
+                selectedContent.style.display = 'block';
+            }
+            
+            // Add active class to selected tab
+            const selectedTab = document.querySelector(`[data-tab="${tabName}"]`);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+                selectedTab.style.color = '#111827';
+                selectedTab.style.borderBottomColor = '#3b82f6';
+            }
+            
+            // Reinitialize icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        
+        // Add tag item modal
+        function openAddTagModal(category) {
+            document.getElementById('tag-category-type').value = category;
+            document.getElementById('add-tag-modal').style.display = 'flex';
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        
+        function closeAddTagModal() {
+            document.getElementById('add-tag-modal').style.display = 'none';
+            document.getElementById('add-tag-form').reset();
+        }
+        
+        // Close tag modal on backdrop click
+        document.getElementById('add-tag-modal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddTagModal();
+            }
+        });
+        
+        // Open tag menu
+        function openTagMenu(category) {
+            // Set the modal title based on category
+            const categoryNames = {
+                'journal-categories': 'Journal Categories',
+                'journal-type': 'Journal Type',
+                'journal-format': 'Journal Format',
+                'article-categories': 'Article Categories',
+                'project-archive-categories': 'Project Archive Categories',
+                'hof-categories': 'Hall of Fame Categories',
+                'member-categories': 'Member Categories',
+                'request-categories': 'Request Categories',
+                'blog-categories': 'Blog Categories'
+            };
+            
+            document.getElementById('tag-menu-title').textContent = categoryNames[category] || category;
+            document.getElementById('tag-menu-modal').style.display = 'flex';
+            
+            // In production, you would fetch the actual data for this category from the backend
+            // For now, we're using sample data
+        }
+        
+        function closeTagMenuModal() {
+            document.getElementById('tag-menu-modal').style.display = 'none';
+            // Uncheck all checkboxes
+            document.querySelectorAll('.category-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('select-all-categories').checked = false;
+        }
+        
+        // Close tag menu modal on backdrop click
+        document.getElementById('tag-menu-modal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeTagMenuModal();
+            }
+        });
+        
+        // Toggle all categories
+        function toggleAllCategories(checkbox) {
+            document.querySelectorAll('.category-checkbox').forEach(cb => {
+                cb.checked = checkbox.checked;
+            });
+        }
+        
+        // Delete single category
+        function deleteCategory(id) {
+            if (confirm('Are you sure you want to delete this category?')) {
+                // This would typically make an AJAX call to delete the category
+                console.log('Delete category', id);
+                // Remove the row from the table
+                const row = event.target.closest('tr');
+                if (row) {
+                    row.remove();
+                }
+            }
+        }
+        
+        // Delete selected categories
+        function deleteSelectedCategories() {
+            const selected = document.querySelectorAll('.category-checkbox:checked');
+            if (selected.length === 0) {
+                alert('Please select at least one category to delete.');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to delete ${selected.length} category/categories?`)) {
+                // This would typically make an AJAX call to delete the selected categories
+                selected.forEach(checkbox => {
+                    const row = checkbox.closest('tr');
+                    if (row) {
+                        row.remove();
+                    }
+                });
+                document.getElementById('select-all-categories').checked = false;
+            }
+        }
+    </script>
+</body>
+</html>

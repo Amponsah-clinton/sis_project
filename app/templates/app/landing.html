@@ -10,24 +10,9 @@
 
           <div class="owl-carousel slide-one-item-alt-text">
             <div class="slide-text">
-              <h1>Advancing Research Through Innovation</h1>
-              <p class="mb-5">Explore groundbreaking research papers, cutting-edge methodologies, and innovative findings that shape the future of knowledge and discovery.</p>
-              <p><a href="#" target="_blank" class="btn btn-outline-light py-3 px-5">Browse Papers</a></p>
-            </div>
-            <div class="slide-text">
-              <h1>Peer-Reviewed Excellence</h1>
-              <p class="mb-5">Access high-quality, peer-reviewed research publications from leading scholars and institutions worldwide.</p>
-              <p><a href="#" target="_blank" class="btn btn-outline-light py-3 px-5">View Publications</a></p>
-            </div>
-            <div class="slide-text">
-              <h1>Discover New Insights</h1>
-              <p class="mb-5">Stay updated with the latest research findings, methodologies, and academic contributions across diverse fields of study.</p>
-              <p><a href="#" target="_blank" class="btn btn-outline-light py-3 px-5">Explore Research</a></p>
-            </div>
-            <div class="slide-text">
-              <h1>Academic Excellence</h1>
-              <p class="mb-5">Join a community of researchers, scholars, and academics dedicated to advancing knowledge and scientific understanding.</p>
-              <p><a href="#" target="_blank" class="btn btn-outline-light py-3 px-5">Join Community</a></p>
+              <h1>{% if site_settings.banner_title %}{{ site_settings.banner_title }}{% else %}Advancing Research Through Innovation{% endif %}</h1>
+              <p class="mb-5">{% if site_settings.banner_subtitle %}{{ site_settings.banner_subtitle }}{% else %}Explore groundbreaking research papers, cutting-edge methodologies, and innovative findings that shape the future of knowledge and discovery.{% endif %}</p>
+              <p><a href="{% url 'app:browse' %}" class="btn btn-outline-light py-3 px-5">Browse Papers</a></p>
             </div>
           </div>
 
@@ -35,10 +20,14 @@
         <div class="col-lg-6 ml-auto"  data-aos="fade-up" data-aos-delay="100">
                       
           <div class="owl-carousel slide-one-item-alt">
-            <img src="{% static 'app/images/img_1.jpg' %}" alt="Research Innovation" class="img-fluid">
-            <img src="{% static 'app/images/img_2.jpg' %}" alt="Research Publication" class="img-fluid">
-            <img src="{% static 'app/images/img_3.jpg' %}" alt="Research Discovery" class="img-fluid">
-            <img src="{% static 'app/images/img_4.jpg' %}" alt="Academic Research" class="img-fluid">
+            {% if site_settings.default_banner_image %}
+              <img src="{{ site_settings.default_banner_image.url }}" alt="Banner Image" class="img-fluid">
+            {% else %}
+              <img src="https://res.cloudinary.com/dmqizfpyz/image/upload/v1763149807/bg1_svob3l.png" alt="Research Innovation" class="img-fluid">
+              <img src="https://res.cloudinary.com/dmqizfpyz/image/upload/v1763149807/bg2_dlnqkz.png" alt="Research Publication" class="img-fluid">
+              <img src="https://res.cloudinary.com/dmqizfpyz/image/upload/v1763149806/bg3_gv0clb.png" alt="Research Discovery" class="img-fluid">
+              <img src="{% static 'app/images/img_4.jpg' %}" alt="Academic Research" class="img-fluid">
+            {% endif %}
           </div>
 
         </div>

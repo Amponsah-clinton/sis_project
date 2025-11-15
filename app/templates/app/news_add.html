@@ -1,0 +1,148 @@
+{% extends 'app/dashboard.html' %}
+{% load static %}
+
+{% block extra_css %}
+<!-- Quill Rich Text Editor CSS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<style>
+    .ql-container {
+        font-size: 0.875rem;
+        font-family: inherit;
+    }
+    .ql-editor {
+        min-height: 350px;
+    }
+    .ql-toolbar {
+        border-top-left-radius: 0.375rem;
+        border-top-right-radius: 0.375rem;
+        background: #f9fafb;
+    }
+    .ql-container {
+        border-bottom-left-radius: 0.375rem;
+        border-bottom-right-radius: 0.375rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="padding: 2rem; max-width: 900px; margin: 0 auto;">
+    <h1 style="font-size: 1.5rem; font-weight: 700; color: #111827; margin-bottom: 2rem;">Add New Blog</h1>
+    
+    <form method="POST" action="{% url 'app:news_add' %}" enctype="multipart/form-data" style="background: white; border-radius: 0.5rem; padding: 2rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-weight: 600; color: #111827; margin-bottom: 0.5rem;">Img *</label>
+            <div id="image-upload-area" style="border: 2px dashed #d1d5db; border-radius: 0.5rem; padding: 2rem; text-align: center; background: #f9fafb; cursor: pointer; position: relative;" onclick="document.getElementById('blog-image-input').click()">
+                <input type="file" id="blog-image-input" name="blog_image" accept="image/*" onchange="previewImage(this)" style="display: none;" required>
+                <p style="color: #6b7280; margin: 0;">Choose files or drag and drop files to upload</p>
+                <img id="image-preview" src="" alt="Preview" style="display: none; max-width: 100%; max-height: 300px; margin-top: 1rem; border-radius: 0.375rem;">
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-weight: 600; color: #111827; margin-bottom: 0.5rem;">Title *</label>
+            <input type="text" name="blog_title" class="form-input" placeholder="Enter Title" required style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;">
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-weight: 600; color: #111827; margin-bottom: 0.5rem;">Content *</label>
+            <textarea name="blog_content" id="blog_content" required style="display: none;"></textarea>
+            <div id="editor" style="border: 1px solid #d1d5db; border-radius: 0.375rem; min-height: 400px; background: white;"></div>
+            <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">Use the toolbar above to format your content. HTML formatting is supported.</p>
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-weight: 600; color: #111827; margin-bottom: 0.5rem;">Tag</label>
+            <input type="text" name="blog_tag" class="form-input" placeholder="Select a value..." style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;">
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-weight: 600; color: #111827; margin-bottom: 0.5rem;">Order Priority</label>
+            <select name="blog_order_priority" class="form-select" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;">
+                <option value="">Select a value...</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5" selected>5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+            </select>
+            <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">On a scale of 1 to 9 (optional)</p>
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-weight: 600; color: #111827; margin-bottom: 0.5rem;">Category *</label>
+            <select name="blog_category" class="form-select" required style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;">
+                <option value="">Select a category...</option>
+                <option value="opinion">Opinion</option>
+                <option value="technology">Technology</option>
+                <option value="medicine_health">Medicine and Health</option>
+                <option value="education">Education</option>
+                <option value="science">Science</option>
+                <option value="business">Business</option>
+                <option value="general">General</option>
+            </select>
+        </div>
+        
+        <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+            <button type="submit" style="background: #ff6b6b; color: white; border: none; border-radius: 0.375rem; padding: 0.625rem 1.25rem; font-size: 0.875rem; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem;">
+                Submit
+                <i data-lucide="send" style="width: 1rem; height: 1rem;"></i>
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Quill Rich Text Editor JS -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script>
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+    
+    // Initialize Quill Editor
+    var quill = new Quill('#editor', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'font': [] }],
+                [{ 'align': [] }],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'indent': '-1'}, { 'indent': '+1' }],
+                ['blockquote', 'code-block'],
+                ['link', 'image', 'video'],
+                ['clean']
+            ]
+        },
+        placeholder: 'Enter blog content...'
+    });
+    
+    // Update hidden textarea before form submission
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const content = document.getElementById('blog_content');
+        content.value = quill.root.innerHTML;
+    });
+    
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('image-preview');
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+{% endblock %}
+

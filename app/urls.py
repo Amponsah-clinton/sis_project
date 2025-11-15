@@ -39,6 +39,7 @@ urlpatterns = [
     path('service_solution/', views.service_solution, name='service_solution'),
     path('policy_terms/', views.policy_terms, name='policy_terms'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('settings/', views.settings, name='settings'),
     path('account_detail/', views.account_detail, name='account_detail'),
     path('edit_account/', views.edit_account, name='edit_account'),
     path('view_account/<int:user_id>/', views.view_account, name='view_account'),
@@ -50,5 +51,10 @@ urlpatterns = [
     path('export_account/<int:user_id>/<str:format_type>/', views.export_account, name='export_account'),
     path('change_email/', views.change_email, name='change_email'),
     path('reset_password/', views.reset_password, name='reset_password'),
+    path('news/', views.news_list, name='news_list'),
+    path('news/add/', views.news_add, name='news_add'),
+    path('news/edit/<int:blog_id>/', views.news_edit, name='news_edit'),
+    path('news/delete/<int:blog_id>/', views.news_delete, name='news_delete'),
+    path('news/toggle-publish/<int:blog_id>/', views.news_toggle_publish, name='news_toggle_publish'),
 ]
 

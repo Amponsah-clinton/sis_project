@@ -7,6 +7,7 @@
     <title>Dashboard - ScholarIndex</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{% static 'app/css/dashboard.css' %}">
+    {% block extra_css %}{% endblock %}
     <style>
         /* CSS Variables */
         :root {
@@ -162,8 +163,8 @@
                                     <i data-lucide="chevron-down" class="chevron"></i>
                                 </button>
                                 <ul class="menu-sub">
-                                    <li><a href="{% url 'app:indexed_articles' %}" class="menu-sub-link">Published records</a></li>
-                                    <li><a href="{% url 'app:dashboard' %}" class="menu-sub-link">Write | create new blog</a></li>
+                                    <li><a href="{% url 'app:news_list' %}" class="menu-sub-link">Published records</a></li>
+                                    <li><a href="{% url 'app:news_add' %}" class="menu-sub-link">Write | create new blog</a></li>
                                 </ul>
                             </li>
                         </ul>
@@ -178,7 +179,7 @@
                                 </a>
                             </li>
                             <li class="menu-item">
-                                <a href="{% url 'app:account_detail' %}" class="menu-link" data-tooltip="Settings">
+                                <a href="{% url 'app:settings' %}" class="menu-link" data-tooltip="Settings">
                                     <i data-lucide="settings"></i>
                                     <span>Settings</span>
                                 </a>
@@ -354,6 +355,7 @@
             <!-- Dashboard Content -->
             <main class="dashboard-main">
                 <div class="dashboard-content">
+                    {% block content %}
                     <!-- Page Header -->
                     <div class="page-header">
                         <div>
@@ -583,6 +585,7 @@
                         </div>
                     </div>
                 </div>
+                    {% endblock %}
             </main>
         </div>
     </div>
@@ -594,6 +597,7 @@
             lucide.createIcons();
         }
     </script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>
 
