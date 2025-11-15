@@ -441,7 +441,7 @@
                                     <li><a href="{% url 'app:team_members' %}" class="menu-sub-link">Team members</a></li>
                                     <li><a href="{% url 'app:request_membership' %}" class="menu-sub-link">Reg Institutions</a></li>
                                     <li><a href="{% url 'app:account_detail' %}" class="menu-sub-link">Accounts</a></li>
-                                    <li><a href="{% url 'app:sponsors' %}" class="menu-sub-link">Sponsors</a></li>
+                                    <li><a href="{% url 'app:donate' %}" class="menu-sub-link">Donate</a></li>
                                 </ul>
                             </li>
                             <li class="menu-item collapsible">
@@ -461,7 +461,7 @@
                     <div class="menu-group">
                         <ul class="menu-list">
                             <li class="menu-item">
-                                <a href="{% url 'app:sponsors' %}" class="menu-link" data-tooltip="Payment">
+                                <a href="{% url 'app:donate' %}" class="menu-link" data-tooltip="Payment">
                                     <i data-lucide="credit-card"></i>
                                     <span>Payment</span>
                                 </a>
@@ -1000,11 +1000,11 @@
                                     </div>
                                     
                                     <div class="page-toggle-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
-                                        <span style="font-size: 0.9375rem; color: #111827;">Enable Sponsors Page</span>
+                                        <span style="font-size: 0.9375rem; color: #111827;">Enable Donate Page</span>
                                         <label class="toggle-switch" style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
-                                            <input type="checkbox" name="enable_sponsors" {% if site_settings.enable_sponsors_page %}checked{% endif %} onchange="togglePage(this, 'sponsors')" style="opacity: 0; width: 0; height: 0;">
-                                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; {% if site_settings.enable_sponsors_page %}background-color: #22c55e;{% else %}background-color: #d1d5db;{% endif %} transition: .4s; border-radius: 1.5rem;">
-                                                <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: 0.1875rem; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%; {% if site_settings.enable_sponsors_page %}transform: translateX(1.5rem);{% else %}transform: translateX(0);{% endif %}"></span>
+                                            <input type="checkbox" name="enable_donate" {% if site_settings.enable_donate_page %}checked{% endif %} onchange="togglePage(this, 'donate')" style="opacity: 0; width: 0; height: 0;">
+                                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; {% if site_settings.enable_donate_page %}background-color: #22c55e;{% else %}background-color: #d1d5db;{% endif %} transition: .4s; border-radius: 1.5rem;">
+                                                <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: 0.1875rem; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%; {% if site_settings.enable_donate_page %}transform: translateX(1.5rem);{% else %}transform: translateX(0);{% endif %}"></span>
                                             </span>
                                         </label>
                                     </div>
@@ -2149,7 +2149,7 @@
                                             <option value="member">member</option>
                                             <option value="directory_researchers">directory of researchers</option>
                                             <option value="hall_of_fame">hall of fame</option>
-                                            <option value="sponsors">sponsors</option>
+                                            <option value="donate">donate</option>
                                             <option value="accounts">accounts</option>
                                         </select>
                                         <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">Hold Ctrl (Windows) or Cmd (Mac) to select multiple permissions</p>

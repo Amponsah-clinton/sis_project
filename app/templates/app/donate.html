@@ -1,0 +1,849 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Sponsor & Donate - ScholarIndex{% endblock %}
+
+{% block extra_css %}
+<style>
+  .sponsor-page {
+    padding: 1.5rem 1.5rem;
+    background-color: var(--background);
+    min-height: calc(100vh - 5rem);
+  }
+
+  .sponsor-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .sponsor-layout {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .sponsor-text-section {
+    position: sticky;
+    top: 2rem;
+  }
+
+  .sponsor-text-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--foreground);
+    margin-bottom: 1rem;
+    font-family: 'Playfair Display', serif;
+    line-height: 1.2;
+  }
+
+  .sponsor-text-content {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--foreground);
+    margin-bottom: 1rem;
+  }
+
+  .sponsor-text-content p {
+    margin-bottom: 1rem;
+  }
+
+  .sponsor-text-content p:last-child {
+    margin-bottom: 0;
+  }
+
+  .donate-link {
+    display: inline-block;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-decoration: underline;
+    text-transform: uppercase;
+    margin-top: 1rem;
+    transition: color 0.2s ease;
+  }
+
+  .donate-link:hover {
+    color: hsl(215, 85%, 30%);
+  }
+
+  .sponsor-form-section {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+  }
+
+  .form-section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--foreground);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--foreground);
+    margin-bottom: 0.5rem;
+  }
+
+  .form-group label .required {
+    color: #dc2626;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background-color: var(--background);
+    color: var(--foreground);
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  /* Amount Dropdown */
+  .amount-select-wrapper {
+    position: relative;
+  }
+
+  .amount-select-wrapper::after {
+    content: '';
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid var(--foreground);
+    pointer-events: none;
+  }
+
+  .form-group select {
+    appearance: none;
+    padding-right: 2.5rem;
+  }
+
+  .field-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #059669;
+  }
+
+  .field-status svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Cover Picture Upload */
+  .cover-picture-upload {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    background-color: var(--background);
+    position: relative;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cover-picture-upload.has-image {
+    padding: 0.5rem;
+  }
+
+  .cover-picture-preview {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    display: none;
+  }
+
+  .cover-picture-preview.show {
+    display: block;
+  }
+
+  .cover-picture-upload input[type="file"] {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .cover-picture-placeholder {
+    width: 100px;
+    height: 100px;
+    background-color: #fef3c7;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+    color: #92400e;
+    font-size: 0.875rem;
+  }
+
+  .remove-image-btn {
+    margin-top: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: none;
+  }
+
+  .remove-image-btn.show {
+    display: inline-block;
+  }
+
+  /* Checkbox */
+  .checkbox-group {
+    margin: 1.5rem 0;
+  }
+
+  .checkbox-group input[type="checkbox"] {
+    width: auto;
+    margin-right: 0.5rem;
+  }
+
+  .checkbox-group label {
+    font-weight: 400;
+    display: inline;
+    margin-bottom: 0;
+  }
+
+  /* Payment Summary */
+  .payment-summary {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-top: 2rem;
+  }
+
+  .contributor-name {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--foreground);
+    margin-bottom: 1rem;
+  }
+
+  .charge-info {
+    margin-bottom: 1rem;
+  }
+
+  .charge-info-text {
+    font-size: 0.9375rem;
+    color: var(--muted-foreground);
+    margin-bottom: 0.5rem;
+  }
+
+  .charge-amount {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--foreground);
+  }
+
+  .note-text {
+    color: #dc2626;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    margin-bottom: 1rem;
+  }
+
+  .contribution-purpose {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  .payment-options-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--foreground);
+    margin-bottom: 1rem;
+  }
+
+  .payment-options {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+
+  .payment-option-logo {
+    height: 30px;
+    width: auto;
+    opacity: 0.8;
+  }
+
+  .pay-now-button {
+    width: 100%;
+    padding: 1rem 2rem;
+    background-color: #059669;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.125rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .pay-now-button:hover {
+    background-color: #047857;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+  }
+
+  .pay-now-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .pay-now-button svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .error-message {
+    background-color: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    display: none;
+  }
+
+  .error-message.show {
+    display: block;
+  }
+
+  .success-message {
+    background-color: #d1fae5;
+    border: 1px solid #a7f3d0;
+    color: #065f46;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    display: none;
+  }
+
+  .success-message.show {
+    display: block;
+  }
+
+  /* Responsive */
+  @media (max-width: 968px) {
+    .sponsor-layout {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .sponsor-text-section {
+      position: static;
+    }
+
+    .sponsor-text-title {
+      font-size: 1.75rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .sponsor-page {
+      padding: 1.5rem 1rem;
+    }
+
+    .sponsor-layout {
+      gap: 1.5rem;
+    }
+
+    .sponsor-form-section {
+      padding: 1.5rem;
+    }
+
+    .sponsor-text-title {
+      font-size: 1.5rem;
+    }
+
+    .sponsor-text-content {
+      font-size: 0.875rem;
+    }
+
+    .payment-summary {
+      padding: 1.5rem;
+    }
+
+    .charge-amount {
+      font-size: 1.75rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sponsor-page">
+  <div class="sponsor-container">
+    <div class="error-message" id="errorMessage"></div>
+    <div class="success-message" id="successMessage"></div>
+
+    <div class="sponsor-layout">
+      <!-- Text Section -->
+      <div class="sponsor-text-section">
+        <h1 class="sponsor-text-title">Support us Financially</h1>
+        <div class="sponsor-text-content">
+          <p>
+            Scholar Indexing Society is growing and needs your help. We build our own systems, 
+            we don't charge for access, we don't sell your data, and we don't run ads. We rely 
+            on donations to keep our infrastructure running and to continue providing free access 
+            to knowledge. We're grateful for any support you can provide.
+          </p>
+          <p>
+            We know that not everyone can donate, and that's okay. But if you can, your 
+            contribution will be put to good use. We believe that access to knowledge should 
+            be free and open to everyone, and your support helps us make that possible.
+          </p>
+        </div>
+      </div>
+
+      <!-- Form Section -->
+      <div class="sponsor-form-section">
+        <form id="donationForm" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <!-- Contribute Section -->
+      <div class="form-section">
+        <h2 class="form-section-title">Contribute</h2>
+        
+        <div class="form-group">
+          <label for="amount">Amount <span class="required">*</span></label>
+          <div class="amount-select-wrapper">
+            <select id="amount" name="amount" required>
+              <option value="">Select a value ...</option>
+              <option value="450">01. Premier $ (450)</option>
+              <option value="400">02. Sustaining $ (400)</option>
+              <option value="350">03. Basic $ (350)</option>
+              <option value="300">04. Power $ (300)</option>
+              <option value="250">05. Double $ (250)</option>
+              <option value="200">05. Single $ (200)</option>
+              <option value="150">06. Inspired $ (150)</option>
+              <option value="100">07. Compact $ (100)</option>
+              <option value="500">08. Charity Homes $ (500)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contributor's Contact Section -->
+      <div class="form-section">
+        <h2 class="form-section-title">Contributor's Contact</h2>
+
+        <div class="form-group">
+          <label for="cover_picture">Cover picture <span class="required">*</span></label>
+          <div class="cover-picture-upload" id="coverPictureUpload">
+            <img id="coverPicturePreview" class="cover-picture-preview" alt="Cover preview">
+            <div class="cover-picture-placeholder" id="coverPlaceholder">Image</div>
+            <input type="file" id="cover_picture" name="cover_picture" accept="image/*" required>
+            <button type="button" class="remove-image-btn" id="removeImageBtn" onclick="removeCoverImage()">Remove</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="fullname">Fullname <span class="required">*</span></label>
+          <input type="text" id="fullname" name="fullname" required placeholder="Enter your full name">
+          <div class="field-status" id="fullnameStatus" style="display: none;">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span>Available</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email <span class="required">*</span></label>
+          <input type="email" id="email" name="email" required placeholder="Enter your email address">
+          <div class="field-status" id="emailStatus" style="display: none;">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span>Available</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="organization_url">Organization Url <span class="required">*</span></label>
+          <input type="url" id="organization_url" name="organization_url" required placeholder="Enter your organization URL">
+          <div class="field-status" id="orgUrlStatus" style="display: none;">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span>Available</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="info">Info</label>
+          <textarea id="info" name="info" placeholder="Enter info"></textarea>
+          <div class="field-status" id="infoStatus" style="display: none;">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Terms of Service -->
+      <div class="checkbox-group">
+        <input type="checkbox" id="terms" name="terms" required>
+        <label for="terms">I agree to Scholar Indexing Society Terms of Service and Privacy Policy</label>
+      </div>
+
+      <!-- Payment Summary -->
+      <div class="payment-summary">
+        <div class="contributor-name" id="summaryName">Contributor Name</div>
+        
+        <div class="charge-info">
+          <div class="charge-info-text">You will be charged</div>
+          <div class="charge-amount" id="summaryAmount">$0 USD</div>
+          <div class="charge-info-text" style="margin-top: 0.75rem;">
+            <span style="font-weight: 600;">Ghanaian Cedis (GHS) Equivalent:</span>
+            <div class="charge-amount" id="summaryAmountGHS" style="font-size: 1.5rem; margin-top: 0.25rem;">₵0.00 GHS</div>
+            <div style="font-size: 0.75rem; color: var(--muted-foreground); margin-top: 0.25rem;">
+              (Exchange rate: 1 USD = <span id="exchangeRate">13.5</span> GHS)
+            </div>
+          </div>
+        </div>
+
+        <div class="note-text">Note!</div>
+        
+        <div class="contribution-purpose">
+          The contribution you would provide will be used for the sustainability and independence of this system, and for the services such as the maintenance of the robust infrastructure, staffing, system updates, rigorous checks of corrections and additions, and standardization.
+        </div>
+
+        <div class="payment-options-title">Available payment options</div>
+        <div class="payment-options">
+          <img src="https://www.visa.com/dam/VCOM/regional/na/us/pay-with-visa/images/visa-logo.png" alt="VISA" class="payment-option-logo" style="height: 20px;">
+          <img src="https://www.mastercard.com/content/dam/mccom/global/logos/logo-mastercard-mobile.svg" alt="Mastercard" class="payment-option-logo" style="height: 20px;">
+          <div style="background-color: #ffcc00; color: #000; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">MTN</div>
+          <div style="background-color: #e60000; color: #fff; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">Vodafone</div>
+          <div style="background-color: #e60000; color: #fff; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">AirtelTigo</div>
+        </div>
+
+        <button type="submit" class="pay-now-button" id="payNowButton">
+          PAY NOW
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+      </div>
+    </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+  const PAYSTACK_PUBLIC_KEY = '{{ paystack_public_key }}';
+
+  // Cover picture preview
+  document.getElementById('cover_picture').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const preview = document.getElementById('coverPicturePreview');
+        const placeholder = document.getElementById('coverPlaceholder');
+        const uploadArea = document.getElementById('coverPictureUpload');
+        const removeBtn = document.getElementById('removeImageBtn');
+        
+        preview.src = e.target.result;
+        preview.classList.add('show');
+        placeholder.style.display = 'none';
+        uploadArea.classList.add('has-image');
+        removeBtn.classList.add('show');
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  function removeCoverImage() {
+    document.getElementById('cover_picture').value = '';
+    document.getElementById('coverPicturePreview').src = '';
+    document.getElementById('coverPicturePreview').classList.remove('show');
+    document.getElementById('coverPlaceholder').style.display = 'flex';
+    document.getElementById('coverPictureUpload').classList.remove('has-image');
+    document.getElementById('removeImageBtn').classList.remove('show');
+  }
+
+  // Field validation status
+  document.getElementById('fullname').addEventListener('input', function() {
+    if (this.value.trim()) {
+      document.getElementById('fullnameStatus').style.display = 'flex';
+      updateSummary();
+    } else {
+      document.getElementById('fullnameStatus').style.display = 'none';
+    }
+  });
+
+  document.getElementById('email').addEventListener('input', function() {
+    if (this.value.trim()) {
+      document.getElementById('emailStatus').style.display = 'flex';
+    } else {
+      document.getElementById('emailStatus').style.display = 'none';
+    }
+  });
+
+  document.getElementById('organization_url').addEventListener('input', function() {
+    if (this.value.trim()) {
+      document.getElementById('orgUrlStatus').style.display = 'flex';
+    } else {
+      document.getElementById('orgUrlStatus').style.display = 'none';
+    }
+  });
+
+  document.getElementById('info').addEventListener('input', function() {
+    if (this.value.trim()) {
+      document.getElementById('infoStatus').style.display = 'flex';
+    } else {
+      document.getElementById('infoStatus').style.display = 'none';
+    }
+  });
+
+  // Currency conversion algorithm: USD to GHS (Ghanaian Cedis)
+  // Exchange rate: 1 USD = 13.5 GHS (can be updated based on current rates)
+  const USD_TO_GHS_RATE = 13.5;
+  
+  function convertUSDToGHS(usdAmount) {
+    if (!usdAmount || isNaN(usdAmount) || usdAmount <= 0) {
+      return 0;
+    }
+    // Convert and round to 2 decimal places
+    const ghsAmount = parseFloat(usdAmount) * USD_TO_GHS_RATE;
+    return Math.round(ghsAmount * 100) / 100; // Round to 2 decimal places
+  }
+  
+  function formatGHS(amount) {
+    return `₵${amount.toLocaleString('en-GH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} GHS`;
+  }
+
+  // Update payment summary
+  function updateSummary() {
+    const amount = document.getElementById('amount').value;
+    const fullname = document.getElementById('fullname').value;
+    
+    if (fullname) {
+      document.getElementById('summaryName').textContent = fullname;
+    }
+    
+    if (amount) {
+      document.getElementById('summaryAmount').textContent = `$${amount} USD`;
+      
+      // Convert and display GHS equivalent
+      const ghsAmount = convertUSDToGHS(amount);
+      document.getElementById('summaryAmountGHS').textContent = formatGHS(ghsAmount);
+    } else {
+      document.getElementById('summaryAmount').textContent = '$0 USD';
+      document.getElementById('summaryAmountGHS').textContent = '₵0.00 GHS';
+    }
+  }
+
+  document.getElementById('amount').addEventListener('change', updateSummary);
+  document.getElementById('fullname').addEventListener('input', updateSummary);
+
+  // Form submission
+  document.getElementById('donationForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const amount = document.getElementById('amount').value;
+    const fullname = document.getElementById('fullname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const organizationUrl = document.getElementById('organization_url').value.trim();
+    const coverPicture = document.getElementById('cover_picture').files[0];
+    const terms = document.getElementById('terms').checked;
+
+    // Validation
+    if (!amount) {
+      showError('Please select an amount');
+      return;
+    }
+
+    if (!fullname) {
+      showError('Please enter your full name');
+      return;
+    }
+
+    if (!email) {
+      showError('Please enter your email address');
+      return;
+    }
+
+    if (!organizationUrl) {
+      showError('Please enter your organization URL');
+      return;
+    }
+
+    if (!coverPicture) {
+      showError('Please upload a cover picture');
+      return;
+    }
+
+    if (!terms) {
+      showError('Please agree to the Terms of Service');
+      return;
+    }
+
+    // Disable button
+    const payButton = document.getElementById('payNowButton');
+    payButton.disabled = true;
+    payButton.innerHTML = '<svg class="animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...';
+
+    try {
+      // Initialize payment (amount is in USD, convert to cents)
+      const amountInCents = parseFloat(amount) * 100;
+      
+      const response = await fetch('{% url "app:initialize_payment" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+          amount: amountInCents,
+          email: email,
+          name: fullname
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        showError(data.error);
+        payButton.disabled = false;
+        payButton.innerHTML = 'PAY NOW <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>';
+        return;
+      }
+
+      // Initialize Paystack payment
+      // Convert USD to GHS: 1 USD = 13.5 GHS, then convert to pesewas
+      const amountInGHS = (parseFloat(amount) * USD_TO_GHS_RATE) * 100; // Convert USD to GHS pesewas
+      
+      const handler = PaystackPop.setup({
+        key: PAYSTACK_PUBLIC_KEY,
+        email: email,
+        amount: Math.round(amountInGHS), // Amount in pesewas (GHS)
+        currency: 'GHS',
+        ref: data.reference,
+        metadata: {
+          custom_fields: [
+            {
+              display_name: 'Contributor Name',
+              variable_name: 'contributor_name',
+              value: fullname
+            },
+            {
+              display_name: 'Organization URL',
+              variable_name: 'organization_url',
+              value: organizationUrl
+            }
+          ]
+        },
+        callback: function(response) {
+          // Payment successful
+          showSuccess('Thank you for your contribution! Your payment was successful.');
+          // Here you can upload the cover picture and save other form data
+          // For now, we'll just show success
+          setTimeout(() => {
+            document.getElementById('donationForm').reset();
+            removeCoverImage();
+            document.getElementById('summaryName').textContent = 'Contributor Name';
+            document.getElementById('summaryAmount').textContent = '$0 USD';
+            document.getElementById('summaryAmountGHS').textContent = '₵0.00 GHS';
+            document.querySelectorAll('.field-status').forEach(el => el.style.display = 'none');
+          }, 2000);
+        },
+        onClose: function() {
+          // User closed the payment modal
+          payButton.disabled = false;
+          payButton.innerHTML = 'PAY NOW <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>';
+        }
+      });
+
+      handler.openIframe();
+
+    } catch (error) {
+      showError('An error occurred. Please try again.');
+      payButton.disabled = false;
+      payButton.innerHTML = 'PAY NOW <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>';
+      console.error('Error:', error);
+    }
+  });
+
+  function showError(message) {
+    const errorDiv = document.getElementById('errorMessage');
+    errorDiv.textContent = message;
+    errorDiv.classList.add('show');
+    document.getElementById('successMessage').classList.remove('show');
+    setTimeout(() => {
+      errorDiv.classList.remove('show');
+    }, 5000);
+  }
+
+  function showSuccess(message) {
+    const successDiv = document.getElementById('successMessage');
+    successDiv.textContent = message;
+    successDiv.classList.add('show');
+    document.getElementById('errorMessage').classList.remove('show');
+  }
+</script>
+{% endblock %}

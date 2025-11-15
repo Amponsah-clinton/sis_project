@@ -16,26 +16,48 @@
     margin: 0 auto;
   }
 
-  .team-header {
-    text-align: center;
-    margin-bottom: 3rem;
+  .team-intro {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 3rem;
+    margin-bottom: 4rem;
+    align-items: center;
   }
 
-  .team-header h1 {
-    font-size: 2.5rem;
+  .team-intro-heading {
+    font-size: 3rem;
     font-weight: 700;
-    margin-bottom: 0.75rem;
-    color: var(--foreground);
+    color: #111827;
+    font-family: serif;
+    line-height: 1.2;
   }
 
-  .team-header p {
-    font-size: 1.125rem;
-    color: var(--muted-foreground);
+  .team-intro-text {
+    font-size: 1rem;
+    color: #111827;
+    font-family: serif;
+    line-height: 1.8;
+  }
+
+  .team-intro-text .team-members-link {
+    color: #3b82f6;
+    font-weight: 500;
+  }
+
+  @media (max-width: 768px) {
+    .team-intro {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .team-intro-heading {
+      font-size: 2.5rem;
+    }
   }
 
   .team-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 2rem;
     margin-bottom: 3rem;
   }
@@ -68,7 +90,7 @@
 
   .team-image-wrapper {
     width: 100%;
-    height: 300px;
+    height: 320px;
     overflow: hidden;
     background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
     position: relative;
@@ -111,80 +133,178 @@
     flex-direction: column;
     gap: 0.75rem;
     background-color: #ffffff;
-    text-align: center;
   }
 
   .team-name-wrapper {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 0.625rem;
-    margin-bottom: 0.375rem;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
     flex-wrap: wrap;
   }
 
   .team-name {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #1e40af;
+    color: #111827;
     margin: 0;
     line-height: 1.3;
   }
 
-  .verification-icon {
-    width: 20px;
-    height: 20px;
-    color: #3b82f6;
-    flex-shrink: 0;
-    filter: drop-shadow(0 1px 2px rgba(59, 130, 246, 0.3));
-  }
-
-  .team-role {
-    font-size: 0.9375rem;
-    color: #dc2626;
+  .team-name-full {
+    font-size: 1rem;
     font-weight: 600;
-    margin-bottom: 0.5rem;
-    line-height: 1.4;
-  }
-
-  .team-department {
-    font-size: 0.875rem;
-    color: #6b7280;
-    margin-bottom: 0.75rem;
-    line-height: 1.5;
-  }
-
-  .team-social {
+    color: #111827;
+    margin: 0;
+    line-height: 1.3;
     display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 0.5rem;
-    padding-top: 1rem;
-    border-top: 2px solid #f3f4f6;
+    align-items: center;
+    gap: 0.375rem;
   }
 
-  .social-link {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
+  .verification-icon {
+    width: 18px;
+    height: 18px;
+    color: #f97316;
+    flex-shrink: 0;
+  }
+
+  .team-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
+
+  .team-meta-item svg {
+    width: 16px;
+    height: 16px;
+    color: #6b7280;
+    flex-shrink: 0;
+  }
+
+  .team-bio {
+    font-size: 0.875rem;
+    color: #4b5563;
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .team-bio-readmore {
+    color: #3b82f6;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .team-bio-readmore:hover {
+    text-decoration: underline;
+  }
+
+  .btn-more-info {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: #4b5563;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    text-decoration: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #f3f4f6;
-    color: #6b7280;
-    transition: all 0.3s ease;
+    gap: 0.5rem;
+    margin-top: auto;
+    position: relative;
+  }
+
+  .btn-more-info:hover {
+    background-color: #374151;
     text-decoration: none;
-  }
-
-  .social-link:hover {
-    background-color: #3b82f6;
     color: #ffffff;
-    transform: translateY(-2px);
   }
 
-  .social-link svg {
-    width: 18px;
-    height: 18px;
+  .btn-more-info svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Biography Tooltip */
+  .biography-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 400px;
+    max-width: 90vw;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    padding: 1.5rem;
+    margin-bottom: 0.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 1000;
+    pointer-events: none;
+  }
+
+  .btn-more-info:hover .biography-tooltip {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .biography-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 8px solid transparent;
+    border-top-color: #ffffff;
+  }
+
+  .biography-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e40af;
+    font-family: serif;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+  }
+
+  .biography-heading {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.75rem;
+    font-family: serif;
+  }
+
+  .biography-content {
+    font-size: 0.875rem;
+    color: #111827;
+    line-height: 1.7;
+    font-family: serif;
+  }
+
+  .biography-content p {
+    margin-bottom: 0.75rem;
+  }
+
+  .biography-content p:last-child {
+    margin-bottom: 0;
   }
 
   @media (max-width: 640px) {
@@ -192,24 +312,16 @@
       padding: 2rem 1rem;
     }
 
-    .team-header h1 {
-      font-size: 2rem;
-    }
-
-    .team-header p {
-      font-size: 1rem;
-    }
-
     .team-image-wrapper {
-      height: 260px;
+      height: 280px;
     }
 
     .team-card-content {
-      padding: 1.25rem;
+      padding: 1.5rem;
     }
 
     .team-name {
-      font-size: 1.125rem;
+      font-size: 1.25rem;
     }
   }
 </style>
@@ -217,14 +329,17 @@
 <div class="team-members-page">
   <div class="container">
     <div class="team-wrapper">
-      <!-- Page Header -->
-      <div class="team-header">
-        <h1>Team Members</h1>
-        <p>Meet the dedicated team behind ScholarIndex</p>
+      <!-- Team Introduction Section -->
+      <div class="team-intro">
+        <h2 class="team-intro-heading">Team Members</h2>
+        <div class="team-intro-text">
+          <p>S.I.S. team members are groupings of researchers who collaborate on a variety of projects. Team members contribute to initiatives that assist individuals across all member societies.</p>
+          <p><span class="team-members-link">The Following are the Current Members of the Scholar Indexing Society Team Members</span></p>
+        </div>
       </div>
 
       <!-- Team Members Grid -->
-      <div class="team-grid">
+      <div class="team-grid" id="team-grid">
         <!-- Team Member 1 -->
         <article class="team-card">
           <div class="team-image-wrapper">
@@ -232,31 +347,49 @@
             <span>AJ</span>
           </div>
           <div class="team-card-content">
-            <div class="team-name-wrapper">
-              <h3 class="team-name">Alex Johnson</h3>
+            <h3 class="team-name">Alex Johnson</h3>
+            <div class="team-name-full">
+              <span>Alex Johnson</span>
               <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
               </svg>
             </div>
-            <p class="team-role">Lead Developer</p>
-            <p class="team-department">Technology</p>
-            <div class="team-social">
-              <a href="#" class="social-link" aria-label="LinkedIn">
-                <svg fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                </svg>
-              </a>
-              <a href="#" class="social-link" aria-label="Twitter">
-                <svg fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
-                </svg>
-              </a>
-              <a href="#" class="social-link" aria-label="Email">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                </svg>
-              </a>
+            <div class="team-meta-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+              <span>Lead Developer</span>
             </div>
+            <div class="team-meta-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+              </svg>
+              <span>Technology Department</span>
+            </div>
+            <div class="team-meta-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>United States</span>
+            </div>
+            <p class="team-bio">
+              Experienced software developer with expertise in building scalable web applications and managing complex technical infrastructure.<span class="team-bio-readmore">Read more</span>
+            </p>
+            <a href="#" class="btn-more-info">
+              More Info
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+              <div class="biography-tooltip">
+                <div class="biography-name">Alex Johnson</div>
+                <div class="biography-heading">Biography:</div>
+                <div class="biography-content">
+                  <p>Alex Johnson is an experienced software developer with expertise in building scalable web applications and managing complex technical infrastructure. He serves as the Lead Developer for the Scholar Indexing Society Team.</p>
+                  <p><strong>Education:</strong> Master's in Computer Science from MIT, Bachelor's in Software Engineering from Stanford University.</p>
+                  <p><strong>Expertise:</strong> Full-stack development, cloud infrastructure, database management, and system architecture design.</p>
+                </div>
+              </div>
+            </a>
           </div>
         </article>
 
@@ -267,31 +400,49 @@
             <span>SW</span>
           </div>
           <div class="team-card-content">
-            <div class="team-name-wrapper">
-              <h3 class="team-name">Sarah Williams</h3>
+            <h3 class="team-name">Sarah Williams</h3>
+            <div class="team-name-full">
+              <span>Sarah Williams</span>
               <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
               </svg>
             </div>
-            <p class="team-role">Content Manager</p>
-            <p class="team-department">Editorial</p>
-            <div class="team-social">
-              <a href="#" class="social-link" aria-label="LinkedIn">
-                <svg fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                </svg>
-              </a>
-              <a href="#" class="social-link" aria-label="Twitter">
-                <svg fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
-                </svg>
-              </a>
-              <a href="#" class="social-link" aria-label="Email">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                </svg>
-              </a>
+            <div class="team-meta-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+              <span>Content Manager</span>
             </div>
+            <div class="team-meta-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+              </svg>
+              <span>Editorial Department</span>
+            </div>
+            <div class="team-meta-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>United States</span>
+            </div>
+            <p class="team-bio">
+              Skilled content strategist with a passion for academic publishing and editorial excellence.<span class="team-bio-readmore">Read more</span>
+            </p>
+            <a href="#" class="btn-more-info">
+              More Info
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+              <div class="biography-tooltip">
+                <div class="biography-name">Sarah Williams</div>
+                <div class="biography-heading">Biography:</div>
+                <div class="biography-content">
+                  <p>Sarah Williams is a skilled content strategist with a passion for academic publishing and editorial excellence. She serves as the Content Manager for the Scholar Indexing Society Team.</p>
+                  <p><strong>Education:</strong> Master's in Journalism from Columbia University, Bachelor's in English Literature from Harvard University.</p>
+                  <p><strong>Expertise:</strong> Content strategy, editorial management, academic writing, and publication quality assurance.</p>
+                </div>
+              </div>
+            </a>
           </div>
         </article>
 
@@ -302,31 +453,49 @@
             <span>MB</span>
           </div>
           <div class="team-card-content">
-            <div class="team-name-wrapper">
-              <h3 class="team-name">Michael Brown</h3>
+            <h3 class="team-name">Michael Brown</h3>
+            <div class="team-name-full">
+              <span>Michael Brown</span>
               <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
               </svg>
             </div>
-            <p class="team-role">UX Designer</p>
-            <p class="team-department">Design</p>
-            <div class="team-social">
-              <a href="#" class="social-link" aria-label="LinkedIn">
-                <svg fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                </svg>
-              </a>
-              <a href="#" class="social-link" aria-label="Twitter">
-                <svg fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
-                </svg>
-              </a>
-              <a href="#" class="social-link" aria-label="Email">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                </svg>
-              </a>
+            <div class="team-meta-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+              <span>UX Designer</span>
             </div>
+            <div class="team-meta-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+              </svg>
+              <span>Design Department</span>
+            </div>
+            <div class="team-meta-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>United States</span>
+            </div>
+            <p class="team-bio">
+              Creative designer focused on creating intuitive user experiences and visually appealing interfaces.<span class="team-bio-readmore">Read more</span>
+            </p>
+            <a href="#" class="btn-more-info">
+              More Info
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+              <div class="biography-tooltip">
+                <div class="biography-name">Michael Brown</div>
+                <div class="biography-heading">Biography:</div>
+                <div class="biography-content">
+                  <p>Michael Brown is a creative designer focused on creating intuitive user experiences and visually appealing interfaces. He serves as the UX Designer for the Scholar Indexing Society Team.</p>
+                  <p><strong>Education:</strong> Master's in Interaction Design from Carnegie Mellon University, Bachelor's in Graphic Design from Rhode Island School of Design.</p>
+                  <p><strong>Expertise:</strong> User experience design, interface design, user research, and design systems development.</p>
+                </div>
+              </div>
+            </a>
           </div>
         </article>
 
@@ -337,31 +506,49 @@
             <span>ED</span>
           </div>
           <div class="team-card-content">
-            <div class="team-name-wrapper">
-              <h3 class="team-name">Emily Davis</h3>
+            <h3 class="team-name">Emily Davis</h3>
+            <div class="team-name-full">
+              <span>Emily Davis</span>
               <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
               </svg>
             </div>
-            <p class="team-role">Data Analyst</p>
-            <p class="team-department">Analytics</p>
-            <div class="team-social">
-              <a href="#" class="social-link" aria-label="LinkedIn">
-                <svg fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                </svg>
-              </a>
-              <a href="#" class="social-link" aria-label="Twitter">
-                <svg fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
-                </svg>
-              </a>
-              <a href="#" class="social-link" aria-label="Email">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                </svg>
-              </a>
+            <div class="team-meta-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+              <span>Data Analyst</span>
             </div>
+            <div class="team-meta-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+              </svg>
+              <span>Analytics Department</span>
+            </div>
+            <div class="team-meta-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>United States</span>
+            </div>
+            <p class="team-bio">
+              Analytical professional specializing in data interpretation and statistical analysis for research insights.<span class="team-bio-readmore">Read more</span>
+            </p>
+            <a href="#" class="btn-more-info">
+              More Info
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+              <div class="biography-tooltip">
+                <div class="biography-name">Emily Davis</div>
+                <div class="biography-heading">Biography:</div>
+                <div class="biography-content">
+                  <p>Emily Davis is an analytical professional specializing in data interpretation and statistical analysis for research insights. She serves as the Data Analyst for the Scholar Indexing Society Team.</p>
+                  <p><strong>Education:</strong> Master's in Data Science from University of California, Berkeley, Bachelor's in Statistics from University of Michigan.</p>
+                  <p><strong>Expertise:</strong> Data analysis, statistical modeling, research metrics, and data visualization.</p>
+                </div>
+              </div>
+            </a>
           </div>
         </article>
 
@@ -372,31 +559,49 @@
             <span>DW</span>
           </div>
           <div class="team-card-content">
-            <div class="team-name-wrapper">
-              <h3 class="team-name">David Wilson</h3>
+            <h3 class="team-name">David Wilson</h3>
+            <div class="team-name-full">
+              <span>David Wilson</span>
               <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
               </svg>
             </div>
-            <p class="team-role">Marketing Specialist</p>
-            <p class="team-department">Marketing</p>
-            <div class="team-social">
-              <a href="#" class="social-link" aria-label="LinkedIn">
-                <svg fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                </svg>
-              </a>
-              <a href="#" class="social-link" aria-label="Twitter">
-                <svg fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
-                </svg>
-              </a>
-              <a href="#" class="social-link" aria-label="Email">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                </svg>
-              </a>
+            <div class="team-meta-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+              <span>Marketing Specialist</span>
             </div>
+            <div class="team-meta-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+              </svg>
+              <span>Marketing Department</span>
+            </div>
+            <div class="team-meta-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>United States</span>
+            </div>
+            <p class="team-bio">
+              Strategic marketer with expertise in digital marketing and brand development for academic platforms.<span class="team-bio-readmore">Read more</span>
+            </p>
+            <a href="#" class="btn-more-info">
+              More Info
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+              <div class="biography-tooltip">
+                <div class="biography-name">David Wilson</div>
+                <div class="biography-heading">Biography:</div>
+                <div class="biography-content">
+                  <p>David Wilson is a strategic marketer with expertise in digital marketing and brand development for academic platforms. He serves as the Marketing Specialist for the Scholar Indexing Society Team.</p>
+                  <p><strong>Education:</strong> Master's in Marketing from Northwestern University, Bachelor's in Business Administration from University of Pennsylvania.</p>
+                  <p><strong>Expertise:</strong> Digital marketing, brand strategy, content marketing, and academic platform promotion.</p>
+                </div>
+              </div>
+            </a>
           </div>
         </article>
 
@@ -407,31 +612,49 @@
             <span>JM</span>
           </div>
           <div class="team-card-content">
-            <div class="team-name-wrapper">
-              <h3 class="team-name">Jessica Martinez</h3>
+            <h3 class="team-name">Jessica Martinez</h3>
+            <div class="team-name-full">
+              <span>Jessica Martinez</span>
               <svg class="verification-icon" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
               </svg>
             </div>
-            <p class="team-role">Research Coordinator</p>
-            <p class="team-department">Research</p>
-            <div class="team-social">
-              <a href="#" class="social-link" aria-label="LinkedIn">
-                <svg fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                </svg>
-              </a>
-              <a href="#" class="social-link" aria-label="Twitter">
-                <svg fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
-                </svg>
-              </a>
-              <a href="#" class="social-link" aria-label="Email">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                </svg>
-              </a>
+            <div class="team-meta-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+              <span>Research Coordinator</span>
             </div>
+            <div class="team-meta-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+              </svg>
+              <span>Research Department</span>
+            </div>
+            <div class="team-meta-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>United States</span>
+            </div>
+            <p class="team-bio">
+              Organized coordinator managing research operations and ensuring smooth workflow processes.<span class="team-bio-readmore">Read more</span>
+            </p>
+            <a href="#" class="btn-more-info">
+              More Info
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+              <div class="biography-tooltip">
+                <div class="biography-name">Jessica Martinez</div>
+                <div class="biography-heading">Biography:</div>
+                <div class="biography-content">
+                  <p>Jessica Martinez is an organized coordinator managing research operations and ensuring smooth workflow processes. She serves as the Research Coordinator for the Scholar Indexing Society Team.</p>
+                  <p><strong>Education:</strong> Master's in Research Administration from Johns Hopkins University, Bachelor's in Project Management from Georgetown University.</p>
+                  <p><strong>Expertise:</strong> Research coordination, project management, workflow optimization, and operational efficiency.</p>
+                </div>
+              </div>
+            </a>
           </div>
         </article>
       </div>
@@ -458,4 +681,3 @@
   });
 </script>
 {% endblock %}
-

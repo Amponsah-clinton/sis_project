@@ -35,7 +35,7 @@
 
   .directory-layout {
     display: grid;
-    grid-template-columns: 280px 1fr;
+    grid-template-columns: 350px 1fr;
     gap: 2rem;
   }
 
@@ -53,15 +53,135 @@
 
   .directory-sidebar {
     position: sticky;
-    top: 6rem;
+    top: 100px;
     height: fit-content;
+    max-height: calc(100vh - 140px);
+    overflow-y: auto;
   }
 
+  /* Filter Sidebar Styles */
   .filter-section {
-    background-color: var(--card);
-    border: 1px solid var(--border);
-    border-radius: calc(var(--radius) + 4px);
-    padding: 1.5rem;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+  }
+
+  .filter-header {
+    padding: 0.75rem;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: #111827;
+    user-select: none;
+  }
+
+  .filter-header:hover {
+    background-color: #f9fafb;
+  }
+
+  .filter-header svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s;
+  }
+
+  .filter-section.collapsed .filter-header svg {
+    transform: rotate(-90deg);
+  }
+
+  .filter-content {
+    padding: 0.75rem;
+    display: block;
+  }
+
+  .filter-section.collapsed .filter-content {
+    display: none;
+  }
+
+  .filter-search {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.8125rem;
+    margin-bottom: 0.5rem;
+    background-color: #ffffff;
+  }
+
+  .filter-search:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+
+  .filter-list {
+    max-height: 200px;
+    overflow-y: auto;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .filter-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.375rem 0;
+    cursor: pointer;
+  }
+
+  .filter-item:hover {
+    background-color: #f9fafb;
+    margin: 0 -0.5rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .filter-item input[type="checkbox"] {
+    margin-right: 0.5rem;
+    cursor: pointer;
+  }
+
+  .filter-item-label {
+    flex: 1;
+    font-size: 0.8125rem;
+    color: #374151;
+    cursor: pointer;
+  }
+
+  .filter-count {
+    background-color: #f97316;
+    color: #ffffff;
+    padding: 0.125rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    min-width: 32px;
+    text-align: center;
+  }
+
+  .reset-button {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    background-color: #dc2626;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 0.5rem;
+  }
+
+  .reset-button:hover {
+    background-color: #b91c1c;
   }
 
   .filter-section-header {
@@ -632,72 +752,89 @@
       <div class="directory-layout">
         <!-- Sidebar Filters -->
         <aside class="directory-sidebar">
-          <div class="filter-section collapsed" id="filterSection">
-            <div class="filter-section-header">
-              <h3>Filters</h3>
-              <button class="filter-toggle-btn" onclick="toggleFilters()">
-                <span>Show Filters</span>
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
-              </button>
+          <!-- Area of Interest Filter -->
+          <div class="filter-section" id="area-filter">
+            <div class="filter-header" onclick="toggleFilter('area-filter')">
+              <span>AREA OF INTEREST</span>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
             </div>
-            
             <div class="filter-content">
-              <form method="get" action="{% url 'app:directory_researchers' %}" id="filterForm">
-              <!-- Search Filter -->
-              <div class="filter-group">
-                <label>Search Researchers</label>
-                  <input type="text" class="filter-input" name="search" placeholder="Search by name, institution..." id="researcherSearch" value="{{ current_search }}">
-              </div>
-
-              <!-- Discipline Filter -->
-              <div class="filter-group">
-                  <label>Discipline/Research Area</label>
-                  <input type="text" class="filter-input" name="discipline" placeholder="Enter discipline..." id="disciplineFilter" value="{{ current_discipline }}">
-              </div>
-
-              <!-- Institution Filter -->
-              <div class="filter-group">
-                <label>Institution</label>
-                  <select class="filter-select" name="institution" id="institutionFilter">
-                  <option value="">All Institutions</option>
-                    {% for inst in institutions %}
-                      <option value="{{ inst }}" {% if current_institution == inst %}selected{% endif %}>{{ inst }}</option>
-                    {% endfor %}
-                </select>
-              </div>
-
-              <!-- Country Filter -->
-              <div class="filter-group">
-                <label>Country</label>
-                  <select class="filter-select" name="country" id="countryFilter">
-                  <option value="">All Countries</option>
-                    {% for country in countries %}
-                      <option value="{{ country }}" {% if current_country == country %}selected{% endif %}>{{ country }}</option>
-                    {% endfor %}
-                </select>
-              </div>
-
-              <!-- Sort By -->
-              <div class="filter-group">
-                <label>Sort By</label>
-                  <select class="filter-select" name="sort" id="sortFilter">
-                    <option value="recent" {% if current_sort == 'recent' %}selected{% endif %}>Recently Added</option>
-                    <option value="name" {% if current_sort == 'name' %}selected{% endif %}>Name (A-Z)</option>
-                </select>
-              </div>
-
-                <!-- Clear Filters -->
-                <button type="button" class="btn-filter-clear" onclick="clearFilters()">Clear All Filters</button>
-                <p style="font-size: 0.75rem; color: var(--muted-foreground); margin-top: 0.5rem; text-align: center;">Filters update automatically</p>
-              </form>
+              <input type="text" class="filter-search" id="area-search" placeholder="Search Area of interest" onkeyup="filterAreas()">
+              <ul class="filter-list" id="area-list">
+                {% for area in areas_of_interest %}
+                <li class="filter-item">
+                  <label class="filter-item-label">
+                    <input type="checkbox" class="filter-checkbox" data-type="area" data-value="{{ area.name|escapejs }}" onchange="applyFilters()">
+                    <span>{{ area.name }}</span>
+                  </label>
+                  {% if area.count > 0 %}
+                  <span class="filter-count">{{ area.count }}</span>
+                  {% endif %}
+                </li>
+                {% endfor %}
+              </ul>
             </div>
           </div>
+
+          <!-- Institution Filter -->
+          <div class="filter-section collapsed" id="institution-filter">
+            <div class="filter-header" onclick="toggleFilter('institution-filter')">
+              <span>INSTITUTION</span>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+            <div class="filter-content">
+              <input type="text" class="filter-search" id="institution-search" placeholder="Search institution" onkeyup="filterInstitutions()">
+              <ul class="filter-list" id="institution-list">
+                {% for inst in institutions %}
+                <li class="filter-item">
+                  <label class="filter-item-label">
+                    <input type="checkbox" class="filter-checkbox" data-type="institution" data-value="{{ inst.name|escapejs }}" onchange="applyFilters()">
+                    <span>{{ inst.name }}</span>
+                  </label>
+                  <span class="filter-count">{{ inst.count }}</span>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+
+          <!-- Country Filter -->
+          <div class="filter-section collapsed" id="country-filter">
+            <div class="filter-header" onclick="toggleFilter('country-filter')">
+              <span>COUNTRY</span>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+            <div class="filter-content">
+              <ul class="filter-list" id="country-list">
+                {% for country in countries %}
+                <li class="filter-item">
+                  <label class="filter-item-label">
+                    <input type="checkbox" class="filter-checkbox" data-type="country" data-value="{{ country.name|escapejs }}" onchange="applyFilters()">
+                    <span>{{ country.name }}</span>
+                  </label>
+                  <span class="filter-count">{{ country.count }}</span>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+
+          <button class="reset-button" onclick="resetFilters()">Reset</button>
         </aside>
 
         <!-- Main Content -->
         <main class="directory-main">
+          <!-- Search Bar -->
+          <div style="margin-bottom: 2rem;">
+            <input type="text" class="filter-search" id="researcher-search" placeholder="Search researchers by name, institution, or research area..." style="width: 100%; padding: 0.875rem 1rem; font-size: 0.9375rem;" onkeyup="filterResearchers()">
+          </div>
+
           <!-- Results Header -->
           <div class="results-header">
             <div class="results-count">
@@ -805,6 +942,21 @@
 </div>
 
 <script>
+  // Store all researchers data for filtering
+  const allResearchers = [
+    {% for researcher in researchers %}
+    {
+      id: {{ researcher.id }},
+      firstName: "{{ researcher.first_name|escapejs }}",
+      lastName: "{{ researcher.last_name|escapejs }}",
+      institution: "{{ researcher.institution|default:""|escapejs }}",
+      country: "{{ researcher.country|default:""|escapejs }}",
+      researchAreas: "{{ researcher.research_areas|default:""|escapejs }}",
+      position: "{{ researcher.position|default:""|escapejs }}"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+
   function toggleView(view) {
     const container = document.getElementById('researchersContainer');
     const buttons = document.querySelectorAll('.view-btn');
@@ -819,92 +971,157 @@
     }
   }
 
-  function toggleFilters() {
-    const filterSection = document.getElementById('filterSection');
-    const toggleBtn = filterSection.querySelector('.filter-toggle-btn span');
-    
-    filterSection.classList.toggle('collapsed');
-    
-    if (filterSection.classList.contains('collapsed')) {
-      toggleBtn.textContent = 'Show Filters';
+  function toggleFilter(filterId) {
+    const section = document.getElementById(filterId);
+    section.classList.toggle('collapsed');
+  }
+
+  function filterAreas() {
+    const searchTerm = document.getElementById('area-search').value.toLowerCase();
+    const items = document.querySelectorAll('#area-list .filter-item');
+    items.forEach(item => {
+      const text = item.textContent.toLowerCase();
+      item.style.display = text.includes(searchTerm) ? 'flex' : 'none';
+    });
+  }
+
+  function filterInstitutions() {
+    const searchTerm = document.getElementById('institution-search').value.toLowerCase();
+    const items = document.querySelectorAll('#institution-list .filter-item');
+    items.forEach(item => {
+      const text = item.textContent.toLowerCase();
+      item.style.display = text.includes(searchTerm) ? 'flex' : 'none';
+    });
+  }
+
+  function applyFilters() {
+    const selectedAreas = Array.from(document.querySelectorAll('input[data-type="area"]:checked')).map(cb => cb.dataset.value);
+    const selectedInstitutions = Array.from(document.querySelectorAll('input[data-type="institution"]:checked')).map(cb => cb.dataset.value);
+    const selectedCountries = Array.from(document.querySelectorAll('input[data-type="country"]:checked')).map(cb => cb.dataset.value);
+    const searchTerm = document.getElementById('researcher-search').value.toLowerCase();
+
+    const researchersContainer = document.getElementById('researchersContainer');
+    const cards = researchersContainer.querySelectorAll('.researcher-card');
+    let visibleCount = 0;
+
+    cards.forEach((card, index) => {
+      if (index >= allResearchers.length) return;
+      
+      const researcher = allResearchers[index];
+      let visible = true;
+
+      // Filter by search term
+      if (searchTerm) {
+        const matchesSearch = 
+          (researcher.firstName || '').toLowerCase().includes(searchTerm) ||
+          (researcher.lastName || '').toLowerCase().includes(searchTerm) ||
+          (researcher.institution || '').toLowerCase().includes(searchTerm) ||
+          (researcher.researchAreas || '').toLowerCase().includes(searchTerm) ||
+          (researcher.position || '').toLowerCase().includes(searchTerm);
+        if (!matchesSearch) visible = false;
+      }
+
+      // Filter by area of interest
+      if (selectedAreas.length > 0) {
+        const matchesArea = selectedAreas.some(area => 
+          (researcher.researchAreas || '').toLowerCase().includes(area.toLowerCase())
+        );
+        if (!matchesArea) visible = false;
+      }
+
+      // Filter by institution
+      if (selectedInstitutions.length > 0) {
+        const researcherInstitution = (researcher.institution || '').toLowerCase();
+        const matchesInstitution = selectedInstitutions.some(inst => 
+          researcherInstitution.includes(inst.toLowerCase())
+        );
+        if (!matchesInstitution) visible = false;
+      }
+
+      // Filter by country
+      if (selectedCountries.length > 0) {
+        const researcherCountry = (researcher.country || '').toLowerCase();
+        const matchesCountry = selectedCountries.some(country => 
+          researcherCountry.includes(country.toLowerCase())
+        );
+        if (!matchesCountry) visible = false;
+      }
+
+      if (visible) {
+        card.style.display = 'block';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // Update results count
+    const resultsCount = document.getElementById('resultsCount');
+    if (resultsCount) {
+      resultsCount.textContent = visibleCount;
+    }
+
+    // Show empty state if no researchers visible
+    const existingEmptyState = researchersContainer.querySelector('.empty-state');
+    if (visibleCount === 0) {
+      if (!existingEmptyState) {
+        const emptyStateDiv = document.createElement('div');
+        emptyStateDiv.className = 'empty-state';
+        emptyStateDiv.style.cssText = 'grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--muted-foreground);';
+        emptyStateDiv.innerHTML = '<p style="font-size: 1.25rem; margin-bottom: 0.5rem;">No researchers found</p><p>Try adjusting your filters or search criteria.</p>';
+        researchersContainer.appendChild(emptyStateDiv);
+      }
     } else {
-      toggleBtn.textContent = 'Hide Filters';
+      if (existingEmptyState) {
+        existingEmptyState.remove();
+      }
     }
   }
 
-  function clearFilters() {
-    window.location.href = '{% url "app:directory_researchers" %}';
+  function filterResearchers() {
+    applyFilters();
   }
 
-  // Initialize auto-filtering when DOM is ready
-  (function() {
-    // Wait for DOM to be ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initFilters);
-    } else {
-      initFilters();
+  function resetFilters() {
+    // Clear search
+    document.getElementById('researcher-search').value = '';
+    
+    // Clear all checkboxes
+    document.querySelectorAll('.filter-checkbox').forEach(cb => cb.checked = false);
+    
+    // Clear filter searches
+    document.getElementById('area-search').value = '';
+    document.getElementById('institution-search').value = '';
+    
+    // Show all areas and institutions
+    document.querySelectorAll('.filter-item').forEach(item => {
+      item.style.display = 'flex';
+    });
+    
+    // Show all researchers
+    document.querySelectorAll('.researcher-card').forEach(card => {
+      card.style.display = 'block';
+    });
+
+    // Update results count
+    const resultsCount = document.getElementById('resultsCount');
+    if (resultsCount) {
+      resultsCount.textContent = allResearchers.length;
     }
 
-    function initFilters() {
-      const filterForm = document.getElementById('filterForm');
-      if (!filterForm) return;
-
-      // Prevent form from submitting on Enter key in text inputs (let debounce handle it)
-      filterForm.addEventListener('submit', function(e) {
-        // Allow form submission, just prevent default Enter key behavior
-        const activeElement = document.activeElement;
-        if (activeElement && (activeElement.type === 'text' || activeElement.type === 'search')) {
-          // Let the debounced submit handle it
-        }
-      });
-
-      // Auto-submit form when select filters change (immediate)
-      const institutionFilter = document.getElementById('institutionFilter');
-      if (institutionFilter) {
-        institutionFilter.addEventListener('change', function(e) {
-          filterForm.submit();
-        });
-      }
-
-      const countryFilter = document.getElementById('countryFilter');
-      if (countryFilter) {
-        countryFilter.addEventListener('change', function(e) {
-          filterForm.submit();
-        });
-      }
-
-      const sortFilter = document.getElementById('sortFilter');
-      if (sortFilter) {
-        sortFilter.addEventListener('change', function(e) {
-          filterForm.submit();
-        });
-      }
-
-      // Debounce search input to avoid too many requests (300ms for better responsiveness)
-      let searchTimeout;
-      const researcherSearch = document.getElementById('researcherSearch');
-      if (researcherSearch) {
-        researcherSearch.addEventListener('input', function(e) {
-          clearTimeout(searchTimeout);
-          searchTimeout = setTimeout(function() {
-            filterForm.submit();
-          }, 300); // Wait 300ms after user stops typing
-        });
-      }
-
-      // Debounce discipline filter
-      let disciplineTimeout;
-      const disciplineFilter = document.getElementById('disciplineFilter');
-      if (disciplineFilter) {
-        disciplineFilter.addEventListener('input', function(e) {
-          clearTimeout(disciplineTimeout);
-          disciplineTimeout = setTimeout(function() {
-            filterForm.submit();
-          }, 300);
-        });
-      }
+    // Remove empty state if exists
+    const emptyState = document.querySelector('.empty-state');
+    if (emptyState && allResearchers.length > 0) {
+      emptyState.remove();
     }
-  })();
+  }
+
+  // Initialize - make sure all researchers are visible on load
+  document.addEventListener('DOMContentLoaded', function() {
+    if (allResearchers.length > 0) {
+      applyFilters();
+    }
+  });
 
   // Hide initials when images load
   document.querySelectorAll('.researcher-image-wrapper img').forEach(img => {

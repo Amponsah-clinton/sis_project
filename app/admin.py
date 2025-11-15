@@ -405,7 +405,7 @@ class SiteSettingsAdmin(admin.ModelAdmin):
             'fields': (
                 ('enable_landing_page', 'enable_indexed_articles_page', 'enable_indexed_journals_page', 'enable_project_archive_page'),
                 ('enable_directory_researchers_page', 'enable_hall_of_fame_page', 'enable_council_members_page', 'enable_team_members_page'),
-                ('enable_sponsors_page', 'enable_about_sis_page', 'enable_mission_page', 'enable_criteria_page'),
+                ('enable_donate_page', 'enable_about_sis_page', 'enable_mission_page', 'enable_criteria_page'),
                 ('enable_tolerance_policy_page', 'enable_service_solution_page', 'enable_policy_terms_page'),
                 ('enable_check_turnitin_page', 'enable_work_plagiarism_page', 'enable_thesis_to_article_page'),
                 ('enable_thesis_to_book_page', 'enable_thesis_to_book_chapter_page', 'enable_powerpoint_preparation_page'),

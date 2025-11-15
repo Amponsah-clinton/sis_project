@@ -1267,13 +1267,51 @@ def directory_researchers(request):
         researchers = researchers.order_by('-created_at')
     
     # Get unique values for filter dropdowns
-    countries = DirectoryApplication.objects.filter(terms_accepted=True).values_list('country', flat=True).distinct().order_by('country')
-    institutions = DirectoryApplication.objects.filter(terms_accepted=True).values_list('institution', flat=True).distinct().order_by('institution')
+    from django.db.models import Count
+    countries = DirectoryApplication.objects.filter(terms_accepted=True).exclude(country='').values('country').annotate(count=Count('id')).order_by('country')
+    countries_list = [{'name': c['country'], 'count': c['count']} for c in countries if c['country']]
+    
+    institutions = DirectoryApplication.objects.filter(terms_accepted=True).exclude(institution='').values('institution').annotate(count=Count('id')).order_by('institution')
+    institutions_list = [{'name': i['institution'], 'count': i['count']} for i in institutions if i['institution']]
+    
+    # Predefined areas of interest
+    areas_of_interest = [
+        'Music education, Community music, Applied ethnomusicology, Secondary school music curricula, Intercultural relations and organised cultural encounters',
+        'Brain Computer, Interface Biomedical, Signal Processing, Machine Learning, Deep Learning, Artificial Intelligence',
+        'Artificial Intelligence, Machine Learning, Deep Learning',
+        'Populations of bacteria, Evolution of symbioses',
+        'Water security, water resources management, climate change impact',
+        'Smoking cessation, Harm reduction, Evidence synthesis',
+        'Time Series Econometrics, Forecasting, Macroeconometrics',
+        'Strategic Communications, Marketing & Communications',
+        'Chartered Accountant',
+        'Chemical ecology and management of agricultural pests for sustainable crop production, postharvest technology for food security',
+        'Theology, Environmental health, Community health, Epidemiology',
+        'Education, Curriculum studies, leadership studies, social policy, teaching',
+        'Organisation and Human Development, Management, General Education',
+        'Epidemiology, Occupational Health & Safety',
+        'Data analysis, EHR global health, health policy, and information management research skills/knowledge',
+        'Non-communicable diseases, mental health care',
+        'Public Health',
+        'Health Economics, Behavioral Economics, Public Economics, Industrial Organization',
+        'Finance, Banking, Economics',
+        'Time Series Analysis, Empirical Finance, Financial Markets, Corporate Finance, Digital Assets & FinTech',
+    ]
+    
+    # Count researchers for each area of interest (show all areas, sorted by count descending)
+    areas_with_count = []
+    for area in areas_of_interest:
+        count = DirectoryApplication.objects.filter(terms_accepted=True, research_areas__icontains=area).count()
+        areas_with_count.append({'name': area, 'count': count})
+    
+    # Sort by count descending (highest to smallest)
+    areas_with_count.sort(key=lambda x: x['count'], reverse=True)
     
     return render(request, 'app/directory_researchers.html', {
         'researchers': researchers,
-        'countries': countries,
-        'institutions': institutions,
+        'countries': countries_list,
+        'institutions': institutions_list,
+        'areas_of_interest': areas_with_count,
         'current_search': search_query,
         'current_country': country,
         'current_institution': institution,
@@ -1364,12 +1402,52 @@ def team_members(request):
     """Team Members page view"""
     return render(request, 'app/team_members.html')
 
-@check_page_enabled('enable_sponsors_page')
-def sponsors(request):
-    """Sponsors page view"""
+@check_page_enabled('enable_donate_page')
+def donate(request):
+    """Donate page view"""
     from django.conf import settings
-    return render(request, 'app/sponsors.html', {
+    return render(request, 'app/donate.html', {
         'paystack_public_key': settings.PAYSTACK_PUBLIC_KEY,
+    })
+
+def sponsors(request):
+    """Sponsors page view - displays list of contributors/sponsors"""
+    # Sample sponsor data - in production, this would come from a Sponsor model
+    sponsors_data = {
+        'premier': [
+            {
+                'name': 'University of Energy and Natural Resources',
+                'logo': 'https://via.placeholder.com/200x200?text=UENR',
+            },
+            {
+                'name': 'U.S. Department of the Interior',
+                'logo': 'https://via.placeholder.com/200x200?text=USDOI',
+            },
+        ],
+        'sustaining': [
+            {
+                'name': 'IEEE',
+                'logo': 'https://via.placeholder.com/200x200?text=IEEE',
+            },
+            {
+                'name': 'Catholic University of Ghana',
+                'logo': 'https://via.placeholder.com/200x200?text=CUG',
+            },
+            {
+                'name': 'Sunyani Technical University',
+                'logo': 'https://via.placeholder.com/200x200?text=STU',
+            },
+        ],
+        'basic': [
+            {
+                'name': 'International Journal of Multidisciplinary Studies and Innovative Research',
+                'logo': 'https://via.placeholder.com/200x200?text=IJMSIR',
+            },
+        ],
+    }
+    
+    return render(request, 'app/sponsors.html', {
+        'sponsors': sponsors_data,
     })
 
 def initialize_payment(request):
@@ -2142,7 +2220,7 @@ def settings(request):
                 'hall_of_fame': 'enable_hall_of_fame_page',
                 'council_members': 'enable_council_members_page',
                 'team_members': 'enable_team_members_page',
-                'sponsors': 'enable_sponsors_page',
+                'donate': 'enable_donate_page',
                 'about_sis': 'enable_about_sis_page',
                 'mission': 'enable_mission_page',
                 'criteria': 'enable_criteria_page',

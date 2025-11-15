@@ -24,6 +24,7 @@ urlpatterns = [
     path('upload_project/', views.upload_project, name='upload_project'),
     path('council_members/', views.council_members, name='council_members'),
     path('team_members/', views.team_members, name='team_members'),
+    path('donate/', views.donate, name='donate'),
     path('sponsors/', views.sponsors, name='sponsors'),
     path('initialize-payment/', views.initialize_payment, name='initialize_payment'),
     path('request_membership/', views.request_membership, name='request_membership'),

@@ -590,7 +590,7 @@ class SiteSettings(models.Model):
     enable_hall_of_fame_page = models.BooleanField(default=True)
     enable_council_members_page = models.BooleanField(default=True)
     enable_team_members_page = models.BooleanField(default=True)
-    enable_sponsors_page = models.BooleanField(default=True)
+    enable_donate_page = models.BooleanField(default=True)
     enable_about_sis_page = models.BooleanField(default=True)
     enable_mission_page = models.BooleanField(default=True)
     enable_criteria_page = models.BooleanField(default=True)

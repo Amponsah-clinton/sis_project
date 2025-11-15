@@ -112,7 +112,7 @@ a{
             <a href="{% url 'app:directory_researchers' %}" class="nav-dropdown-item">Directory of Researchers</a>
             <a href="{% url 'app:council_members' %}" class="nav-dropdown-item">Council Members</a>
             <a href="{% url 'app:team_members' %}" class="nav-dropdown-item">Team Members</a>
-            <a href="{% url 'app:sponsors' %}" class="nav-dropdown-item">Sponsors</a>
+            <a href="{% url 'app:donate' %}" class="nav-dropdown-item">Donate</a>
             <a href="{% url 'app:request_membership' %}" class="nav-dropdown-item">Request For Membership</a>
             <a href="{% url 'app:apply_directory' %}" class="nav-dropdown-item">Apply For Directory of Researcher</a>
           </div>
@@ -195,7 +195,7 @@ a{
         {% else %}
         <a href="{% url 'app:auth' %}" class="btn btn-ghost">Sign In</a>
         {% endif %}
-        <a href="{% url 'app:sponsors' %}" class="btn btn-primary">
+        <a href="{% url 'app:donate' %}" class="btn btn-primary">
           <i data-lucide="gift"></i>
           Donate
         </a>
@@ -238,7 +238,7 @@ a{
         {% else %}
         <a href="{% url 'app:auth' %}" class="btn btn-ghost" onclick="closeMenu()">Sign In</a>
         {% endif %}
-        <a href="{% url 'app:sponsors' %}" class="btn btn-primary" onclick="closeMenu()">
+        <a href="{% url 'app:donate' %}" class="btn btn-primary" onclick="closeMenu()">
           <i data-lucide="gift"></i>
           Donate
         </a>
