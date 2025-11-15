@@ -1,0 +1,36 @@
+RESEARCH IMAGE REQUIREMENTS
+============================
+
+The carousel requires 4 research-related images with the following specifications:
+
+IMAGE FILES (place in the 'images' folder):
+1. research_innovation.jpg
+2. research_publication.jpg
+3. research_discovery.jpg
+4. research_academic.jpg
+
+RECOMMENDED DIMENSIONS:
+- Width: 1200-1600 pixels
+- Height: 800-1000 pixels
+- Aspect Ratio: 3:2 or 4:3 (landscape orientation)
+- Format: JPG (for photos) or PNG (for graphics)
+- File Size: Under 500KB per image (optimize for web)
+
+MINIMUM DIMENSIONS:
+- Width: 800 pixels
+- Height: 600 pixels
+
+IMAGE SUGGESTIONS:
+1. research_innovation.jpg - Scientists in lab, research equipment, innovation
+2. research_publication.jpg - Academic books, papers, library, scholarly work
+3. research_discovery.jpg - Microscopes, data visualization, scientific discovery
+4. research_academic.jpg - University campus, academic setting, researchers collaborating
+
+All images should be:
+- Research/academic themed
+- High quality and professional
+- Same dimensions for consistency
+- Optimized for web (compressed but clear)
+
+The images will automatically scale and crop to fit the carousel container while maintaining their aspect ratio.
+

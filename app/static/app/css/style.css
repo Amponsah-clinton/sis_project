@@ -2381,12 +2381,12 @@
     /* Image Text Section */
     .image-text-section {
       padding: 6rem 1.5rem;
-      background-color: var(--background);
+      background-color: #ffffff;
     }
 
     @media (min-width: 1024px) {
       .image-text-section {
-        padding: 4rem 1.5rem;
+        padding: 5rem 1.5rem;
       }
     }
 
@@ -2394,7 +2394,7 @@
       display: grid;
       grid-template-columns: 1fr;
       gap: 3rem;
-      align-items: center;
+      align-items: start;
       max-width: 1200px;
       margin: 0 auto;
     }
@@ -2402,7 +2402,8 @@
     @media (min-width: 1024px) {
       .image-text-wrapper {
         grid-template-columns: 1fr 1fr;
-        gap: 3rem;
+        gap: 4rem;
+        align-items: start;
       }
     }
 
@@ -2421,16 +2422,16 @@
     .image-wrapper {
       position: relative;
       width: 100%;
-      border-radius: calc(var(--radius) + 8px);
+      border-radius: 16px;
       overflow: hidden;
-      background-color: var(--muted);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      background-color: #f3f4f6;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
     .image-text-section:hover .image-wrapper {
-      transform: translateY(-4px);
-      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.15);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
     }
 
     .section-image {
@@ -2444,34 +2445,28 @@
 
     @media (min-width: 1024px) {
       .section-image {
-        min-height: 500px;
+        min-height: 600px;
       }
     }
 
     .image-text-section:hover .section-image {
-      transform: scale(1.05);
+      transform: scale(1.02);
     }
 
     .image-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: rgba(26, 31, 58, 0.2);
-      z-index: 1;
-      pointer-events: none;
+      display: none;
     }
 
     .image-text-content {
       order: 1;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
     }
 
     @media (min-width: 1024px) {
       .image-text-content {
         order: 2;
+        align-items: flex-start;
       }
     }
 
@@ -2492,24 +2487,65 @@
     }
 
     .content-title {
-      font-size: 2rem;
+      font-size: 2.25rem;
       font-weight: 700;
       line-height: 1.2;
       margin-bottom: 1.5rem;
-      color: var(--foreground);
+      color: #111827;
+      letter-spacing: -0.02em;
     }
 
     @media (min-width: 768px) {
       .content-title {
-        font-size: 2.5rem;
+        font-size: 2.75rem;
       }
     }
 
     .content-description {
-      font-size: 1.125rem;
-      line-height: 1.7;
-      color: var(--muted-foreground);
+      font-size: 1.0625rem;
+      line-height: 1.75;
+      color: #374151;
       margin-bottom: 1.25rem;
+    }
+    
+    .content-description:last-of-type {
+      margin-bottom: 2rem;
+    }
+    
+    .content-images-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-top: 2.5rem;
+    }
+    
+    .content-small-image {
+      width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      background-color: #f3f4f6;
+    }
+    
+    .content-small-image:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+    
+    .content-small-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      aspect-ratio: 1;
+    }
+    
+    @media (max-width: 640px) {
+      .content-images-grid {
+        gap: 0.75rem;
+        margin-top: 2rem;
+      }
     }
 
     .content-features {

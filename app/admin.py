@@ -4,7 +4,7 @@ from .models import (
     UserProfile, Article, ArticleAuthor, Journal, JournalEditor, Project, ProjectContributor,
     ProjectPayment, MembershipRequest, DirectoryApplication, HallOfFameApplication, PlagiarismCheck,
     PlagiarismWork, ThesisToArticle, ThesisToBook, ThesisToBookChapter, PowerPointPreparation,
-    SiteSettings, Blog, NewsTag, NewsWriter, NewsArticle, NewsComment
+    SiteSettings, Blog, NewsTag, NewsWriter, NewsArticle, NewsComment, NewsBookmark
 )
 from .forms import ProjectForm
 
@@ -543,3 +543,12 @@ class NewsCommentAdmin(admin.ModelAdmin):
     def get_replies_count(self, obj):
         return obj.get_replies_count()
     get_replies_count.short_description = 'Replies'
+
+@admin.register(NewsBookmark)
+class NewsBookmarkAdmin(admin.ModelAdmin):
+    list_display = ('user', 'article', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('user__username', 'article__title')
+    readonly_fields = ('created_at',)
+    raw_id_fields = ('user', 'article')
+    ordering = ('-created_at',)

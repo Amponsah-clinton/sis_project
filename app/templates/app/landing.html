@@ -599,6 +599,214 @@
       font-size: 0.875rem;
     }
   }
+
+  /* Image Text Section */
+  .image-text-section {
+    padding: 6rem 1.5rem;
+    background-color: #ffffff;
+  }
+
+  @media (min-width: 1024px) {
+    .image-text-section {
+      padding: 5rem 1.5rem;
+    }
+  }
+
+  .image-text-wrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    align-items: start;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 1024px) {
+    .image-text-wrapper {
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: stretch;
+    }
+  }
+
+  .image-text-image {
+    position: relative;
+    width: 100%;
+    order: 2;
+  }
+
+  @media (min-width: 1024px) {
+    .image-text-image {
+      order: 1;
+    }
+  }
+
+  .image-wrapper {
+    position: relative;
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    background-color: #f3f4f6;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .image-text-section:hover .image-wrapper {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  }
+  
+  @keyframes imagePan {
+    0% {
+      transform: scale(1) translateX(0) translateY(0);
+    }
+    25% {
+      transform: scale(1.05) translateX(-2%) translateY(-1%);
+    }
+    50% {
+      transform: scale(1.08) translateX(2%) translateY(1%);
+    }
+    75% {
+      transform: scale(1.05) translateX(-1%) translateY(-0.5%);
+    }
+    100% {
+      transform: scale(1) translateX(0) translateY(0);
+    }
+  }
+  
+  @keyframes imageZoom {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+  }
+  
+  .section-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    min-height: 400px;
+    animation: imagePan 20s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  @media (min-width: 1024px) {
+    .section-image {
+      min-height: 0;
+      height: 100%;
+    }
+  }
+  
+  .image-text-section:hover .section-image {
+    animation: imageZoom 8s ease-in-out infinite;
+  }
+
+
+  .image-overlay {
+    display: none;
+  }
+
+  .image-text-content {
+    order: 1;
+    display: flex;
+    align-items: flex-start;
+    height: 100%;
+  }
+
+  @media (min-width: 1024px) {
+    .image-text-content {
+      order: 2;
+      align-items: flex-start;
+      height: 100%;
+    }
+  }
+
+  .content-inner {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .content-title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    color: #111827;
+    letter-spacing: -0.02em;
+  }
+
+  @media (min-width: 768px) {
+    .content-title {
+      font-size: 2.75rem;
+    }
+  }
+
+  .content-description {
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    color: #374151;
+    margin-bottom: 1.25rem;
+  }
+  
+  .content-description:last-of-type {
+    margin-bottom: 0;
+  }
+  
+  .content-images-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: auto;
+    padding-top: 2rem;
+  }
+  
+  .content-small-image {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background-color: #f3f4f6;
+  }
+  
+  .content-small-image:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  }
+  
+  .content-small-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    aspect-ratio: 1;
+  }
+  
+  @media (max-width: 640px) {
+    .content-images-grid {
+      gap: 0.75rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .image-text-image {
+      display: flex;
+      height: 100%;
+    }
+    
+    .image-wrapper {
+      height: 100%;
+      width: 100%;
+      display: flex;
+    }
+  }
 </style>
 
 <script>
@@ -794,37 +1002,27 @@
       <div class="image-text-wrapper">
         <div class="image-text-image">
           <div class="image-wrapper">
-            <img src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=1200&h=800&fit=crop" alt="Research Collaboration" class="section-image" />
+            <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1200&h=800&fit=crop" alt="Bookshelf" class="section-image" />
             <div class="image-overlay"></div>
           </div>
         </div>
         <div class="image-text-content">
           <div class="content-inner">
-            <h2 class="content-title">Scholar Indexing Society - Your Research Partner</h2>
+            <h2 class="content-title">About Scholar Indexing Society</h2>
             <p class="content-description">
-              Scholar Indexing Society (S.I.S) is dedicated to indexing, archiving, and promoting scholarly research across all academic disciplines. We provide comprehensive services including research indexing, plagiarism detection, thesis transformation, and research directory services to support researchers worldwide.
+              Scholar Indexing Society (S.I.S) is a modern research management platform built to streamline academic and administrative workflows. From research indexing and article archiving to plagiarism detection and thesis transformation — S.I.S centralizes everything in an intuitive system.
             </p>
-            <div class="content-features">
-              <div class="feature-item">
-                <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-                <span>Research Indexing Services</span>
+            <p class="content-description">
+              We focus on usability, speed, and analytics to help researchers deliver better outcomes and stronger academic communication.
+            </p>
+            <div class="content-images-grid">
+              <div class="content-small-image">
+                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=600&fit=crop" alt="Research Collaboration" />
               </div>
-              <div class="feature-item">
-                <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-                <span>Plagiarism Detection</span>
-              </div>
-              <div class="feature-item">
-                <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-                <span>Thesis Transformation Services</span>
+              <div class="content-small-image">
+                <img src="https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&h=600&fit=crop" alt="Partnership" />
               </div>
             </div>
-            <a href="{% url 'app:about_sis' %}" class="content-button">Learn More About S.I.S</a>
           </div>
         </div>
       </div>

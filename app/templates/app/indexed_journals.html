@@ -5,6 +5,16 @@
 
 {% block content %}
 <style>
+  /* Remove all text decorations */
+  .indexed-journals-page,
+  .indexed-journals-page *,
+  .indexed-journals-page a,
+  .indexed-journals-page a:hover,
+  .indexed-journals-page a:visited,
+  .indexed-journals-page a:active {
+    text-decoration: none !important;
+  }
+
   /* Page Header Styling */
   .indexed-journals-page {
     padding: 2rem 1.5rem 3rem;
@@ -478,7 +488,7 @@
 
   .journal-card-new:hover .journal-title-new {
     color: #1d4ed8;
-    text-decoration: underline;
+    text-decoration: none;
   }
 
   .journal-website-link {
@@ -493,7 +503,7 @@
 
   .journal-website-link:hover {
     color: #1d4ed8;
-    text-decoration: underline;
+    text-decoration: none;
   }
 
   .journal-fee {

@@ -24,7 +24,7 @@ from .models import (
     UserProfile, Article, ArticleAuthor, Journal, JournalEditor, Project, ProjectContributor, ProjectPayment,
     MembershipRequest, DirectoryApplication, HallOfFameApplication, PlagiarismCheck,
     PlagiarismWork, ThesisToArticle, ThesisToBook, ThesisToBookChapter, PowerPointPreparation,
-    NewsTag, NewsWriter, NewsArticle, NewsComment
+    NewsTag, NewsWriter, NewsArticle, NewsComment, NewsBookmark
 )
 
 def landing(request):
@@ -102,7 +102,10 @@ def auth(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, f'Welcome back, {user.username}!')
-                return redirect('app:dashboard')
+                if user.is_superuser or user.is_staff:
+                    return redirect('app:dashboard')
+                else:
+                    return redirect('app:user_dashboard')
             else:
                 messages.error(request, 'Invalid username/email or password')
             
@@ -155,7 +158,10 @@ def auth(request):
                 # Automatically log in the user after registration
                 login(request, user)
                 messages.success(request, f'Registration successful! Welcome, {user.username}!')
-                return redirect('app:dashboard')
+                if user.is_superuser or user.is_staff:
+                    return redirect('app:dashboard')
+                else:
+                    return redirect('app:user_dashboard')
             else:
                 # Display form errors
                 for field, errors in form.errors.items():
@@ -2035,11 +2041,17 @@ def news_detail(request, slug):
         is_approved=True
     ).order_by('-created_at')
     
+    # Check if user has bookmarked this article
+    is_bookmarked = False
+    if request.user.is_authenticated:
+        is_bookmarked = NewsBookmark.objects.filter(user=request.user, article=article).exists()
+    
     return render(request, 'app/news_detail.html', {
         'article': article,
         'sidebar_articles': sidebar_articles,
         'related_articles': related_articles,
         'comments': comments,
+        'is_bookmarked': is_bookmarked,
     })
 
 @login_required
@@ -2124,13 +2136,39 @@ def get_comment_replies(request, comment_id):
     return JsonResponse({'success': True, 'replies': replies_data})
 
 @login_required
+def toggle_bookmark(request, article_slug):
+    """Toggle bookmark for a news article"""
+    article = get_object_or_404(NewsArticle, slug=article_slug, is_published=True)
+    
+    bookmark, created = NewsBookmark.objects.get_or_create(
+        user=request.user,
+        article=article
+    )
+    
+    if not created:
+        # Bookmark already exists, remove it
+        bookmark.delete()
+        is_bookmarked = False
+        action = 'removed'
+    else:
+        # Bookmark was created
+        is_bookmarked = True
+        action = 'added'
+    
+    return JsonResponse({
+        'success': True,
+        'action': action,
+        'is_bookmarked': is_bookmarked
+    })
+
+@login_required
 def delete_news_comment(request, comment_id):
-    """Delete a comment (admin only)"""
+    """Delete a comment (superadmin only)"""
     comment = get_object_or_404(NewsComment, id=comment_id)
     
-    # Check if user is admin or staff
-    if not (request.user.is_staff or request.user.is_superuser):
-        return JsonResponse({'success': False, 'error': 'Permission denied'}, status=403)
+    # Check if user is superuser (superadmin)
+    if not request.user.is_superuser:
+        return JsonResponse({'success': False, 'error': 'Permission denied. Only superadmins can delete comments.'}, status=403)
     
     article_slug = comment.article.slug
     comment.delete()
@@ -2328,6 +2366,114 @@ def dashboard(request):
         'registered_members_count': registered_members_count,
         'recent_users': recent_users,
         'recent_blogs': recent_blogs,
+    })
+
+@login_required
+def user_dashboard(request):
+    """User Dashboard page view - for ordinary users"""
+    user = request.user
+    profile = None
+    try:
+        profile = user.profile
+    except UserProfile.DoesNotExist:
+        profile = UserProfile.objects.create(user=user)
+    
+    # Get user's articles count
+    user_articles_count = Article.objects.filter(submitted_by=user).count()
+    
+    # Get user's journals count
+    user_journals_count = Journal.objects.filter(submitted_by=user).count()
+    
+    # Get user's requests count (all types)
+    user_plagiarism_checks = PlagiarismCheck.objects.filter(email=user.email)
+    user_plagiarism_works = PlagiarismWork.objects.filter(email=user.email)
+    user_thesis_articles = ThesisToArticle.objects.filter(email=user.email)
+    user_thesis_books = ThesisToBook.objects.filter(email=user.email)
+    user_thesis_chapters = ThesisToBookChapter.objects.filter(email=user.email)
+    user_powerpoints = PowerPointPreparation.objects.filter(email=user.email)
+    
+    user_requests_count = (
+        user_plagiarism_checks.count() +
+        user_plagiarism_works.count() +
+        user_thesis_articles.count() +
+        user_thesis_books.count() +
+        user_thesis_chapters.count() +
+        user_powerpoints.count()
+    )
+    
+    # Get user's articles
+    user_articles = Article.objects.filter(submitted_by=user).order_by('-created_at')
+    
+    # Get user's journals
+    user_journals = Journal.objects.filter(submitted_by=user).order_by('-created_at')
+    
+    # Get user's requests (combined)
+    user_requests = []
+    for req in user_plagiarism_checks:
+        user_requests.append({
+            'id': req.id,
+            'type': 'check_plagiarism',
+            'type_display': 'Check Turnitin Plagiarism',
+            'created_at': req.created_at,
+            'status': 'pending',
+        })
+    for req in user_plagiarism_works:
+        user_requests.append({
+            'id': req.id,
+            'type': 'work_plagiarism',
+            'type_display': 'Work My Plagiarism',
+            'created_at': req.created_at,
+            'status': 'pending',
+        })
+    for req in user_thesis_articles:
+        user_requests.append({
+            'id': req.id,
+            'type': 'thesis_to_article',
+            'type_display': 'Thesis To Article',
+            'created_at': req.created_at,
+            'status': 'pending',
+        })
+    for req in user_thesis_books:
+        user_requests.append({
+            'id': req.id,
+            'type': 'thesis_to_book',
+            'type_display': 'Thesis To Book',
+            'created_at': req.created_at,
+            'status': 'pending',
+        })
+    for req in user_thesis_chapters:
+        user_requests.append({
+            'id': req.id,
+            'type': 'thesis_to_book_chapter',
+            'type_display': 'Thesis To Book Chapter',
+            'created_at': req.created_at,
+            'status': 'pending',
+        })
+    for req in user_powerpoints:
+        user_requests.append({
+            'id': req.id,
+            'type': 'powerpoint_preparation',
+            'type_display': 'Power Point Preparation',
+            'created_at': req.created_at,
+            'status': 'pending',
+        })
+    
+    # Sort requests by created_at
+    user_requests.sort(key=lambda x: x['created_at'] if x['created_at'] else None, reverse=True)
+    
+    # Get user's bookmarks
+    user_bookmarks = NewsBookmark.objects.filter(user=user).select_related('article').prefetch_related('article__tags').order_by('-created_at')
+    
+    return render(request, 'app/user_dashboard.html', {
+        'user': user,
+        'profile': profile,
+        'user_articles_count': user_articles_count,
+        'user_journals_count': user_journals_count,
+        'user_requests_count': user_requests_count,
+        'user_articles': user_articles,
+        'user_journals': user_journals,
+        'user_requests': user_requests,
+        'user_bookmarks': user_bookmarks,
     })
 
 @login_required
