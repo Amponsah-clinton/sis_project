@@ -1,0 +1,294 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Browse Articles - ScholarIndex{% endblock %}
+
+{% block content %}
+<style>
+  .browse-page {
+    padding: 3rem 1.5rem;
+    background-color: #f9fafb;
+    min-height: calc(100vh - 5rem);
+  }
+
+  .browse-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .browse-header {
+    margin-bottom: 2rem;
+  }
+
+  .browse-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .search-section {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .search-form {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+  }
+
+  .form-group {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-group input {
+    width: 100%;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.9375rem;
+    color: #111827;
+    background-color: #ffffff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .form-group input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .form-group input::placeholder {
+    color: #9ca3af;
+  }
+
+  .btn {
+    padding: 0.625rem 1.25rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn-primary {
+    background-color: #3b82f6;
+    color: #ffffff;
+  }
+
+  .btn-primary:hover {
+    background-color: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+  }
+
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding: 0 0.5rem;
+  }
+
+  .results-count {
+    font-size: 0.9375rem;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .results-count strong {
+    color: #111827;
+  }
+
+  .articles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .article-card {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .article-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    border-color: #3b82f6;
+  }
+
+  .article-card-content {
+    padding: 1.25rem;
+  }
+
+  .article-card-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .article-card-abstract {
+    font-size: 0.875rem;
+    color: #6b7280;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .article-card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    color: #9ca3af;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+  }
+
+  .empty-state h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-state p {
+    font-size: 0.9375rem;
+    color: #6b7280;
+  }
+
+  @media (max-width: 768px) {
+    .browse-page {
+      padding: 2rem 1rem;
+    }
+
+    .search-form {
+      flex-direction: column;
+    }
+
+    .form-group {
+      min-width: 100%;
+    }
+
+    .articles-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .results-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+  }
+</style>
+
+<div class="browse-page">
+  <div class="browse-container">
+    <div class="browse-header">
+      <h1>Browse Articles</h1>
+      
+      <div class="search-section">
+        <form method="get" action="{% url 'app:browse' %}" class="search-form">
+          <div class="form-group">
+            <label for="query">Search Articles</label>
+            {{ search_form.query }}
+          </div>
+          <button type="submit" class="btn btn-primary">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 0.5rem;">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            Search
+          </button>
+        </form>
+      </div>
+    </div>
+
+    {% if search_form.query.value %}
+    <div class="results-header">
+      <div class="results-count">
+        Found <strong>{{ results|length }}</strong> article{{ results|length|pluralize }}
+        {% if search_form.query.value %}
+          for "{{ search_form.query.value }}"
+        {% endif %}
+      </div>
+      <a href="{% url 'app:browse' %}" class="btn btn-secondary" style="background-color: #6b7280; color: #ffffff;">Clear Search</a>
+    </div>
+    {% endif %}
+
+    {% if results %}
+    <div class="articles-grid">
+      {% for article in results %}
+      <a href="{% url 'app:article_detail' article_id=article.id %}" class="article-card">
+        <div class="article-card-content">
+          <h3 class="article-card-title">{{ article.title|striptags }}</h3>
+          {% if article.abstract %}
+          <p class="article-card-abstract">{{ article.abstract|striptags|truncatewords:30 }}</p>
+          {% endif %}
+          <div class="article-card-meta">
+            <span>View Article</span>
+            {% if article.publication_date %}
+            <span>{{ article.publication_date|date:"M Y" }}</span>
+            {% endif %}
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% elif search_form.query.value %}
+    <div class="empty-state">
+      <h3>No articles found</h3>
+      <p>Try adjusting your search query or <a href="{% url 'app:browse' %}" style="color: #3b82f6;">view all articles</a>.</p>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <h3>Search for Articles</h3>
+      <p>Enter a search term above to find articles by title or abstract.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+

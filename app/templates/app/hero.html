@@ -3,10 +3,25 @@
   /* Hero Section Styles - Exact copy from clone/css/style.css */
   .intro-section {
     position: relative;
+    overflow: visible;
   }
   .intro-section, .intro-section .container .row {
     height: 85vh;
     min-height: 900px;
+    overflow: visible;
+  }
+  
+  .intro-section .container {
+    overflow: visible;
+    position: relative;
+  }
+  
+  .intro-section .container .row {
+    overflow: visible;
+  }
+  
+  .intro-section .col-lg-5 {
+    overflow: visible;
   }
   .intro-section:before {
     content: "";
@@ -27,11 +42,14 @@
     font-size: 3rem;
     font-weight: 900;
     color: #fff;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
   }
   .intro-section p {
     color: rgba(255, 255, 255, 0.5);
     font-size: 1.1rem;
     max-width: 400px;
+    margin-bottom: 0;
   }
   @media (max-width: 991.98px) {
     .intro-section p {
@@ -52,7 +70,8 @@
   }
   .slide-one-item-alt-text {
     position: relative;
-    overflow: hidden;
+    overflow: visible;
+    padding-bottom: 7rem;
   }
   .slide-one-item-alt-text .slide-text {
     position: absolute;
@@ -98,6 +117,134 @@
       text-align: center;
     }
   }
+
+  /* Static Hero Search Bar */
+  .hero-search-static {
+    position: absolute;
+    bottom: -4.875rem;
+    left: 0;
+    z-index: 1000;
+    display: block;
+    width: 100%;
+    max-width: 500px;
+    pointer-events: auto;
+  }
+
+  @media (max-width: 991.98px) {
+    .hero-search-static {
+      display: none;
+    }
+  }
+
+  .hero-search-wrapper {
+    display: flex;
+    align-items: stretch;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    overflow: visible;
+    max-width: 500px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    position: relative;
+    z-index: 1001;
+  }
+
+  .hero-search-wrapper:focus-within {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+  }
+
+  .search-input-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1001;
+  }
+
+  .hero-search-input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: none;
+    background: transparent;
+    font-size: 0.9375rem;
+    color: #111827;
+    outline: none;
+    pointer-events: auto;
+    cursor: text;
+  }
+
+  .hero-search-input::placeholder {
+    color: #9ca3af;
+  }
+
+  .autocomplete-results {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 10000;
+    display: none;
+  }
+
+  .autocomplete-results.show {
+    display: block;
+  }
+
+  .autocomplete-item {
+    display: block;
+    padding: 0.875rem 1rem;
+    text-decoration: none;
+    color: #111827;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+  }
+
+  .autocomplete-item:last-child {
+    border-bottom: none;
+  }
+
+  .autocomplete-item:hover {
+    background-color: #f9fafb;
+  }
+
+  .autocomplete-item-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.25rem;
+  }
+
+  .autocomplete-item-type {
+    font-size: 0.75rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .autocomplete-item-auth-required {
+    padding: 0.75rem 1rem;
+    background-color: #fef3c7;
+    border-bottom: 1px solid #fde68a;
+    color: #92400e;
+    font-size: 0.875rem;
+    text-align: center;
+  }
+
+  .autocomplete-item-auth-required a {
+    color: #3b82f6;
+    text-decoration: underline;
+    font-weight: 600;
+  }
 </style>
 
 <div class="intro-section custom-owl-carousel" id="home-section">
@@ -110,28 +257,40 @@
           <div class="slide-text">
             <h1>Advancing Research Through Innovation</h1>
             <p class="mb-5">Explore groundbreaking research papers, cutting-edge methodologies, and innovative findings that shape the future of knowledge and discovery.</p>
-            <p><a href="{% url 'app:browse' %}" class="btn btn-outline-light py-3 px-5">Browse Papers</a></p>
           </div>
           
           <!-- Carousel Slide 2 -->
           <div class="slide-text">
             <h1>Peer-Reviewed Excellence</h1>
             <p class="mb-5">Access high-quality, peer-reviewed research publications from leading scholars and institutions worldwide.</p>
-            <p><a href="{% url 'app:browse' %}" class="btn btn-outline-light py-3 px-5">View Publications</a></p>
           </div>
           
           <!-- Carousel Slide 3 -->
           <div class="slide-text">
             <h1>Discover New Insights</h1>
             <p class="mb-5">Stay updated with the latest research findings, methodologies, and academic contributions across diverse fields of study.</p>
-            <p><a href="{% url 'app:browse' %}" class="btn btn-outline-light py-3 px-5">Explore Research</a></p>
           </div>
           
           <!-- Carousel Slide 4 -->
           <div class="slide-text">
             <h1>Academic Excellence</h1>
             <p class="mb-5">Join a community of researchers, scholars, and academics dedicated to advancing knowledge and scientific understanding.</p>
-            <p><a href="{% url 'app:browse' %}" class="btn btn-outline-light py-3 px-5">Join Community</a></p>
+          </div>
+        </div>
+
+        <!-- Static Search Bar -->
+        <div class="hero-search-static">
+          <div class="hero-search-wrapper">
+            <div class="search-input-wrapper">
+              <input 
+                type="text" 
+                class="hero-search-input" 
+                id="heroSearchInput" 
+                placeholder="Search articles, journals, authors..."
+                autocomplete="off"
+              />
+              <div class="autocomplete-results" id="autocompleteResults"></div>
+            </div>
           </div>
         </div>
 
@@ -140,16 +299,16 @@
                     
         <div class="owl-carousel slide-one-item-alt">
           <!-- Carousel Image 1 -->
-          <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1200&h=800&fit=crop" alt="Research Innovation" class="img-fluid">
+          <img src="https://res.cloudinary.com/dmqizfpyz/image/upload/v1763149807/bg1_svob3l.png" alt="Research Innovation" class="img-fluid">
           
           <!-- Carousel Image 2 -->
-          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&h=800&fit=crop" alt="Research Publication" class="img-fluid">
+          <img src="https://res.cloudinary.com/dmqizfpyz/image/upload/v1763149807/bg2_dlnqkz.png" alt="Research Publication" class="img-fluid">
           
           <!-- Carousel Image 3 -->
-          <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1200&h=800&fit=crop" alt="Research Discovery" class="img-fluid">
+          <img src="https://res.cloudinary.com/dmqizfpyz/image/upload/v1763149806/bg3_gv0clb.png" alt="Research Discovery" class="img-fluid">
           
           <!-- Carousel Image 4 -->
-          <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&h=800&fit=crop" alt="Academic Research" class="img-fluid">
+          <img src="https://res.cloudinary.com/dmqizfpyz/image/upload/v1763149807/bg1_svob3l.png" alt="Academic Research" class="img-fluid">
         </div>
 
       </div>
@@ -409,6 +568,99 @@
         setTimeout(startInit, 100);
       }
     });
+
+    // Hero Search Autocomplete Functionality
+    function initHeroSearch() {
+      const searchInput = document.getElementById('heroSearchInput');
+      const autocompleteResults = document.getElementById('autocompleteResults');
+      let searchTimeout;
+      let isAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
+
+      if (!searchInput || !autocompleteResults) return;
+
+      // Handle input typing
+      searchInput.addEventListener('input', function(e) {
+        const query = e.target.value.trim();
+        
+        clearTimeout(searchTimeout);
+        
+        if (query.length < 2) {
+          autocompleteResults.classList.remove('show');
+          autocompleteResults.innerHTML = '';
+          return;
+        }
+
+        // Debounce search
+        searchTimeout = setTimeout(function() {
+          performAutocomplete(query);
+        }, 300);
+      });
+
+      // Handle Enter key
+      searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          const query = e.target.value.trim();
+          if (query) {
+            window.location.href = '{% url "app:browse" %}?search=' + encodeURIComponent(query);
+          }
+        }
+      });
+
+      // Close autocomplete when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !autocompleteResults.contains(e.target)) {
+          autocompleteResults.classList.remove('show');
+        }
+      });
+
+      // Perform autocomplete search
+      function performAutocomplete(query) {
+        fetch('{% url "app:hero_autocomplete" %}?q=' + encodeURIComponent(query))
+          .then(response => response.json())
+          .then(data => {
+            if (data.success && data.results.length > 0) {
+              displayResults(data.results, isAuthenticated);
+            } else {
+              autocompleteResults.classList.remove('show');
+              autocompleteResults.innerHTML = '';
+            }
+          })
+          .catch(error => {
+            console.error('Autocomplete error:', error);
+            autocompleteResults.classList.remove('show');
+          });
+      }
+
+      // Display autocomplete results
+      function displayResults(results, authenticated) {
+        let html = '';
+        let hasAuthRequired = false;
+        
+        results.forEach(function(result) {
+          if (result.requires_auth && !authenticated) {
+            if (!hasAuthRequired) {
+              html += '<div class="autocomplete-item-auth-required">';
+              html += 'Please <a href="{% url "app:auth" %}">login</a> or <a href="{% url "app:auth" %}">create an account</a> to access this content';
+              html += '</div>';
+              hasAuthRequired = true;
+            }
+          } else {
+            // Escape HTML to prevent code display
+            const title = result.title.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            html += '<a href="' + result.url + '" class="autocomplete-item">';
+            html += '<div class="autocomplete-item-title">' + title + '</div>';
+            html += '<div class="autocomplete-item-type">' + result.type + '</div>';
+            html += '</a>';
+          }
+        });
+
+        autocompleteResults.innerHTML = html;
+        autocompleteResults.classList.add('show');
+      }
+    }
+
+    // Initialize hero search
+    initHeroSearch();
   });
 </script>
 

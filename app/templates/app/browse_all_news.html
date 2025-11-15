@@ -1,0 +1,427 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Browse All News - ScholarIndex{% endblock %}
+
+{% block content %}
+<style>
+  .browse-news-page {
+    padding: 3rem 1.5rem;
+    background-color: #f9fafb;
+    min-height: calc(100vh - 5rem);
+  }
+
+  .browse-news-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .browse-news-header {
+    margin-bottom: 2rem;
+  }
+
+  .browse-news-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .search-filter-section {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .search-filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+  }
+
+  .form-group {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.9375rem;
+    color: #111827;
+    background-color: #ffffff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .form-group input::placeholder {
+    color: #9ca3af;
+  }
+
+  .search-button-group {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .btn {
+    padding: 0.625rem 1.25rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn-primary {
+    background-color: #3b82f6;
+    color: #ffffff;
+  }
+
+  .btn-primary:hover {
+    background-color: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+  }
+
+  .btn-secondary {
+    background-color: #6b7280;
+    color: #ffffff;
+  }
+
+  .btn-secondary:hover {
+    background-color: #4b5563;
+  }
+
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding: 0 0.5rem;
+  }
+
+  .results-count {
+    font-size: 0.9375rem;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .results-count strong {
+    color: #111827;
+  }
+
+  .clear-filters {
+    font-size: 0.875rem;
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+
+  .clear-filters:hover {
+    color: #2563eb;
+    text-decoration: underline;
+  }
+
+  .news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .news-card {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .news-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    border-color: #3b82f6;
+  }
+
+  .news-card-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    background-color: #f3f4f6;
+  }
+
+  .news-card-content {
+    padding: 1.25rem;
+  }
+
+  .news-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .news-card-tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    padding: 0.25rem 0.5rem;
+    background-color: #f3f4f6;
+    border-radius: 4px;
+  }
+
+  .news-card-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .news-card-excerpt {
+    font-size: 0.875rem;
+    color: #6b7280;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .news-card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    color: #9ca3af;
+  }
+
+  .news-card-date {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .news-card-views {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+  }
+
+  .empty-state-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1rem;
+    color: #d1d5db;
+  }
+
+  .empty-state h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-state p {
+    font-size: 0.9375rem;
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .browse-news-page {
+      padding: 2rem 1rem;
+    }
+
+    .search-filter-form {
+      flex-direction: column;
+    }
+
+    .form-group {
+      min-width: 100%;
+    }
+
+    .search-button-group {
+      width: 100%;
+    }
+
+    .search-button-group .btn {
+      flex: 1;
+    }
+
+    .news-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .results-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+  }
+</style>
+
+<div class="browse-news-page">
+  <div class="browse-news-container">
+    <div class="browse-news-header">
+      <h1>Browse All News</h1>
+      
+      <div class="search-filter-section">
+        <form method="get" action="{% url 'app:browse_all_news' %}" class="search-filter-form">
+          <div class="form-group">
+            <label for="search">Search News</label>
+            <input 
+              type="text" 
+              id="search" 
+              name="search" 
+              placeholder="Search by title, content, or excerpt..." 
+              value="{{ search_query }}"
+            >
+          </div>
+          
+          <div class="form-group">
+            <label for="tag">Filter by Tag</label>
+            <select id="tag" name="tag">
+              <option value="">All Tags</option>
+              {% for tag in all_tags %}
+              <option value="{{ tag.id }}" {% if selected_tag == tag.id|stringformat:"s" %}selected{% endif %}>
+                {{ tag.name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <div class="search-button-group">
+            <button type="submit" class="btn btn-primary">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 0.5rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+              Search
+            </button>
+            {% if search_query or selected_tag %}
+            <a href="{% url 'app:browse_all_news' %}" class="btn btn-secondary">Clear</a>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="results-header">
+      <div class="results-count">
+        Found <strong>{{ articles|length }}</strong> article{{ articles|length|pluralize }}
+        {% if search_query %}
+          matching "{{ search_query }}"
+        {% endif %}
+      </div>
+      {% if search_query or selected_tag %}
+      <a href="{% url 'app:browse_all_news' %}" class="clear-filters">Clear all filters</a>
+      {% endif %}
+    </div>
+
+    {% if articles %}
+    <div class="news-grid">
+      {% for article in articles %}
+      <a href="{% url 'app:news_detail' slug=article.slug %}" class="news-card">
+        {% if article.featured_image %}
+        <img src="{{ article.featured_image.url }}" alt="{{ article.title }}" class="news-card-image">
+        {% else %}
+        <div class="news-card-image" style="background-color: #f3f4f6; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 3rem;">📰</div>
+        {% endif %}
+        <div class="news-card-content">
+          <div class="news-card-tags">
+            {% for tag in article.tags.all|slice:":2" %}
+            <span class="news-card-tag">{{ tag.name }}</span>
+            {% endfor %}
+          </div>
+          <h3 class="news-card-title">{{ article.title }}</h3>
+          {% if article.excerpt %}
+          <p class="news-card-excerpt">{{ article.excerpt }}</p>
+          {% endif %}
+          <div class="news-card-meta">
+            <div class="news-card-date">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              {{ article.formatted_date }}
+            </div>
+            <div class="news-card-views">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+              </svg>
+              {{ article.view_count }} views
+            </div>
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      <h3>No articles found</h3>
+      <p>
+        {% if search_query or selected_tag %}
+        Try adjusting your search or filter criteria.
+        {% else %}
+        There are no news articles available at the moment.
+        {% endif %}
+      </p>
+      {% if search_query or selected_tag %}
+      <a href="{% url 'app:browse_all_news' %}" class="btn btn-primary">View All News</a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+

@@ -48,14 +48,26 @@ def landing(request):
 
 def browse(request):
     """Browse articles view"""
-    search_form = SearchForm(request.GET or None)
-    results = []
+    from django.db.models import Q
     
-    if search_form.is_valid():
+    # Get search query from GET parameter or form
+    search_query = request.GET.get('search', '').strip()
+    search_form = SearchForm(request.GET or None)
+    
+    # If search parameter is provided, use it
+    if search_query:
+        search_form = SearchForm({'query': search_query})
+        results = Article.objects.filter(
+            Q(title__icontains=search_query) | Q(abstract__icontains=search_query)
+        )
+    elif search_form.is_valid():
         query = search_form.cleaned_data['query']
         # Search articles in database
-        results = Article.objects.filter(title__icontains=query) | Article.objects.filter(abstract__icontains=query)
-        messages.info(request, f'Found {results.count()} results for: {query}')
+        results = Article.objects.filter(
+            Q(title__icontains=query) | Q(abstract__icontains=query)
+        )
+    else:
+        results = Article.objects.none()
     
     return render(request, 'app/browse.html', {
         'search_form': search_form,
@@ -1898,8 +1910,8 @@ def policy_terms(request):
 
 def news(request):
     """News page view with Latest News, Top Tags, and Recommended News"""
-    # Get latest news articles (6 for the grid)
-    latest_news = NewsArticle.objects.filter(is_published=True)[:6]
+    # Get latest news articles (10 for the grid)
+    latest_news = NewsArticle.objects.filter(is_published=True)[:10]
     
     # Get top tags (ordered by priority, then name, limit to 3 initially)
     top_tags = NewsTag.objects.filter(is_active=True).order_by('-order_priority', 'name')[:3]
@@ -1937,6 +1949,153 @@ def load_more_tags(request):
         'success': True,
         'tags': tags_data,
         'has_more': has_more
+    })
+
+def browse_all_news(request):
+    """Browse all news with search and filter functionality"""
+    from django.db.models import Q
+    
+    # Get all published news articles
+    articles = NewsArticle.objects.filter(is_published=True)
+    
+    # Search functionality
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        articles = articles.filter(
+            Q(title__icontains=search_query) |
+            Q(content__icontains=search_query) |
+            Q(excerpt__icontains=search_query)
+        )
+    
+    # Filter by tag
+    tag_filter = request.GET.get('tag', '')
+    if tag_filter:
+        articles = articles.filter(tags__id=tag_filter)
+    
+    # Filter by date range (optional - can be added later)
+    # date_from = request.GET.get('date_from', '')
+    # date_to = request.GET.get('date_to', '')
+    
+    # Order by published date (newest first)
+    articles = articles.order_by('-published_date').distinct()
+    
+    # Get all active tags for filter dropdown
+    all_tags = NewsTag.objects.filter(is_active=True).order_by('name')
+    
+    # Pagination (optional - can be added later if needed)
+    # For now, show all filtered results
+    
+    return render(request, 'app/browse_all_news.html', {
+        'articles': articles,
+        'all_tags': all_tags,
+        'search_query': search_query,
+        'selected_tag': tag_filter,
+    })
+
+def hero_autocomplete(request):
+    """Autocomplete API endpoint for hero search - searches only: Indexed Articles, Indexed Journals, Project Archive, and News"""
+    from django.utils.html import strip_tags
+    import re
+    
+    query = request.GET.get('q', '').strip()
+    
+    if len(query) < 2:
+        return JsonResponse({'success': False, 'results': []})
+    
+    def clean_text(text):
+        """Remove HTML tags and code snippets from text"""
+        if not text:
+            return ""
+        # Remove HTML tags
+        text = strip_tags(str(text))
+        # Remove code-like patterns (HTML entities, style attributes, etc.)
+        text = re.sub(r'&[a-z]+;', '', text)  # Remove HTML entities like &quot;
+        text = re.sub(r'style="[^"]*"', '', text)  # Remove style attributes
+        text = re.sub(r'<[^>]+>', '', text)  # Remove any remaining HTML tags
+        text = re.sub(r'\{[^}]+\}', '', text)  # Remove CSS-like blocks
+        text = re.sub(r'rgb\([^)]+\)', '', text)  # Remove rgb() color codes
+        # Clean up extra whitespace
+        text = ' '.join(text.split())
+        return text[:100]  # Limit length
+    
+    results = []
+    
+    # 1. Search Indexed Articles
+    articles = Article.objects.filter(
+        status__in=['approved', 'pending']  # Only show approved/pending articles
+    ).filter(
+        Q(title__icontains=query) | 
+        Q(abstract__icontains=query) | 
+        Q(keywords__icontains=query) |
+        Q(authors_names__icontains=query) |
+        Q(journal_name__icontains=query) |
+        Q(discipline__icontains=query)
+    )[:8]  # Get more results per category
+    for article in articles:
+        results.append({
+            'title': clean_text(article.title),
+            'type': 'Indexed Articles',
+            'url': f'/indexed_articles/view/{article.id}/',
+            'requires_auth': False
+        })
+    
+    # 2. Search Indexed Journals
+    journals = Journal.objects.filter(
+        Q(journal_name__icontains=query) | 
+        Q(journal_scope__icontains=query) |
+        Q(publisher_name__icontains=query) |
+        Q(issn_print__icontains=query) |
+        Q(issn_online__icontains=query) |
+        Q(e_issn__icontains=query) |
+        Q(subject_area__icontains=query)
+    )[:8]
+    for journal in journals:
+        results.append({
+            'title': clean_text(journal.journal_name),
+            'type': 'Indexed Journals',
+            'url': f'/indexed_journals/view/{journal.id}/',
+            'requires_auth': False
+        })
+    
+    # 3. Search Project | Research Archive
+    projects = Project.objects.filter(
+        Q(project_title__icontains=query) | 
+        Q(description__icontains=query) |
+        Q(category__icontains=query) |
+        Q(institution__icontains=query)
+    )[:8]
+    for project in projects:
+        results.append({
+            'title': clean_text(project.project_title),
+            'type': 'Project | Research Archive',
+            'url': f'/project_archive/view/{project.id}/',
+            'requires_auth': False
+        })
+    
+    # 4. Search News Page
+    news_articles = NewsArticle.objects.filter(
+        is_published=True
+    ).filter(
+        Q(title__icontains=query) | 
+        Q(excerpt__icontains=query) |
+        Q(content__icontains=query)
+    )[:8]
+    for news in news_articles:
+        results.append({
+            'title': clean_text(news.title),
+            'type': 'News',
+            'url': f'/news/{news.slug}/',
+            'requires_auth': False
+        })
+    
+    # Limit total results and sort by relevance (prioritize title matches)
+    # Sort: title matches first, then other matches
+    results.sort(key=lambda x: (not x['title'].lower().startswith(query.lower()), x['title']))
+    results = results[:20]  # Show up to 20 results total
+    
+    return JsonResponse({
+        'success': True,
+        'results': results
     })
 
 @login_required
