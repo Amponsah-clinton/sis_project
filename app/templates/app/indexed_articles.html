@@ -596,18 +596,18 @@
 
     <!-- Main Content -->
     <div class="main-content">
-      <!-- Page Header -->
-      <div class="page-header">
-        <h1>Indexed Articles</h1>
-        <p>Browse through our comprehensive collection of indexed research articles</p>
-      </div>
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1>Indexed Articles</h1>
+      <p>Browse through our comprehensive collection of indexed research articles</p>
+    </div>
 
       <!-- Search Bar -->
       <div class="search-bar-container">
         <input type="text" class="search-bar" id="article-search" placeholder="Search articles by title, author, or abstract..." onkeyup="filterArticles()">
       </div>
 
-      <!-- Articles List -->
+    <!-- Articles List -->
       <div class="articles-list" id="articles-list">
       {% if articles_with_time %}
         {% for item in articles_with_time %}
@@ -631,24 +631,24 @@
               {% if article.authors_names %}
                 <p class="article-authors">{{ article.authors_names }}</p>
               {% elif article.articleauthor_set.all %}
-                <p class="article-authors">
+            <p class="article-authors">
                   {% for author in article.articleauthor_set.all %}
                     {{ author.name }}{% if not forloop.last %}, {% endif %}
                   {% endfor %}
                 </p>
               {% endif %}
 
-              {% if article.abstract %}
+                {% if article.abstract %}
                 <p class="article-snippet">
-                  {% autoescape off %}
+                    {% autoescape off %}
                     {{ article.abstract|striptags|truncatewords:30 }}
-                  {% endautoescape %}
-                </p>
-              {% endif %}
+                    {% endautoescape %}
+                  </p>
+                {% endif %}
 
               <div class="article-meta">
                 <span class="article-platform-text">{{ time_ago }}</span>
-              </div>
+            </div>
             </div>
           </a>
           {% endwith %}
@@ -659,7 +659,7 @@
           <p>There are no indexed articles available at the moment.</p>
         </div>
       {% endif %}
-      </div>
+    </div>
 
       <!-- Pagination -->
       {% if page_obj.has_other_pages or page_obj.paginator.count > 0 %}
@@ -685,8 +685,8 @@
               <option value="60" {% if per_page == 60 %}selected{% endif %}>60</option>
               <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
             </select>
-          </div>
-        </div>
+  </div>
+</div>
         
         <div class="pagination-nav">
           {% if page_obj.has_previous %}
@@ -725,7 +725,7 @@
             </span>
           {% endif %}
         </div>
-      </div>
+            </div>
       {% endif %}
     </div>
   </div>

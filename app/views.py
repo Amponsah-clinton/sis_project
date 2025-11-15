@@ -1412,36 +1412,36 @@ def donate(request):
 
 def sponsors(request):
     """Sponsors page view - displays list of contributors/sponsors"""
-    # Sample sponsor data - in production, this would come from a Sponsor model
+    # Sponsor data with actual logo URLs
     sponsors_data = {
         'premier': [
             {
                 'name': 'University of Energy and Natural Resources',
-                'logo': 'https://via.placeholder.com/200x200?text=UENR',
+                'logo': 'https://res.cloudinary.com/dmqizfpyz/image/upload/v1763228952/uenr_kxmfdz.png',
             },
             {
                 'name': 'U.S. Department of the Interior',
-                'logo': 'https://via.placeholder.com/200x200?text=USDOI',
+                'logo': 'https://res.cloudinary.com/dmqizfpyz/image/upload/v1763228952/premier_yploja.png',
             },
         ],
         'sustaining': [
             {
                 'name': 'IEEE',
-                'logo': 'https://via.placeholder.com/200x200?text=IEEE',
+                'logo': 'https://res.cloudinary.com/dmqizfpyz/image/upload/v1763228951/ieee_idrslf.gif',
             },
             {
                 'name': 'Catholic University of Ghana',
-                'logo': 'https://via.placeholder.com/200x200?text=CUG',
+                'logo': 'https://res.cloudinary.com/dmqizfpyz/image/upload/v1763228951/cug_tsz1xw.png',
             },
             {
                 'name': 'Sunyani Technical University',
-                'logo': 'https://via.placeholder.com/200x200?text=STU',
+                'logo': 'https://res.cloudinary.com/dmqizfpyz/image/upload/v1763228952/stu_uvpu4j.png',
             },
         ],
         'basic': [
             {
                 'name': 'International Journal of Multidisciplinary Studies and Innovative Research',
-                'logo': 'https://via.placeholder.com/200x200?text=IJMSIR',
+                'logo': 'https://res.cloudinary.com/dmqizfpyz/image/upload/v1763228952/ijms_pdlmyd.jpg',
             },
         ],
     }
@@ -1514,24 +1514,61 @@ def initialize_payment(request):
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 def request_membership(request):
-    """Request For Membership page view"""
+    """Request For SIS Member page view"""
     if request.method == 'POST':
-        form = MembershipRequestForm(request.POST, request.FILES)
-        if form.is_valid():
-            membership = form.save(commit=False)
-            if request.user.is_authenticated:
-                membership.submitted_by = request.user
-            membership.save()
+        # Get form data
+        full_name = request.POST.get('full_name', '').strip()
+        email = request.POST.get('email', '').strip()
+        country = request.POST.get('country', '').strip()
+        institution = request.POST.get('institution', '').strip()
+        aspiring_position = request.POST.get('aspiring_position', '').strip()
+        about_yourself = request.POST.get('about_yourself', '').strip()
+        terms = request.POST.get('terms') == 'on'
+        profile_picture = request.FILES.get('profile_picture')
+        
+        # Validation
+        if not full_name:
+            messages.error(request, 'Please enter your first name and surname.')
+        elif not email:
+            messages.error(request, 'Please enter your email address.')
+        elif not country:
+            messages.error(request, 'Please select a country.')
+        elif not institution:
+            messages.error(request, 'Please enter your institution.')
+        elif not aspiring_position:
+            messages.error(request, 'Please select an aspiring position.')
+        elif not about_yourself:
+            messages.error(request, 'Please tell us more about yourself.')
+        elif not terms:
+            messages.error(request, 'Please agree to the Terms and Conditions and Privacy policy.')
+        elif not profile_picture:
+            messages.error(request, 'Please upload a profile picture.')
+        else:
+            # Split full name into first and last name
+            name_parts = full_name.split(maxsplit=1)
+            first_name = name_parts[0] if name_parts else ''
+            last_name = name_parts[1] if len(name_parts) > 1 else ''
+            
+            # Create membership request
+            from app.models import MembershipRequest
+            membership = MembershipRequest.objects.create(
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                phone='',  # Not required in new form
+                country=country,
+                institution=institution,
+                position=aspiring_position,
+                membership_type='individual',  # Default value
+                research_interests=about_yourself,
+                profile_picture=profile_picture,
+                terms_accepted=terms,
+                submitted_by=request.user if request.user.is_authenticated else None
+            )
             messages.success(request, 'Your membership request has been submitted successfully!')
             return redirect('app:landing')
-        else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f'{field}: {error}')
-    else:
-        form = MembershipRequestForm()
     
-    return render(request, 'app/request_membership.html', {'form': form})
+    return render(request, 'app/request_membership.html')
 
 def apply_directory(request):
     """Apply For Directory of Researcher page view"""

@@ -224,19 +224,24 @@ class MembershipRequest(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.EmailField()
-    phone = models.CharField(max_length=20)
+    phone = models.CharField(max_length=20, blank=True)
     country = models.CharField(max_length=100)
     institution = models.CharField(max_length=300, blank=True)
     position = models.CharField(max_length=200, blank=True)
-    membership_type = models.CharField(max_length=50, choices=MEMBERSHIP_TYPE_CHOICES)
+    membership_type = models.CharField(max_length=50, choices=MEMBERSHIP_TYPE_CHOICES, default='individual')
     research_interests = models.TextField(blank=True)
+    profile_picture = models.ImageField(upload_to='membership_requests/profiles/', blank=True, null=True)
     cv_file = models.FileField(
         upload_to='membership_requests/cvs/',
-        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'doc', 'docx'])]
+        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'doc', 'docx'])],
+        blank=True,
+        null=True
     )
     motivation_letter = models.FileField(
         upload_to='membership_requests/letters/',
-        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'doc', 'docx'])]
+        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'doc', 'docx'])],
+        blank=True,
+        null=True
     )
     terms_accepted = models.BooleanField(default=False)
     submitted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
