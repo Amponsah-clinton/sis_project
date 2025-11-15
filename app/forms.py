@@ -107,14 +107,18 @@ class ArticleAuthorForm(forms.ModelForm):
 class JournalForm(forms.ModelForm):
     class Meta:
         model = Journal
-        fields = ['journal_name', 'journal_abbreviation', 'publisher_name', 'publisher_address',
-                  'publisher_country', 'publisher_email', 'publisher_phone', 'publisher_website',
-                  'issn_print', 'issn_online', 'e_issn', 'subject_area', 'language',
-                  'publication_frequency', 'first_publication_year', 'journal_scope',
-                  'journal_logo', 'terms_accepted']
+        fields = ['journal_name', 'journal_abbreviation', 'journal_cover_image', 'journal_logo', 'journal_url',
+                  'publisher_name', 'publisher_address', 'publisher_country', 'publisher_email', 
+                  'publisher_phone', 'publisher_website', 'issn_print', 'issn_online', 'e_issn', 
+                  'subject_area', 'language', 'publication_frequency', 'first_publication_year', 
+                  'journal_scope', 'journal_type', 'journal_format', 'publication_fee', 
+                  'open_access', 'peer_review', 'terms_accepted']
         widgets = {
             'journal_name': forms.TextInput(attrs={'class': 'form-control'}),
             'journal_abbreviation': forms.TextInput(attrs={'class': 'form-control'}),
+            'journal_cover_image': forms.FileInput(attrs={'class': 'form-control'}),
+            'journal_logo': forms.FileInput(attrs={'class': 'form-control'}),
+            'journal_url': forms.URLInput(attrs={'class': 'form-control'}),
             'publisher_name': forms.TextInput(attrs={'class': 'form-control'}),
             'publisher_address': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'publisher_country': forms.TextInput(attrs={'class': 'form-control'}),
@@ -129,7 +133,11 @@ class JournalForm(forms.ModelForm):
             'publication_frequency': forms.TextInput(attrs={'class': 'form-control'}),
             'first_publication_year': forms.NumberInput(attrs={'class': 'form-control'}),
             'journal_scope': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
-            'journal_logo': forms.FileInput(attrs={'class': 'form-control'}),
+            'journal_type': forms.Select(attrs={'class': 'form-control'}),
+            'journal_format': forms.Select(attrs={'class': 'form-control'}),
+            'publication_fee': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'open_access': forms.HiddenInput(),  # Handled manually via radio buttons
+            'peer_review': forms.HiddenInput(),  # Handled manually via radio buttons
             'terms_accepted': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 

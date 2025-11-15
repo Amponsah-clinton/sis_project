@@ -1,18 +1,18 @@
 {% extends 'app/base.html' %}
 {% load static %}
 
-{% block title %}Upload | Archive Project - ScholarIndex{% endblock %}
+{% block title %}New Project Archive - ScholarIndex{% endblock %}
 
 {% block content %}
 <style>
   .upload-project-page {
-    padding: 2rem 1.5rem;
-    background-color: #f5f5f5;
+    padding: 2rem 1.5rem 3rem;
+    background-color: #f9fafb;
     min-height: calc(100vh - 5rem);
   }
 
   .upload-container {
-    max-width: 1000px;
+    max-width: 900px;
     margin: 0 auto;
   }
 
@@ -21,44 +21,21 @@
     border-radius: 8px;
     padding: 2rem;
     margin-bottom: 2rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
   .upload-header h1 {
-    font-size: 2rem;
+    font-size: 1.75rem;
     font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 0.5rem;
-  }
-
-  .upload-header p {
-    font-size: 0.9375rem;
-    color: #6b7280;
+    color: #111827;
     margin: 0;
   }
 
   .upload-form {
     background-color: #ffffff;
     border-radius: 8px;
-    padding: 2rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  .form-section {
-    margin-bottom: 2.5rem;
-  }
-
-  .form-section:last-of-type {
-    margin-bottom: 0;
-  }
-
-  .section-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 2px solid #e5e7eb;
+    padding: 2.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
   .form-group {
@@ -78,64 +55,23 @@
     margin-left: 0.25rem;
   }
 
-  .form-group input[type="text"],
-  .form-group input[type="email"],
-  .form-group input[type="url"],
-  .form-group input[type="date"],
-  .form-group input[type="number"],
-  .form-group select,
-  .form-group textarea {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-size: 0.9375rem;
-    color: #1f2937;
-    background-color: #ffffff;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    font-family: inherit;
-  }
-
-  .form-group input:focus,
-  .form-group select:focus,
-  .form-group textarea:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-
-  .form-group textarea {
-    resize: vertical;
-    min-height: 100px;
-  }
-
   .form-row {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
   }
 
-  .form-group.full-width {
-    grid-column: 1 / -1;
+  .form-row-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
   }
 
-  .form-hint {
-    font-size: 0.75rem;
-    color: #6b7280;
-    margin-top: 0.5rem;
-  }
-
-  .char-counter {
-    font-size: 0.75rem;
-    color: #6b7280;
-    text-align: right;
-    margin-top: 0.25rem;
-  }
-
+  /* File Upload Styling */
   .file-upload-wrapper {
     border: 2px dashed #d1d5db;
     border-radius: 8px;
-    padding: 2rem;
+    padding: 3rem 2rem;
     text-align: center;
     background-color: #f9fafb;
     transition: all 0.3s ease;
@@ -166,109 +102,147 @@
     overflow: hidden;
   }
 
-  .file-upload-icon {
-    width: 48px;
-    height: 48px;
-    margin: 0 auto 1rem;
-    color: #6b7280;
-  }
-
   .file-upload-text {
-    font-size: 1rem;
-    font-weight: 500;
-    color: #1f2937;
-    margin-bottom: 0.5rem;
-  }
-
-  .file-upload-hint {
-    font-size: 0.875rem;
-    color: #6b7280;
-  }
-
-  .file-name-display {
-    margin-top: 1rem;
-    padding: 0.75rem;
-    background-color: #ffffff;
-    border-radius: 6px;
-    font-size: 0.875rem;
-    color: #059669;
-    font-weight: 500;
-  }
-
-  .member-section {
-    background-color: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .member-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid #e5e7eb;
-  }
-
-  .member-header span {
-    font-weight: 600;
-    color: #1f2937;
     font-size: 0.9375rem;
+    color: #6b7280;
+    margin: 0;
   }
 
-  .btn-remove-member {
-    background: none;
-    border: none;
-    color: #ef4444;
-    cursor: pointer;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    transition: background-color 0.2s;
-  }
-
-  .btn-remove-member:hover {
-    background-color: #fee2e2;
-  }
-
-  .btn-add-member {
+  /* Input and Select Styling */
+  .form-group input[type="text"],
+  .form-group input[type="number"],
+  .form-group select,
+  .form-group textarea {
     width: 100%;
-    padding: 0.875rem 1.5rem;
-    background-color: #ffffff;
-    border: 2px dashed #d1d5db;
-    border-radius: 8px;
-    color: #6b7280;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
     font-size: 0.9375rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
+    color: #111827;
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .form-group input:disabled {
+    background-color: #f3f4f6;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+
+  .form-group input.auto-detected {
+    border-color: #10b981;
+    background-color: #f0fdf4;
+  }
+
+  .form-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+    font-family: inherit;
+  }
+
+  /* Rich Text Editor Styling */
+  .rich-text-editor {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    overflow: hidden;
+    background-color: #ffffff;
+  }
+
+  .rich-text-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background-color: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    flex-wrap: wrap;
+  }
+
+  .toolbar-btn {
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    border: none;
+    background: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #6b7280;
+    transition: all 0.2s ease;
   }
 
-  .btn-add-member:hover {
-    border-color: #3b82f6;
+  .toolbar-btn:hover {
+    background-color: #e5e7eb;
+    color: #111827;
+  }
+
+  .toolbar-btn.active {
+    background-color: #dbeafe;
     color: #3b82f6;
-    background-color: #eff6ff;
   }
 
+  .toolbar-separator {
+    width: 1px;
+    height: 24px;
+    background-color: #e5e7eb;
+    margin: 0 0.25rem;
+  }
+
+  .toolbar-select {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.8125rem;
+    background-color: #ffffff;
+    color: #374151;
+    cursor: pointer;
+  }
+
+  .rich-text-content {
+    min-height: 300px;
+    padding: 1rem;
+    border: none;
+    outline: none;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: #111827;
+    font-family: inherit;
+  }
+
+  .rich-text-content:focus {
+    outline: none;
+  }
+
+  .rich-text-content[data-placeholder]:empty:before {
+    content: attr(data-placeholder);
+    color: #9ca3af;
+  }
+
+  /* Checkbox Styling */
   .checkbox-group {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .checkbox-group label {
     display: flex;
     align-items: flex-start;
     gap: 0.75rem;
-    cursor: pointer;
-    font-size: 0.875rem;
-    color: #374151;
-    margin: 0;
+    margin-top: 1.5rem;
   }
 
   .checkbox-group input[type="checkbox"] {
@@ -280,6 +254,14 @@
     flex-shrink: 0;
   }
 
+  .checkbox-group label {
+    font-size: 0.875rem;
+    color: #374151;
+    margin: 0;
+    cursor: pointer;
+    line-height: 1.5;
+  }
+
   .checkbox-group a {
     color: #3b82f6;
     text-decoration: none;
@@ -289,45 +271,59 @@
     text-decoration: underline;
   }
 
+  /* Submit Button */
   .form-actions {
     display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
+    justify-content: center;
+    margin-top: 2.5rem;
     padding-top: 2rem;
-    margin-top: 2rem;
     border-top: 1px solid #e5e7eb;
   }
 
-  .btn-submit,
-  .btn-draft {
-    padding: 0.875rem 2rem;
-    border-radius: 6px;
-    font-size: 0.9375rem;
+  .btn-submit {
+    padding: 0.875rem 2.5rem;
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
-    border: none;
-  }
-
-  .btn-draft {
-    background-color: #f3f4f6;
-    color: #374151;
-    border: 1px solid #d1d5db;
-  }
-
-  .btn-draft:hover {
-    background-color: #e5e7eb;
-  }
-
-  .btn-submit {
-    background-color: #3b82f6;
-    color: #ffffff;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
   }
 
   .btn-submit:hover {
-    background-color: #2563eb;
+    background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+
+  .btn-submit:active {
+    transform: translateY(0);
+  }
+
+  .btn-submit svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .file-name-display {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background-color: #ffffff;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #059669;
+    font-weight: 500;
+    display: none;
+  }
+
+  .file-name-display.show {
+    display: block;
   }
 
   @media (max-width: 768px) {
@@ -335,31 +331,45 @@
       padding: 1.5rem 1rem;
     }
 
-    .upload-header,
     .upload-form {
       padding: 1.5rem;
     }
 
-    .upload-header h1 {
-      font-size: 1.75rem;
+    .upload-header {
+      padding: 1.5rem;
     }
 
-    .form-row {
+    .upload-header h1 {
+      font-size: 1.5rem;
+    }
+
+    .form-row,
+    .form-row-3 {
       grid-template-columns: 1fr;
       gap: 0;
     }
 
-    .form-actions {
-      flex-direction: column;
+    .form-group {
+      margin-bottom: 1.25rem;
     }
 
-    .btn-submit,
-    .btn-draft {
-      width: 100%;
+    .rich-text-toolbar {
+      gap: 0.375rem;
+      padding: 0.5rem;
     }
 
-    .section-title {
-      font-size: 1.125rem;
+    .toolbar-btn {
+      width: 28px;
+      height: 28px;
+    }
+
+    .rich-text-content {
+      min-height: 250px;
+      padding: 0.75rem;
+    }
+
+    .file-upload-wrapper {
+      padding: 2rem 1.5rem;
     }
   }
 
@@ -368,21 +378,17 @@
       padding: 1rem 0.75rem;
     }
 
-    .upload-header,
     .upload-form {
       padding: 1.25rem;
     }
 
-    .upload-header h1 {
-      font-size: 1.5rem;
-    }
-
-    .form-section {
-      margin-bottom: 2rem;
-    }
-
-    .member-section {
+    .upload-header {
       padding: 1.25rem;
+    }
+
+    .btn-submit {
+      width: 100%;
+      justify-content: center;
     }
   }
 </style>
@@ -390,516 +396,510 @@
 <div class="upload-project-page">
   <div class="upload-container">
     <div class="upload-header">
-      <h1>Upload | Archive Project</h1>
-      <p>Submit your research project to be archived in our database</p>
+      <h1>New Project Archive</h1>
     </div>
 
     <form class="upload-form" method="post" action="{% url 'app:upload_project' %}" enctype="multipart/form-data">
       {% csrf_token %}
 
-      <!-- Project Information -->
-      <div class="form-section">
-        <h2 class="section-title">Project Information</h2>
-        
-        <div class="form-group full-width">
-          <label for="project_title">Project Title <span class="required">*</span></label>
-          <input type="text" id="project_title" name="project_title" required placeholder="Enter the full title of your research project">
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="project_type">Project Type <span class="required">*</span></label>
-            <select id="project_type" name="project_type" required>
-              <option value="">Select project type</option>
-              <option value="research-project">Research Project</option>
-              <option value="collaboration">Collaboration</option>
-              <option value="grant-funded">Grant Funded</option>
-              <option value="institutional">Institutional</option>
-              <option value="international">International</option>
-              <option value="ongoing">Ongoing Project</option>
-              <option value="completed">Completed Project</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="project_status">Project Status <span class="required">*</span></label>
-            <select id="project_status" name="project_status" required>
-              <option value="">Select status</option>
-              <option value="active">Active</option>
-              <option value="completed">Completed</option>
-              <option value="archived">Archived</option>
-              <option value="on-hold">On Hold</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="start_date">Start Date <span class="required">*</span></label>
-            <input type="date" id="start_date" name="start_date" required>
-          </div>
-
-          <div class="form-group">
-            <label for="end_date">End Date</label>
-            <input type="date" id="end_date" name="end_date">
-            <div class="form-hint">Leave blank if project is ongoing</div>
-          </div>
-        </div>
-
-        <div class="form-group full-width">
-          <label for="project_description">Project Description <span class="required">*</span></label>
-          <textarea id="project_description" name="project_description" required placeholder="Provide a comprehensive description of your research project, objectives, and methodology" rows="5" maxlength="2000"></textarea>
-          <div class="char-counter"><span id="descriptionCount">0</span> / 2000 characters</div>
-        </div>
-
-        <div class="form-group full-width">
-          <label for="project_objectives">Project Objectives</label>
-          <textarea id="project_objectives" name="project_objectives" placeholder="List the main objectives and goals of the project" rows="3"></textarea>
+      <!-- File Upload -->
+      <div class="form-group">
+        <label>File <span class="required">*</span></label>
+        <div class="file-upload-wrapper" id="fileUploadArea" onclick="document.getElementById('project_file').click()">
+          <input type="file" id="project_file" name="project_file" accept=".pdf,.doc,.docx,.zip" class="file-input" required onchange="handleFileSelect(event)">
+          <p class="file-upload-text">Choose files or drag and drop files to upload</p>
+          <div class="file-name-display" id="fileName"></div>
         </div>
       </div>
 
-      <!-- Institution & Funding -->
-      <div class="form-section">
-        <h2 class="section-title">Institution & Funding</h2>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="institution_name">Institution Name <span class="required">*</span></label>
-            <input type="text" id="institution_name" name="institution_name" required placeholder="Primary institution">
-          </div>
-
-          <div class="form-group">
-            <label for="institution_country">Institution Country <span class="required">*</span></label>
-            <select id="institution_country" name="institution_country" required>
-              <option value="">Select country</option>
-              <option value="US">United States</option>
-              <option value="UK">United Kingdom</option>
-              <option value="CA">Canada</option>
-              <option value="AU">Australia</option>
-              <option value="DE">Germany</option>
-              <option value="FR">France</option>
-              <option value="IT">Italy</option>
-              <option value="ES">Spain</option>
-              <option value="NL">Netherlands</option>
-              <option value="CH">Switzerland</option>
-              <option value="SG">Singapore</option>
-              <option value="JP">Japan</option>
-              <option value="CN">China</option>
-              <option value="IN">India</option>
-              <option value="BR">Brazil</option>
-              <option value="ZA">South Africa</option>
-              <option value="NG">Nigeria</option>
-              <option value="KE">Kenya</option>
-              <option value="GH">Ghana</option>
-              <option value="EG">Egypt</option>
-              <option value="ET">Ethiopia</option>
-              <option value="MA">Morocco</option>
-              <option value="TZ">Tanzania</option>
-              <option value="UG">Uganda</option>
-              <option value="ZW">Zimbabwe</option>
-              <option value="BW">Botswana</option>
-              <option value="NA">Namibia</option>
-              <option value="MW">Malawi</option>
-              <option value="RW">Rwanda</option>
-              <option value="ZM">Zambia</option>
-              <option value="MZ">Mozambique</option>
-              <option value="AO">Angola</option>
-              <option value="CM">Cameroon</option>
-              <option value="SN">Senegal</option>
-              <option value="CI">Ivory Coast</option>
-              <option value="BF">Burkina Faso</option>
-              <option value="ML">Mali</option>
-              <option value="NE">Niger</option>
-              <option value="TD">Chad</option>
-              <option value="CD">Democratic Republic of the Congo</option>
-              <option value="CG">Republic of the Congo</option>
-              <option value="GA">Gabon</option>
-              <option value="GN">Guinea</option>
-              <option value="SL">Sierra Leone</option>
-              <option value="LR">Liberia</option>
-              <option value="TG">Togo</option>
-              <option value="BJ">Benin</option>
-              <option value="GM">Gambia</option>
-              <option value="MU">Mauritius</option>
-              <option value="SC">Seychelles</option>
-              <option value="KM">Comoros</option>
-              <option value="MG">Madagascar</option>
-            </select>
-          </div>
+      <!-- Subject and Discipline -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="subject">Subject <span class="required">*</span></label>
+          <select id="subject" name="subject" required>
+            <option value="">Select a value...</option>
+            <option value="medicine-health">Medicine and Health</option>
+            <option value="technology">Technology</option>
+            <option value="engineering">Engineering</option>
+            <option value="computer-science">Computer Science</option>
+            <option value="art-humanities">Art and Humanities</option>
+            <option value="social-science">Social Science and Behavioral Sciences</option>
+            <option value="physics">Physics</option>
+            <option value="chemistry">Chemistry</option>
+            <option value="biology">Biology</option>
+          </select>
         </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="funding_amount">Funding Amount</label>
-            <input type="number" id="funding_amount" name="funding_amount" step="0.01" min="0" placeholder="e.g., 2500000">
-            <div class="form-hint">Enter amount in USD</div>
-          </div>
-
-          <div class="form-group">
-            <label for="funding_source">Funding Source</label>
-            <input type="text" id="funding_source" name="funding_source" placeholder="e.g., NSF, NIH, EU Horizon">
-          </div>
-        </div>
-
-        <div class="form-group full-width">
-          <label for="funding_details">Funding Details</label>
-          <textarea id="funding_details" name="funding_details" placeholder="Additional information about funding, grants, or sponsors" rows="3"></textarea>
+        <div class="form-group">
+          <label for="discipline">Discipline <span class="required">*</span></label>
+          <select id="discipline" name="category" required>
+            <option value="">Select a value...</option>
+            <option value="medicine-health">Medicine and Health</option>
+            <option value="technology">Technology</option>
+            <option value="engineering">Engineering</option>
+            <option value="computer-science">Computer Science</option>
+            <option value="art-humanities">Art and Humanities</option>
+            <option value="social-science">Social Science and Behavioral Sciences</option>
+            <option value="physics">Physics</option>
+            <option value="chemistry">Chemistry</option>
+            <option value="biology">Biology</option>
+          </select>
         </div>
       </div>
 
-      <!-- Team Members -->
-      <div class="form-section">
-        <h2 class="section-title">Team Members</h2>
-        
-        <div id="membersContainer">
-          <div class="member-section" data-member-index="0">
-            <div class="member-header">
-              <span>Team Member 1 (Principal Investigator)</span>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="member0_first_name">First Name <span class="required">*</span></label>
-                <input type="text" id="member0_first_name" name="members[0][first_name]" required placeholder="First name">
-              </div>
-              <div class="form-group">
-                <label for="member0_last_name">Last Name <span class="required">*</span></label>
-                <input type="text" id="member0_last_name" name="members[0][last_name]" required placeholder="Last name">
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="member0_email">Email <span class="required">*</span></label>
-                <input type="email" id="member0_email" name="members[0][email]" required placeholder="email@example.com">
-              </div>
-              <div class="form-group">
-                <label for="member0_role">Role</label>
-                <input type="text" id="member0_role" name="members[0][role]" placeholder="e.g., Principal Investigator">
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="member0_affiliation">Affiliation</label>
-                <input type="text" id="member0_affiliation" name="members[0][affiliation]" placeholder="Institution/University">
-              </div>
-              <div class="form-group">
-                <label for="member0_country">Country</label>
-                <select id="member0_country" name="members[0][country]">
-                  <option value="">Select country</option>
-                  <option value="US">United States</option>
-                  <option value="UK">United Kingdom</option>
-                  <option value="CA">Canada</option>
-                  <option value="AU">Australia</option>
-                  <option value="DE">Germany</option>
-                  <option value="FR">France</option>
-                  <option value="ZA">South Africa</option>
-                  <option value="NG">Nigeria</option>
-                  <option value="KE">Kenya</option>
-                  <option value="GH">Ghana</option>
-                </select>
-              </div>
-            </div>
-          </div>
+      <!-- Price, Chapters, Pages -->
+      <div class="form-row-3">
+        <div class="form-group">
+          <label for="price_usd">Price in USD <span class="required">*</span></label>
+          <input type="number" id="price_usd" name="price_usd" step="0.01" min="0" placeholder="Enter Price in USD" required>
         </div>
 
-        <button type="button" class="btn-add-member" onclick="addMember()">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-          </svg>
-          Add Team Member
-        </button>
-      </div>
-
-      <!-- Project Details -->
-      <div class="form-section">
-        <h2 class="section-title">Project Details</h2>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="discipline">Primary Discipline <span class="required">*</span></label>
-            <select id="discipline" name="discipline" required>
-              <option value="">Select discipline</option>
-              <option value="medicine-health">Medicine and Health</option>
-              <option value="technology">Technology</option>
-              <option value="engineering">Engineering</option>
-              <option value="computer-science">Computer Science</option>
-              <option value="art-humanities">Art and Humanities</option>
-              <option value="social-science">Social Science and Behavioral Sciences</option>
-              <option value="chemical-engineering">Chemical Engineering</option>
-              <option value="economics">Economics, Econometrics and Finance</option>
-              <option value="biochemistry">Biochemistry, Genetics, and Molecular Biology</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="keywords">Keywords</label>
-            <input type="text" id="keywords" name="keywords" placeholder="Enter keywords separated by commas">
-          </div>
+        <div class="form-group">
+          <label for="chapters">Chapters <span class="required">*</span></label>
+          <input type="number" id="chapters" name="chapters" min="1" placeholder="Enter Chapters" required>
         </div>
 
-        <div class="form-group full-width">
-          <label for="methodology">Methodology</label>
-          <textarea id="methodology" name="methodology" placeholder="Describe the research methodology and approach" rows="4"></textarea>
-        </div>
-
-        <div class="form-group full-width">
-          <label for="expected_outcomes">Expected Outcomes</label>
-          <textarea id="expected_outcomes" name="expected_outcomes" placeholder="Describe the expected outcomes and deliverables" rows="3"></textarea>
+        <div class="form-group">
+          <label for="pages">Pages <span class="required">*</span></label>
+          <input type="number" id="pages" name="pages" min="1" placeholder="Enter Pages" required>
         </div>
       </div>
 
-      <!-- Project Files -->
-      <div class="form-section">
-        <h2 class="section-title">Project Files & Documentation</h2>
-        
-        <div class="form-group full-width">
-          <label>Project Documentation</label>
-          <div class="file-upload-wrapper" id="docUploadArea" onclick="document.getElementById('projectDocs').click()">
-            <input type="file" id="projectDocs" name="project_docs" accept=".pdf,.doc,.docx" multiple class="file-input" onchange="handleDocsSelect(event)">
-            <div class="file-upload-icon">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+      <!-- Project Topic -->
+      <div class="form-group">
+        <label for="project_topic">Project Topic <span class="required">*</span></label>
+        <textarea id="project_topic" name="project_title" placeholder="Enter Project Topic" required></textarea>
+      </div>
+
+      <!-- Overview -->
+      <div class="form-group">
+        <label>Overview <span class="required">*</span></label>
+        <div class="rich-text-editor">
+          <div class="rich-text-toolbar">
+            <button type="button" class="toolbar-btn" onclick="document.execCommand('undo', false, null)" title="Undo">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
               </svg>
-            </div>
-            <div class="file-upload-text">Click to upload or drag and drop</div>
-            <div class="file-upload-hint">PDF, DOC, DOCX files (Max size: 50MB per file)</div>
-            <div class="file-name-display" id="docsFileName" style="display: none;"></div>
-          </div>
-        </div>
-
-        <div class="form-group full-width">
-          <label>Project Images</label>
-          <div class="file-upload-wrapper" id="imageUploadArea" onclick="document.getElementById('projectImages').click()">
-            <input type="file" id="projectImages" name="project_images" accept="image/*" multiple class="file-input" onchange="handleImagesSelect(event)">
-            <div class="file-upload-icon">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            </button>
+            <button type="button" class="toolbar-btn" onclick="document.execCommand('redo', false, null)" title="Redo">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6-6m6 6l-6 6"></path>
+              </svg>
+            </button>
+            <div class="toolbar-separator"></div>
+            <button type="button" class="toolbar-btn" onclick="document.execCommand('bold', false, null)" title="Bold">
+              <strong>B</strong>
+            </button>
+            <button type="button" class="toolbar-btn" onclick="document.execCommand('underline', false, null)" title="Underline">
+              <u>U</u>
+            </button>
+            <div class="toolbar-separator"></div>
+            <select class="toolbar-select" onchange="document.execCommand('fontName', false, this.value)">
+              <option value="Roboto">Roboto</option>
+              <option value="Arial">Arial</option>
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="Courier New">Courier New</option>
+            </select>
+            <button type="button" class="toolbar-btn" onclick="showColorPicker('foreColor')" title="Text Color">
+              <span style="text-decoration: underline; color: #fbbf24;">A</span>
+            </button>
+            <div class="toolbar-separator"></div>
+            <button type="button" class="toolbar-btn" onclick="document.execCommand('justifyLeft', false, null)" title="Align Left">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+            </button>
+            <button type="button" class="toolbar-btn" onclick="document.execCommand('justifyCenter', false, null)" title="Align Center">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+            </button>
+            <button type="button" class="toolbar-btn" onclick="document.execCommand('justifyRight', false, null)" title="Align Right">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+            </button>
+            <button type="button" class="toolbar-btn" onclick="document.execCommand('justifyFull', false, null)" title="Justify">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+            </button>
+            <div class="toolbar-separator"></div>
+            <button type="button" class="toolbar-btn" onclick="document.execCommand('insertUnorderedList', false, null)" title="Bullet List">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path>
+              </svg>
+            </button>
+            <button type="button" class="toolbar-btn" onclick="document.execCommand('insertOrderedList', false, null)" title="Numbered List">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path>
+              </svg>
+            </button>
+            <div class="toolbar-separator"></div>
+            <button type="button" class="toolbar-btn" onclick="insertLink()" title="Insert Link">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+              </svg>
+            </button>
+            <button type="button" class="toolbar-btn" onclick="insertImage()" title="Insert Image">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
               </svg>
-            </div>
-            <div class="file-upload-text">Click to upload or drag and drop</div>
-            <div class="file-upload-hint">Image files (JPG, PNG, GIF - Max size: 10MB per file)</div>
-            <div class="file-name-display" id="imagesFileName" style="display: none;"></div>
+            </button>
+            <button type="button" class="toolbar-btn" onclick="insertVideo()" title="Insert Video">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+              </svg>
+            </button>
+            <button type="button" class="toolbar-btn" onclick="insertTable()" title="Insert Table">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+              </svg>
+            </button>
+            <div class="toolbar-separator"></div>
+            <button type="button" class="toolbar-btn" onclick="toggleCodeView()" title="Code View">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+              </svg>
+            </button>
+            <button type="button" class="toolbar-btn" title="Help">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </button>
           </div>
+          <div class="rich-text-content" id="overviewEditor" contenteditable="true" data-placeholder="Enter overview..."></div>
+          <textarea id="description" name="description" style="display: none;" required></textarea>
         </div>
       </div>
 
-      <!-- Additional Information -->
-      <div class="form-section">
-        <h2 class="section-title">Additional Information</h2>
-        
-        <div class="form-group full-width">
-          <label for="publications">Related Publications</label>
-          <textarea id="publications" name="publications" placeholder="List any publications related to this project (DOIs, titles, etc.)" rows="3"></textarea>
-        </div>
-
-        <div class="form-group full-width">
-          <label for="collaborations">Collaborations</label>
-          <textarea id="collaborations" name="collaborations" placeholder="List collaborating institutions or organizations" rows="2"></textarea>
-        </div>
-
-        <div class="form-group full-width">
-          <label for="website">Project Website</label>
-          <input type="url" id="website" name="website" placeholder="https://project.example.com">
-        </div>
-
-        <div class="checkbox-group">
-          <label>
-            <input type="checkbox" id="public_archive" name="public_archive" checked>
-            <span>Make this project publicly accessible in the archive</span>
-          </label>
-
-          <label>
-            <input type="checkbox" id="terms" name="terms" required>
-            <span>I confirm that all information provided is accurate and I have the authority to archive this project <span class="required">*</span></span>
-          </label>
-
-          <label>
-            <input type="checkbox" id="copyright" name="copyright" required>
-            <span>I agree to the <a href="{% url 'app:policy_terms' %}">Terms and Conditions</a> and <a href="{% url 'app:policy_terms' %}">Archive Policy</a> <span class="required">*</span></span>
-          </label>
-        </div>
+      <!-- Terms and Conditions -->
+      <div class="checkbox-group">
+        <input type="checkbox" id="terms" name="terms" required>
+        <label for="terms">
+          By continuing you agree with our <a href="{% url 'app:policy_terms' %}" target="_blank">Terms and Conditions</a> and <a href="{% url 'app:policy_terms' %}" target="_blank">Privacy policy</a>.
+        </label>
       </div>
 
-      <!-- Form Actions -->
+      <!-- Submit Button -->
       <div class="form-actions">
-        <button type="button" class="btn-draft">Save as Draft</button>
-        <button type="submit" class="btn-submit">Upload & Archive Project</button>
+        <button type="submit" class="btn-submit">
+          Submit
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+          </svg>
+        </button>
       </div>
     </form>
   </div>
 </div>
 
+<!-- PDF.js for page counting -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
-  let memberCount = 1;
-
-  function addMember() {
-    const container = document.getElementById('membersContainer');
-    const memberSection = document.createElement('div');
-    memberSection.className = 'member-section';
-    memberSection.setAttribute('data-member-index', memberCount);
-    
-    memberSection.innerHTML = `
-      <div class="member-header">
-        <span>Team Member ${memberCount + 1}</span>
-        <button type="button" class="btn-remove-member" onclick="removeMember(this)">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="member${memberCount}_first_name">First Name <span class="required">*</span></label>
-          <input type="text" id="member${memberCount}_first_name" name="members[${memberCount}][first_name]" required placeholder="First name">
-        </div>
-        <div class="form-group">
-          <label for="member${memberCount}_last_name">Last Name <span class="required">*</span></label>
-          <input type="text" id="member${memberCount}_last_name" name="members[${memberCount}][last_name]" required placeholder="Last name">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="member${memberCount}_email">Email <span class="required">*</span></label>
-          <input type="email" id="member${memberCount}_email" name="members[${memberCount}][email]" required placeholder="email@example.com">
-        </div>
-        <div class="form-group">
-          <label for="member${memberCount}_role">Role</label>
-          <input type="text" id="member${memberCount}_role" name="members[${memberCount}][role]" placeholder="e.g., Co-Investigator">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="member${memberCount}_affiliation">Affiliation</label>
-          <input type="text" id="member${memberCount}_affiliation" name="members[${memberCount}][affiliation]" placeholder="Institution/University">
-        </div>
-        <div class="form-group">
-          <label for="member${memberCount}_country">Country</label>
-          <select id="member${memberCount}_country" name="members[${memberCount}][country]">
-            <option value="">Select country</option>
-            <option value="US">United States</option>
-            <option value="UK">United Kingdom</option>
-            <option value="CA">Canada</option>
-            <option value="AU">Australia</option>
-            <option value="DE">Germany</option>
-            <option value="FR">France</option>
-            <option value="ZA">South Africa</option>
-            <option value="NG">Nigeria</option>
-            <option value="KE">Kenya</option>
-            <option value="GH">Ghana</option>
-          </select>
-        </div>
-      </div>
-    `;
-    
-    container.appendChild(memberSection);
-    memberCount++;
+  // Configure PDF.js worker
+  if (typeof pdfjsLib !== 'undefined') {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   }
 
-  function removeMember(button) {
-    const memberSection = button.closest('.member-section');
-    memberSection.remove();
-    updateMemberNumbers();
-  }
+  // Wait for DOM to be ready
+  document.addEventListener('DOMContentLoaded', function() {
+    initializeForm();
+  });
 
-  function updateMemberNumbers() {
-    const members = document.querySelectorAll('.member-section');
-    members.forEach((member, index) => {
-      const header = member.querySelector('.member-header span');
-      if (index === 0) {
-        header.textContent = 'Team Member 1 (Principal Investigator)';
-      } else {
-        header.textContent = `Team Member ${index + 1}`;
+  // File upload handling with automatic page detection
+  async function handleFileSelect(event) {
+    const file = event.target.files[0];
+    const fileName = document.getElementById('fileName');
+    const uploadArea = document.getElementById('fileUploadArea');
+    const pagesInput = document.getElementById('pages');
+    
+    if (file) {
+      fileName.textContent = file.name;
+      fileName.classList.add('show');
+      uploadArea.classList.add('has-file');
+      
+      // Detect pages automatically
+      const fileExtension = file.name.split('.').pop().toLowerCase();
+      
+      if (fileExtension === 'pdf') {
+        // Count PDF pages using PDF.js
+        if (typeof pdfjsLib === 'undefined') {
+          console.error('PDF.js library not loaded');
+          if (pagesInput) {
+            pagesInput.placeholder = 'PDF.js not loaded - Enter Pages manually';
+          }
+          return;
+        }
+        
+        try {
+          // Show loading state
+          if (pagesInput) {
+            pagesInput.value = '';
+            pagesInput.placeholder = 'Counting pages...';
+            pagesInput.disabled = true;
+          }
+          
+          const arrayBuffer = await file.arrayBuffer();
+          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          const pageCount = pdf.numPages;
+          
+          if (pagesInput) {
+            pagesInput.value = pageCount;
+            pagesInput.placeholder = 'Enter Pages';
+            pagesInput.disabled = false;
+            pagesInput.classList.add('auto-detected');
+            pagesInput.dispatchEvent(new Event('input', { bubbles: true }));
+            console.log('Detected', pageCount, 'pages in PDF');
+            
+            // Remove the auto-detected class after a moment
+            setTimeout(() => {
+              pagesInput.classList.remove('auto-detected');
+            }, 2000);
+          }
+        } catch (error) {
+          console.error('Error counting PDF pages:', error);
+          // Show error state
+          if (pagesInput) {
+            pagesInput.value = '';
+            pagesInput.placeholder = 'Error counting - Enter Pages manually';
+            pagesInput.disabled = false;
+            setTimeout(() => {
+              pagesInput.placeholder = 'Enter Pages';
+            }, 3000);
+          }
+        }
+      } else if (fileExtension === 'doc' || fileExtension === 'docx') {
+        // For Word documents, we can't easily count pages client-side
+        // But we can try to estimate based on file size (rough estimate)
+        // 1 page ≈ 50-100KB for typical documents
+        const fileSizeKB = file.size / 1024;
+        const estimatedPages = Math.max(1, Math.round(fileSizeKB / 75));
+        if (pagesInput) {
+          pagesInput.value = estimatedPages;
+          pagesInput.classList.add('auto-detected');
+          pagesInput.dispatchEvent(new Event('input', { bubbles: true }));
+          console.log('Estimated', estimatedPages, 'pages based on file size');
+          
+          // Show a note that it's an estimate
+          let note = document.getElementById('pages-estimate-note');
+          if (!note) {
+            note = document.createElement('small');
+            note.textContent = ' (estimated - please verify)';
+            note.style.color = '#6b7280';
+            note.style.fontSize = '0.75rem';
+            note.style.marginTop = '0.25rem';
+            note.style.display = 'block';
+            note.id = 'pages-estimate-note';
+            pagesInput.parentElement.appendChild(note);
+          }
+          
+          // Remove the auto-detected class after a moment
+          setTimeout(() => {
+            pagesInput.classList.remove('auto-detected');
+          }, 2000);
+        }
+      } else if (fileExtension === 'zip') {
+        // For ZIP files, we can't determine pages
+        if (pagesInput) {
+          pagesInput.placeholder = 'Enter Pages (ZIP file)';
+        }
       }
-    });
-  }
-
-  function handleDocsSelect(event) {
-    const files = event.target.files;
-    const fileName = document.getElementById('docsFileName');
-    const uploadArea = document.getElementById('docUploadArea');
-    
-    if (files.length > 0) {
-      const fileNames = Array.from(files).map(f => f.name).join(', ');
-      fileName.textContent = `${files.length} file(s): ${fileNames}`;
-      fileName.style.display = 'block';
-      uploadArea.classList.add('has-file');
     } else {
       fileName.textContent = '';
-      fileName.style.display = 'none';
+      fileName.classList.remove('show');
       uploadArea.classList.remove('has-file');
+      // Clear pages if file is removed
+      if (pagesInput) {
+        pagesInput.value = '';
+        pagesInput.classList.remove('auto-detected');
+        pagesInput.placeholder = 'Enter Pages';
+        const note = document.getElementById('pages-estimate-note');
+        if (note) note.remove();
+      }
     }
   }
 
-  function handleImagesSelect(event) {
-    const files = event.target.files;
-    const fileName = document.getElementById('imagesFileName');
-    const uploadArea = document.getElementById('imageUploadArea');
-    
-    if (files.length > 0) {
-      const fileNames = Array.from(files).map(f => f.name).join(', ');
-      fileName.textContent = `${files.length} file(s): ${fileNames}`;
-      fileName.style.display = 'block';
-      uploadArea.classList.add('has-file');
-    } else {
-      fileName.textContent = '';
-      fileName.style.display = 'none';
-      uploadArea.classList.remove('has-file');
-    }
-  }
+  // Drag and drop for file upload
+  const fileUploadArea = document.getElementById('fileUploadArea');
+  const fileInput = document.getElementById('project_file');
 
-  // Character counter for description
-  document.getElementById('project_description')?.addEventListener('input', function(e) {
-    const count = e.target.value.length;
-    document.getElementById('descriptionCount').textContent = count;
+  fileUploadArea.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    fileUploadArea.classList.add('drag-over');
   });
 
-  // Drag and drop functionality for docs
-  const docUploadArea = document.getElementById('docUploadArea');
-  const docInput = document.getElementById('projectDocs');
-
-  docUploadArea.addEventListener('dragover', function(e) {
+  fileUploadArea.addEventListener('dragleave', function(e) {
     e.preventDefault();
-    docUploadArea.classList.add('drag-over');
+    fileUploadArea.classList.remove('drag-over');
   });
 
-  docUploadArea.addEventListener('dragleave', function(e) {
+  fileUploadArea.addEventListener('drop', async function(e) {
     e.preventDefault();
-    docUploadArea.classList.remove('drag-over');
-  });
-
-  docUploadArea.addEventListener('drop', function(e) {
-    e.preventDefault();
-    docUploadArea.classList.remove('drag-over');
+    fileUploadArea.classList.remove('drag-over');
     
     const files = e.dataTransfer.files;
     if (files.length > 0) {
-      docInput.files = files;
-      handleDocsSelect({ target: docInput });
+      fileInput.files = files;
+      await handleFileSelect({ target: fileInput });
     }
   });
 
-  // Drag and drop functionality for images
-  const imageUploadArea = document.getElementById('imageUploadArea');
-  const imageInput = document.getElementById('projectImages');
+  // Rich text editor functions
+  function showColorPicker(command) {
+    const color = prompt('Enter color (e.g., #ff0000 or red):');
+    if (color) {
+      document.execCommand(command, false, color);
+    }
+  }
 
-  imageUploadArea.addEventListener('dragover', function(e) {
-    e.preventDefault();
-    imageUploadArea.classList.add('drag-over');
-  });
+  function insertLink() {
+    const url = prompt('Enter URL:');
+    if (url) {
+      document.execCommand('createLink', false, url);
+    }
+  }
 
-  imageUploadArea.addEventListener('dragleave', function(e) {
-    e.preventDefault();
-    imageUploadArea.classList.remove('drag-over');
-  });
+  function insertImage() {
+    const url = prompt('Enter image URL:');
+    if (url) {
+      document.execCommand('insertImage', false, url);
+    }
+  }
 
-  imageUploadArea.addEventListener('drop', function(e) {
-    e.preventDefault();
-    imageUploadArea.classList.remove('drag-over');
+  function insertVideo() {
+    const url = prompt('Enter video URL:');
+    if (url) {
+      const video = document.createElement('iframe');
+      video.src = url;
+      video.width = '560';
+      video.height = '315';
+      video.frameBorder = '0';
+      document.execCommand('insertHTML', false, video.outerHTML);
+    }
+  }
+
+  function insertTable() {
+    const rows = prompt('Number of rows:', '3');
+    const cols = prompt('Number of columns:', '3');
+    if (rows && cols) {
+      let table = '<table border="1" style="border-collapse: collapse; width: 100%;">';
+      for (let i = 0; i < rows; i++) {
+        table += '<tr>';
+        for (let j = 0; j < cols; j++) {
+          table += '<td style="padding: 8px;">&nbsp;</td>';
+        }
+        table += '</tr>';
+      }
+      table += '</table>';
+      document.execCommand('insertHTML', false, table);
+    }
+  }
+
+  function toggleCodeView() {
+    const editor = document.getElementById('overviewEditor');
+    const isCodeView = editor.classList.toggle('code-view');
+    if (isCodeView) {
+      editor.style.fontFamily = 'monospace';
+      editor.style.whiteSpace = 'pre';
+    } else {
+      editor.style.fontFamily = '';
+      editor.style.whiteSpace = '';
+    }
+  }
+
+  function initializeForm() {
+    // Sync rich text editor content to hidden textarea on input
+    const editor = document.getElementById('overviewEditor');
+    const textarea = document.getElementById('description');
     
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      imageInput.files = files;
-      handleImagesSelect({ target: imageInput });
+    if (editor && textarea) {
+      // Update textarea whenever editor content changes
+      editor.addEventListener('input', function() {
+        let content = this.innerHTML.trim();
+        // Don't save placeholder as content
+        if (content && this.textContent.trim() !== this.dataset.placeholder) {
+          textarea.value = content;
+        }
+      });
+      
+      // Also sync on blur
+      editor.addEventListener('blur', function() {
+        let content = this.innerHTML.trim();
+        let text = this.textContent.trim();
+        if (text && text !== this.dataset.placeholder) {
+          textarea.value = content;
+        }
+      });
     }
-  });
+
+    // Sync rich text editor content to hidden textarea before submit
+    const form = document.querySelector('.upload-form');
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        console.log('Form submit event triggered');
+        
+        if (!editor || !textarea) {
+          console.error('Editor or textarea not found');
+          return;
+        }
+        
+        // Get the actual content (text or HTML)
+        let editorContent = editor.innerHTML.trim();
+        let editorText = editor.textContent.trim();
+        
+        // Remove placeholder if it exists
+        const placeholder = editor.dataset.placeholder || 'Enter overview...';
+        if (editorText === placeholder) {
+          editorText = '';
+          editorContent = '';
+        }
+        
+        // Clean up empty HTML tags
+        editorContent = editorContent.replace(/<br\s*\/?>/gi, '');
+        editorContent = editorContent.replace(/<div><\/div>/gi, '');
+        editorContent = editorContent.trim();
+        
+        console.log('Editor text:', editorText);
+        console.log('Editor content:', editorContent);
+        
+        // Check if editor is empty
+        if (!editorText || !editorContent || editorContent === '' || editorContent === '<div></div>') {
+          e.preventDefault();
+          alert('Please enter an overview in the Overview field.');
+          editor.focus();
+          return false;
+        }
+        
+        // Sync content to hidden textarea
+        textarea.value = editorContent;
+        console.log('Form submitting with description length:', editorContent.length);
+        
+        // Validate other required fields
+        const fileInput = document.getElementById('project_file');
+        if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+          e.preventDefault();
+          alert('Please select a file to upload.');
+          return false;
+        }
+        
+        const subject = document.getElementById('subject');
+        if (!subject || !subject.value) {
+          e.preventDefault();
+          alert('Please select a subject.');
+          return false;
+        }
+        
+        const category = document.getElementById('discipline');
+        if (!category || !category.value) {
+          e.preventDefault();
+          alert('Please select a discipline.');
+          return false;
+        }
+        
+        console.log('All validations passed, submitting form...');
+      });
+    }
+  }
 </script>
 {% endblock %}

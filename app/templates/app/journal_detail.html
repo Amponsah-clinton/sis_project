@@ -1,0 +1,616 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}{{ journal.journal_name }} - ScholarIndex{% endblock %}
+
+{% block content %}
+<style>
+  .journal-detail-wrapper {
+    background-color: #f5f5f5;
+    min-height: 100vh;
+    padding: 2rem 0;
+  }
+
+  .journal-detail-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  /* Header Section */
+  .journal-header-section {
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    border-radius: 10px;
+    padding: 2rem 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .journal-cover-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.15;
+    z-index: 0;
+  }
+
+  .journal-header-watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 8rem;
+    font-weight: 900;
+    color: rgba(0, 0, 0, 0.04);
+    z-index: 1;
+    white-space: nowrap;
+    pointer-events: none;
+    text-transform: uppercase;
+  }
+
+  .journal-header-content {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .journal-header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .journal-badge-number {
+    display: inline-block;
+    background-color: #f97316;
+    color: #ffffff;
+    border-radius: 4px;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    width: fit-content;
+    letter-spacing: 0.02em;
+  }
+
+  .journal-logo-header {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+  }
+
+  .journal-logo-circle-header {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .journal-logo-circle-header img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .journal-logo-text-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 0.375rem;
+  }
+
+  .journal-abbreviation-header {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-align: center;
+    line-height: 1.2;
+    margin-bottom: 0.125rem;
+  }
+
+  .journal-name-text-header {
+    font-size: 0.5rem;
+    color: #ffffff;
+    text-align: center;
+    line-height: 1.1;
+    word-wrap: break-word;
+    max-width: 100%;
+  }
+
+  .journal-title-header {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  .journal-header-right {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .journal-header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .journal-header-label {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .journal-header-value {
+    font-size: 0.8125rem;
+    color: #f97316;
+    font-weight: 600;
+    word-break: break-all;
+  }
+
+  .journal-header-value a {
+    color: #f97316;
+    text-decoration: none;
+  }
+
+  .journal-header-value a:hover {
+    text-decoration: underline;
+  }
+
+  /* Details Section */
+  .journal-details-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 2.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .journal-details-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 3rem;
+  }
+
+  .journal-details-left {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .journal-type {
+    font-size: 1rem;
+    color: #374151;
+    margin: 0;
+    font-weight: 500;
+  }
+
+  .journal-category {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #f97316;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+  }
+
+  .journal-description {
+    font-size: 0.9375rem;
+    color: #374151;
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .journal-details-right {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .journal-details-right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .journal-details-divider {
+    width: 1px;
+    background-color: #e5e7eb;
+    height: 100%;
+    min-height: 200px;
+  }
+
+  .journal-attribute {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .journal-attribute:last-child {
+    border-bottom: none;
+  }
+
+  .journal-attribute-label {
+    font-size: 0.875rem;
+    color: #374151;
+    font-weight: 500;
+  }
+
+  .journal-attribute-value {
+    font-size: 0.875rem;
+    color: #111827;
+    font-weight: 400;
+  }
+
+  .journal-attribute-value.fee {
+    color: #10b981;
+    font-weight: 600;
+    font-size: 0.9375rem;
+  }
+
+  /* Similar Journals Section */
+  .similar-journals-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 2px solid #e5e7eb;
+  }
+
+  .similar-journals-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1.5rem;
+  }
+
+  .similar-journals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .similar-journal-card {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.25rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: block;
+    color: inherit;
+  }
+
+  .similar-journal-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .similar-journal-logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+
+  .similar-journal-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .similar-journal-logo-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 0.25rem;
+  }
+
+  .similar-journal-abbr {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-align: center;
+  }
+
+  .similar-journal-name {
+    font-size: 0.5rem;
+    color: #ffffff;
+    text-align: center;
+    line-height: 1.1;
+  }
+
+  .similar-journal-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2563eb;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.3;
+  }
+
+  .similar-journal-publisher {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0;
+  }
+
+  @media (max-width: 968px) {
+    .journal-header-content {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .journal-header-right {
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .journal-details-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .journal-details-right {
+      grid-template-columns: 1fr;
+    }
+
+    .journal-details-divider {
+      display: none;
+    }
+
+    .similar-journals-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .journal-header-section {
+      padding: 2rem 1.5rem;
+    }
+
+    .journal-title-header {
+      font-size: 1.75rem;
+    }
+
+    .journal-details-section {
+      padding: 1.5rem;
+    }
+  }
+</style>
+
+<div class="journal-detail-wrapper">
+  <div class="journal-detail-container">
+    <!-- Header Section -->
+    <div class="journal-header-section">
+      {% if journal.journal_cover_image %}
+      <img src="{{ journal.journal_cover_image.url }}" alt="{{ journal.journal_name }} Cover" class="journal-cover-image">
+      {% endif %}
+      
+      <div class="journal-header-watermark">
+        {{ journal.journal_abbreviation|default:journal.journal_name|slice:":3"|upper }} {{ journal.journal_name|upper }}
+      </div>
+      
+      <div class="journal-header-content">
+        <div class="journal-header-left">
+          <div class="journal-badge-number">{{ journal_number }}</div>
+          
+          <div class="journal-logo-header">
+            <div class="journal-logo-circle-header">
+              {% if journal.journal_logo %}
+                <img src="{{ journal.journal_logo.url }}" alt="{{ journal.journal_name }}">
+              {% else %}
+                <div class="journal-logo-text-header">
+                  <span class="journal-abbreviation-header">{{ journal.journal_abbreviation|default:journal.journal_name|slice:":3"|upper }}</span>
+                  <span class="journal-name-text-header">{{ journal.journal_name|truncatewords:3 }}</span>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          
+          <h1 class="journal-title-header">{{ journal.journal_name }}</h1>
+        </div>
+        
+        <div class="journal-header-right">
+          {% if journal.journal_url %}
+          <div class="journal-header-info">
+            <span class="journal-header-label">Website:</span>
+            <span class="journal-header-value">
+              <a href="{{ journal.journal_url }}" target="_blank">{{ journal.journal_url }}</a>
+            </span>
+          </div>
+          {% elif journal.publisher_website %}
+          <div class="journal-header-info">
+            <span class="journal-header-label">Website:</span>
+            <span class="journal-header-value">
+              <a href="{{ journal.publisher_website }}" target="_blank">{{ journal.publisher_website }}</a>
+            </span>
+          </div>
+          {% endif %}
+          
+          {% if chief_editor %}
+          <div class="journal-header-info">
+            <span class="journal-header-label">Chief Editor email:</span>
+            <span class="journal-header-value">
+              <a href="mailto:{{ chief_editor.email }}">{{ chief_editor.email }}</a>
+            </span>
+          </div>
+          {% elif journal.publisher_email %}
+          <div class="journal-header-info">
+            <span class="journal-header-label">Chief Editor email:</span>
+            <span class="journal-header-value">
+              <a href="mailto:{{ journal.publisher_email }}">{{ journal.publisher_email }}</a>
+            </span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Details Section -->
+    <div class="journal-details-section">
+      <div class="journal-details-grid">
+        <div class="journal-details-left">
+          <p class="journal-type">
+            {% if journal.journal_type %}
+              {{ journal.get_journal_type_display }}
+            {% else %}
+              Open-Access Journal
+            {% endif %}
+          </p>
+          <p class="journal-category">{{ journal.subject_area|upper }}</p>
+          {% if journal.journal_scope %}
+          <p class="journal-description">{{ journal.journal_scope }}</p>
+          {% else %}
+          <p class="journal-description">
+            {{ journal.journal_name }} is a peer-reviewed academic journal published by {{ journal.publisher_name }}. 
+            This journal focuses on {{ journal.subject_area }} and welcomes high-quality research submissions 
+            from scholars and researchers worldwide.
+          </p>
+          {% endif %}
+        </div>
+        
+        <div class="journal-details-right">
+          <div class="journal-details-right-column">
+            <div class="journal-attribute">
+              <span class="journal-attribute-label">Format:</span>
+              <span class="journal-attribute-value">
+                {% if journal.journal_format %}
+                  {{ journal.get_journal_format_display }}
+                {% else %}
+                  Print/Online
+                {% endif %}
+              </span>
+            </div>
+            
+            <div class="journal-attribute">
+              <span class="journal-attribute-label">Publisher:</span>
+              <span class="journal-attribute-value">{{ journal.publisher_name }}</span>
+            </div>
+            
+            {% if chief_editor %}
+            <div class="journal-attribute">
+              <span class="journal-attribute-label">Chief Editor:</span>
+              <span class="journal-attribute-value">{{ chief_editor.name }}</span>
+            </div>
+            {% endif %}
+            
+            <div class="journal-attribute">
+              <span class="journal-attribute-label">Country / Language:</span>
+              <span class="journal-attribute-value">{{ journal.publisher_country }} / {{ journal.language }}</span>
+            </div>
+            
+            {% if journal.first_publication_year %}
+            <div class="journal-attribute">
+              <span class="journal-attribute-label">Year Started:</span>
+              <span class="journal-attribute-value">{{ journal.first_publication_year }}</span>
+            </div>
+            {% endif %}
+          </div>
+          
+          <div class="journal-details-divider"></div>
+          
+          <div class="journal-details-right-column">
+            {% if journal.issn_online %}
+            <div class="journal-attribute">
+              <span class="journal-attribute-label">ISSN (Online):</span>
+              <span class="journal-attribute-value">{{ journal.issn_online }}</span>
+            </div>
+            {% endif %}
+            
+            {% if journal.issn_print %}
+            <div class="journal-attribute">
+              <span class="journal-attribute-label">ISSN (Print):</span>
+              <span class="journal-attribute-value">{{ journal.issn_print }}</span>
+            </div>
+            {% endif %}
+            
+            {% if journal.publication_frequency %}
+            <div class="journal-attribute">
+              <span class="journal-attribute-label">Frequency:</span>
+              <span class="journal-attribute-value">{{ journal.publication_frequency }}</span>
+            </div>
+            {% endif %}
+            
+            <div class="journal-attribute">
+              <span class="journal-attribute-label">Open Access:</span>
+              <span class="journal-attribute-value">{% if journal.open_access %}yes{% else %}no{% endif %}</span>
+            </div>
+            
+            <div class="journal-attribute">
+              <span class="journal-attribute-label">Peer Review:</span>
+              <span class="journal-attribute-value">{% if journal.peer_review %}yes{% else %}no{% endif %}</span>
+            </div>
+            
+            <div class="journal-attribute">
+              <span class="journal-attribute-label">Average Publication Fee:</span>
+              <span class="journal-attribute-value fee">
+                {% if journal.publication_fee %}
+                  {{ journal.publication_fee|floatformat:0 }} dollars
+                {% else %}
+                  100 dollars
+                {% endif %}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Similar Journals Section -->
+    {% if similar_journals %}
+    <div class="similar-journals-section">
+      <h2 class="similar-journals-title">Similar Journals</h2>
+      <div class="similar-journals-grid">
+        {% for similar_journal in similar_journals %}
+        <a href="{% url 'app:journal_detail' similar_journal.id %}" class="similar-journal-card">
+          <div class="similar-journal-logo">
+            {% if similar_journal.journal_logo %}
+              <img src="{{ similar_journal.journal_logo.url }}" alt="{{ similar_journal.journal_name }}">
+            {% else %}
+              <div class="similar-journal-logo-text">
+                <span class="similar-journal-abbr">{{ similar_journal.journal_abbreviation|default:similar_journal.journal_name|slice:":3"|upper }}</span>
+                <span class="similar-journal-name">{{ similar_journal.journal_name|truncatewords:2 }}</span>
+              </div>
+            {% endif %}
+          </div>
+          <h3 class="similar-journal-title">{{ similar_journal.journal_name }}</h3>
+          <p class="similar-journal-publisher">{{ similar_journal.publisher_name }}</p>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

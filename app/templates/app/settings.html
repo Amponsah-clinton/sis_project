@@ -634,12 +634,6 @@
                                 <input type="hidden" name="section" value="general">
                                 
                                 <div class="form-group">
-                                    <label class="form-label">Default Banner Image</label>
-                                    <input type="file" name="banner_image" accept="image/*" class="form-input" onchange="previewImage(this)">
-                                    <img id="banner-preview" src="{% if site_settings.default_banner_image %}{{ site_settings.default_banner_image.url }}{% else %}https://res.cloudinary.com/dmqizfpyz/image/upload/v1763149807/bg1_svob3l.png{% endif %}" alt="Banner Preview" class="image-preview" style="display: block;">
-                                </div>
-                                
-                                <div class="form-group">
                                     <label class="form-label">Default App Font Size (Px)</label>
                                     <input type="number" name="font_size" id="font-size-input" value="{{ site_settings.default_app_font_size|default:20 }}" min="8" max="72" class="form-input" style="width: 100px; display: inline-block; margin-right: 1rem;">
                                     <div class="slider-container">
@@ -655,6 +649,142 @@
                                     <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">changes from here will affect other users</p>
                                 </div>
                             </form>
+                            
+                            <h3 class="settings-subsection-title" style="margin-top: 3rem;">CAROUSEL IMAGES</h3>
+                            <div class="settings-divider"></div>
+                            <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 1.5rem;">Manage the 3 carousel images displayed on the landing page. You can either upload an image file or provide an image URL for each carousel.</p>
+                            
+                            <!-- Carousel Image 1 -->
+                            <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1.5rem;">
+                                <h4 style="font-size: 1rem; font-weight: 600; color: #111827; margin-bottom: 1rem;">Carousel Image 1</h4>
+                                <form method="POST" action="{% url 'app:settings' %}" enctype="multipart/form-data" id="carousel-1-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="section" value="carousel_1">
+                                    
+                                    <div style="margin-bottom: 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.75rem; background: white;">
+                                        <label class="form-label" style="font-size: 0.875rem; font-weight: 600; color: #111827; margin-bottom: 0.5rem;">Current Image Preview:</label>
+                                        <img id="carousel-1-preview" src="{% if site_settings.carousel_image_1 %}{{ site_settings.carousel_image_1.url }}{% elif site_settings.carousel_image_1_url %}{{ site_settings.carousel_image_1_url }}{% else %}https://res.cloudinary.com/dmqizfpyz/image/upload/v1763149807/bg1_svob3l.png{% endif %}" alt="Carousel 1 Preview" class="image-preview" style="display: block; max-width: 100%; max-height: 300px; border-radius: 0.25rem; margin-bottom: 1rem;">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-weight: 600;">Change This Image</label>
+                                        <p style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.75rem;">Choose one method to change the image above:</p>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                                            <div>
+                                                <label class="form-label" style="font-size: 0.875rem; font-weight: 500;">Method 1: Upload New Image</label>
+                                                <input type="file" name="carousel_image_1" accept="image/*" class="form-input" id="carousel-1-file-input" onchange="previewCarouselImage(this, 'carousel-1-preview')" style="cursor: pointer;">
+                                                <p style="font-size: 0.7rem; color: #9ca3af; margin-top: 0.25rem;">Click to select an image file</p>
+                                            </div>
+                                            <div>
+                                                <label class="form-label" style="font-size: 0.875rem; font-weight: 500;">Method 2: Use Image URL</label>
+                                                <input type="url" name="carousel_image_1_url" value="{{ site_settings.carousel_image_1_url|default:'' }}" class="form-input" placeholder="https://example.com/image.jpg" id="carousel-1-url-input" onchange="previewCarouselImageUrl(this.value, 'carousel-1-preview')">
+                                                <p style="font-size: 0.7rem; color: #9ca3af; margin-top: 0.25rem;">Paste an image URL here</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Title</label>
+                                        <input type="text" name="carousel_image_1_title" value="{{ site_settings.carousel_image_1_title|default:'Advancing Research Through Innovation' }}" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Subtitle</label>
+                                        <textarea name="carousel_image_1_subtitle" class="form-input" rows="3">{{ site_settings.carousel_image_1_subtitle|default:'Explore groundbreaking research papers, cutting-edge methodologies, and innovative findings that shape the future of knowledge and discovery.' }}</textarea>
+                                    </div>
+                                    <button type="submit" class="btn-save">
+                                        <i data-lucide="check"></i>
+                                        Save Changes for Carousel 1
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            <!-- Carousel Image 2 -->
+                            <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1.5rem;">
+                                <h4 style="font-size: 1rem; font-weight: 600; color: #111827; margin-bottom: 1rem;">Carousel Image 2</h4>
+                                <form method="POST" action="{% url 'app:settings' %}" enctype="multipart/form-data" id="carousel-2-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="section" value="carousel_2">
+                                    
+                                    <div style="margin-bottom: 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.75rem; background: white;">
+                                        <label class="form-label" style="font-size: 0.875rem; font-weight: 600; color: #111827; margin-bottom: 0.5rem;">Current Image Preview:</label>
+                                        <img id="carousel-2-preview" src="{% if site_settings.carousel_image_2 %}{{ site_settings.carousel_image_2.url }}{% elif site_settings.carousel_image_2_url %}{{ site_settings.carousel_image_2_url }}{% else %}https://res.cloudinary.com/dmqizfpyz/image/upload/v1763149807/bg2_dlnqkz.png{% endif %}" alt="Carousel 2 Preview" class="image-preview" style="display: block; max-width: 100%; max-height: 300px; border-radius: 0.25rem; margin-bottom: 1rem;">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-weight: 600;">Change This Image</label>
+                                        <p style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.75rem;">Choose one method to change the image above:</p>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                                            <div>
+                                                <label class="form-label" style="font-size: 0.875rem; font-weight: 500;">Method 1: Upload New Image</label>
+                                                <input type="file" name="carousel_image_2" accept="image/*" class="form-input" id="carousel-2-file-input" onchange="previewCarouselImage(this, 'carousel-2-preview')" style="cursor: pointer;">
+                                                <p style="font-size: 0.7rem; color: #9ca3af; margin-top: 0.25rem;">Click to select an image file</p>
+                                            </div>
+                                            <div>
+                                                <label class="form-label" style="font-size: 0.875rem; font-weight: 500;">Method 2: Use Image URL</label>
+                                                <input type="url" name="carousel_image_2_url" value="{{ site_settings.carousel_image_2_url|default:'' }}" class="form-input" placeholder="https://example.com/image.jpg" id="carousel-2-url-input" onchange="previewCarouselImageUrl(this.value, 'carousel-2-preview')">
+                                                <p style="font-size: 0.7rem; color: #9ca3af; margin-top: 0.25rem;">Paste an image URL here</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Title</label>
+                                        <input type="text" name="carousel_image_2_title" value="{{ site_settings.carousel_image_2_title|default:'Advancing Research Through Innovation' }}" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Subtitle</label>
+                                        <textarea name="carousel_image_2_subtitle" class="form-input" rows="3">{{ site_settings.carousel_image_2_subtitle|default:'Explore groundbreaking research papers, cutting-edge methodologies, and innovative findings that shape the future of knowledge and discovery.' }}</textarea>
+                                    </div>
+                                    <button type="submit" class="btn-save">
+                                        <i data-lucide="check"></i>
+                                        Save Changes for Carousel 2
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            <!-- Carousel Image 3 -->
+                            <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1.5rem;">
+                                <h4 style="font-size: 1rem; font-weight: 600; color: #111827; margin-bottom: 1rem;">Carousel Image 3</h4>
+                                <form method="POST" action="{% url 'app:settings' %}" enctype="multipart/form-data" id="carousel-3-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="section" value="carousel_3">
+                                    
+                                    <div style="margin-bottom: 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.75rem; background: white;">
+                                        <label class="form-label" style="font-size: 0.875rem; font-weight: 600; color: #111827; margin-bottom: 0.5rem;">Current Image Preview:</label>
+                                        <img id="carousel-3-preview" src="{% if site_settings.carousel_image_3 %}{{ site_settings.carousel_image_3.url }}{% elif site_settings.carousel_image_3_url %}{{ site_settings.carousel_image_3_url }}{% else %}https://res.cloudinary.com/dmqizfpyz/image/upload/v1763149806/bg3_gv0clb.png{% endif %}" alt="Carousel 3 Preview" class="image-preview" style="display: block; max-width: 100%; max-height: 300px; border-radius: 0.25rem; margin-bottom: 1rem;">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-weight: 600;">Change This Image</label>
+                                        <p style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.75rem;">Choose one method to change the image above:</p>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                                            <div>
+                                                <label class="form-label" style="font-size: 0.875rem; font-weight: 500;">Method 1: Upload New Image</label>
+                                                <input type="file" name="carousel_image_3" accept="image/*" class="form-input" id="carousel-3-file-input" onchange="previewCarouselImage(this, 'carousel-3-preview')" style="cursor: pointer;">
+                                                <p style="font-size: 0.7rem; color: #9ca3af; margin-top: 0.25rem;">Click to select an image file</p>
+                                            </div>
+                                            <div>
+                                                <label class="form-label" style="font-size: 0.875rem; font-weight: 500;">Method 2: Use Image URL</label>
+                                                <input type="url" name="carousel_image_3_url" value="{{ site_settings.carousel_image_3_url|default:'' }}" class="form-input" placeholder="https://example.com/image.jpg" id="carousel-3-url-input" onchange="previewCarouselImageUrl(this.value, 'carousel-3-preview')">
+                                                <p style="font-size: 0.7rem; color: #9ca3af; margin-top: 0.25rem;">Paste an image URL here</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Title</label>
+                                        <input type="text" name="carousel_image_3_title" value="{{ site_settings.carousel_image_3_title|default:'Advancing Research Through Innovation' }}" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Subtitle</label>
+                                        <textarea name="carousel_image_3_subtitle" class="form-input" rows="3">{{ site_settings.carousel_image_3_subtitle|default:'Explore groundbreaking research papers, cutting-edge methodologies, and innovative findings that shape the future of knowledge and discovery.' }}</textarea>
+                                    </div>
+                                    <button type="submit" class="btn-save">
+                                        <i data-lucide="check"></i>
+                                        Save Changes for Carousel 3
+                                    </button>
+                                </form>
+                            </div>
                             
                             <h3 class="settings-subsection-title" style="margin-top: 3rem;">ADDRESS & CONTACTA</h3>
                             <div class="settings-divider"></div>
@@ -2183,6 +2313,30 @@
                     document.getElementById('banner-preview').src = e.target.result;
                 };
                 reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        function previewCarouselImage(input, previewId) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById(previewId);
+                    if (preview) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                    }
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        function previewCarouselImageUrl(url, previewId) {
+            if (url) {
+                const preview = document.getElementById(previewId);
+                if (preview) {
+                    preview.src = url;
+                    preview.style.display = 'block';
+                }
             }
         }
         

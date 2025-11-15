@@ -1,0 +1,846 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}{{ project.project_title }} - ScholarIndex{% endblock %}
+
+{% block content %}
+<style>
+  .project-detail-page {
+    padding: 2.5rem 1.5rem 4rem;
+    background: linear-gradient(to bottom, #f9fafb 0%, #ffffff 100%);
+    min-height: calc(100vh - 5rem);
+  }
+
+  .project-detail-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .project-detail-layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 2.5rem;
+    align-items: start;
+  }
+
+  /* Main Content */
+  .project-main-content {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e5e7eb;
+    transition: box-shadow 0.3s ease;
+  }
+
+  .project-main-content:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  .project-title-main {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 1.25rem;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .project-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #f3f4f6;
+  }
+
+  .project-meta-item {
+    font-size: 0.875rem;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .project-meta-item::before {
+    content: '•';
+    color: #9ca3af;
+    font-weight: bold;
+  }
+
+  .project-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .project-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .project-section-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e5e7eb;
+    display: inline-block;
+    width: 100%;
+  }
+
+  .project-section-content {
+    font-size: 1rem;
+    color: #374151;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    text-align: justify;
+  }
+
+  /* Sidebar */
+  .project-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    position: sticky;
+    top: 2rem;
+  }
+
+  .sidebar-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+  }
+
+  .sidebar-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .stat-number {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.2;
+  }
+
+  .stat-label {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+    font-weight: 400;
+  }
+
+  .sidebar-info-item {
+    font-size: 0.875rem;
+    color: #374151;
+    margin-bottom: 0.75rem;
+    padding: 0;
+    line-height: 1.5;
+  }
+
+  .sidebar-info-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .sidebar-info-item strong {
+    color: #111827;
+    font-weight: 600;
+    margin-right: 0.5rem;
+  }
+
+  .author-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding: 0;
+  }
+
+  .author-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+  }
+
+  .author-details {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .author-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.125rem;
+    word-wrap: break-word;
+  }
+
+  .author-email {
+    font-size: 0.75rem;
+    color: #6b7280;
+    word-break: break-all;
+  }
+
+  .price-display {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0.5rem 0;
+  }
+
+  /* Payment Section */
+  .payment-section {
+    margin-top: 1rem;
+  }
+
+  .payment-input-group {
+    margin-bottom: 0.875rem;
+  }
+
+  .payment-input-label {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .payment-input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    color: #111827;
+    background-color: #ffffff;
+    transition: all 0.3s ease;
+  }
+
+  .payment-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    background-color: #ffffff;
+  }
+
+  .payment-input::placeholder {
+    color: #9ca3af;
+  }
+
+  .payment-instruction {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
+    line-height: 1.5;
+  }
+
+  .payment-methods {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+  }
+
+  .payment-method-logo {
+    height: 30px;
+    object-fit: contain;
+  }
+
+  .btn-validate-download {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    letter-spacing: 0.01em;
+  }
+
+  .btn-validate-download:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+    transform: translateY(-2px);
+  }
+
+  .btn-validate-download:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+  }
+
+  .btn-validate-download:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+  }
+
+  /* Similar Topics */
+  .similar-topics-section {
+    margin-top: 3rem;
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e5e7eb;
+  }
+
+  .similar-topics-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 3px solid #e5e7eb;
+    letter-spacing: -0.01em;
+  }
+
+  .similar-project-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    border-bottom: 1px solid #f3f4f6;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .similar-project-item:hover {
+    background-color: #f9fafb;
+    transform: translateX(4px);
+  }
+
+  .similar-project-item:last-child {
+    border-bottom: none;
+  }
+
+  .similar-project-checkbox {
+    width: 18px;
+    height: 18px;
+    margin-top: 0.25rem;
+    flex-shrink: 0;
+    accent-color: #3b82f6;
+  }
+
+  .similar-project-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .similar-project-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2563eb;
+    text-decoration: none;
+    margin-bottom: 0.75rem;
+    display: block;
+    word-wrap: break-word;
+    line-height: 1.5;
+    transition: color 0.2s ease;
+  }
+
+  .similar-project-title:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+  }
+
+  .similar-project-details {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+  }
+
+  .similar-project-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  .similar-project-price {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .similar-project-stats {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .similar-project-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    color: #6b7280;
+  }
+
+  .btn-view {
+    padding: 0.625rem 1.25rem;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+  }
+
+  .btn-view:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
+  }
+
+  .success-message {
+    background-color: #d1fae5;
+    border: 1px solid #10b981;
+    color: #065f46;
+    padding: 0.875rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    font-weight: 400;
+  }
+
+  .error-message {
+    background-color: #fee2e2;
+    border: 1px solid #ef4444;
+    color: #991b1b;
+    padding: 0.875rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    font-weight: 400;
+  }
+
+  @media (max-width: 1024px) {
+    .project-detail-layout {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .project-sidebar {
+      order: -1;
+      position: static;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .project-detail-page {
+      padding: 1.5rem 1rem 3rem;
+    }
+
+    .project-detail-layout {
+      gap: 1.5rem;
+    }
+
+    .project-main-content,
+    .sidebar-card,
+    .similar-topics-section {
+      padding: 1.5rem;
+      border-radius: 10px;
+    }
+
+    .project-title-main {
+      font-size: 1.5rem;
+      line-height: 1.3;
+    }
+
+    .project-section-content {
+      font-size: 0.9375rem;
+      text-align: left;
+    }
+
+    .sidebar-stats {
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+    }
+
+    .sidebar-card {
+      padding: 1.5rem;
+    }
+
+    .author-info {
+      flex-direction: column;
+      text-align: center;
+      padding: 1.25rem;
+    }
+
+    .author-details {
+      width: 100%;
+    }
+
+    .payment-methods {
+      justify-content: center;
+    }
+
+    .similar-project-item {
+      flex-direction: column;
+      padding: 1.25rem;
+    }
+
+    .similar-project-footer {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+      width: 100%;
+    }
+
+    .similar-project-stats {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .btn-view {
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .project-detail-page {
+      padding: 1rem 0.75rem 2rem;
+    }
+
+    .project-main-content,
+    .sidebar-card,
+    .similar-topics-section {
+      padding: 1.25rem;
+    }
+
+    .project-title-main {
+      font-size: 1.25rem;
+    }
+
+    .project-section-title {
+      font-size: 1rem;
+    }
+
+    .stat-number {
+      font-size: 1.75rem;
+    }
+
+    .price-display {
+      font-size: 1.5rem;
+    }
+
+    .btn-validate-download {
+      padding: 0.875rem 1.25rem;
+      font-size: 0.9375rem;
+    }
+  }
+</style>
+
+<div class="project-detail-page">
+  <div class="project-detail-container">
+    <div class="project-detail-layout">
+      <!-- Main Content -->
+      <main class="project-main-content">
+        <h1 class="project-title-main">{{ project.project_title }}</h1>
+        
+        <div class="project-meta">
+          <span class="project-meta-item">Published on: {{ project.created_at|date:"jS F, Y" }}</span>
+          <span class="project-meta-item">Last update: {% if project.updated_at %}{{ project.updated_at|date:"jS F, Y" }}{% else %}Null date{% endif %}</span>
+        </div>
+
+        <div class="project-section">
+          <h2 class="project-section-title">Topic:</h2>
+          <div class="project-section-content">{{ project.project_title }}</div>
+        </div>
+
+        <div class="project-section">
+          <h2 class="project-section-title">Abstract:</h2>
+          <div class="project-section-content">{{ project.description|safe }}</div>
+        </div>
+      </main>
+
+      <!-- Sidebar -->
+      <aside class="project-sidebar">
+        <!-- Stats Card -->
+        <div class="sidebar-card">
+          <div class="sidebar-stats">
+            <div>
+              <div class="stat-number">{{ project.views }}</div>
+              <div class="stat-label">Total views</div>
+            </div>
+            <div>
+              <div class="stat-number">{{ project.downloads }}</div>
+              <div class="stat-label">Total Downloads</div>
+            </div>
+          </div>
+
+          <div class="sidebar-info-item">
+            <strong>Document type:</strong> {{ project.project_file.name|slice:"-4:"|upper }}
+          </div>
+          <div class="sidebar-info-item">
+            <strong>Chapters:</strong> {{ chapters }}
+          </div>
+          <div class="sidebar-info-item">
+            <strong>Pages:</strong> {{ pages }}
+          </div>
+
+          {% if author %}
+          <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+            <div class="sidebar-info-item" style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.875rem;">Posted by:</div>
+            <div class="author-info">
+              <div class="author-avatar">
+                {{ author.first_name|first|upper }}{{ author.last_name|first|upper }}
+              </div>
+              <div class="author-details">
+                <div class="author-name">{{ author.get_full_name|default:author.username }}</div>
+                <div class="author-email">{{ author.email }}</div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+            <div class="sidebar-info-item" style="font-weight: 600; margin-bottom: 0.25rem; font-size: 0.875rem;">Price:</div>
+            <div class="price-display">USD{{ price|floatformat:0 }}</div>
+          </div>
+        </div>
+
+        <!-- Payment Card -->
+        <div class="sidebar-card">
+          {% if has_paid %}
+          <div class="success-message">
+            ✓ Payment verified! Document has been sent to {{ payment_email }}
+          </div>
+          {% else %}
+          <div class="payment-section">
+            <div class="payment-input-group">
+              <label class="payment-input-label">Enter PAYMENT EMAIL ADDRESS</label>
+              <input type="email" id="paymentEmail" class="payment-input" placeholder="Enter payment Email" required>
+              <p class="payment-instruction">If you've paid already, please provide the same payment email address to continue.</p>
+            </div>
+
+            <div class="payment-input-group">
+              <div class="payment-input-label">Instant Payment & Download System</div>
+              <div class="payment-methods">
+                <img src="https://logos-world.net/wp-content/uploads/2020/04/Visa-Logo.png" alt="VISA" class="payment-method-logo" style="height: 25px;">
+                <img src="https://logos-world.net/wp-content/uploads/2020/04/Mastercard-Logo.png" alt="Mastercard" class="payment-method-logo" style="height: 25px;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/MTN_Logo.svg/1200px-MTN_Logo.svg.png" alt="MTN" class="payment-method-logo" style="height: 30px;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Vodafone_icon.svg/1200px-Vodafone_icon.svg.png" alt="Vodafone Cash" class="payment-method-logo" style="height: 30px;">
+              </div>
+            </div>
+
+            <button type="button" id="payButton" class="btn-validate-download" onclick="initializePayment()">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+              </svg>
+              Validate & Download
+            </button>
+
+            <div id="paymentMessage" style="display: none; margin-top: 1rem;"></div>
+          </div>
+          {% endif %}
+        </div>
+      </aside>
+    </div>
+
+    <!-- Similar Topics -->
+    {% if similar_projects %}
+    <div class="similar-topics-section">
+      <h2 class="similar-topics-title">Similar Topics</h2>
+      {% for similar_project in similar_projects %}
+      <div class="similar-project-item">
+        <input type="checkbox" class="similar-project-checkbox" disabled>
+        <div class="similar-project-content">
+          <a href="{% url 'app:project_detail' similar_project.project.id %}" class="similar-project-title">
+            {{ similar_project.project.project_title }}
+          </a>
+          <div class="similar-project-details">
+            {% if similar_project.project.category %}{{ similar_project.project.category|upper }}{% else %}PROJECT{% endif %} | 
+            {{ similar_project.chapters }} chapter(s) | {{ similar_project.pages }} page(s)
+          </div>
+          <div class="similar-project-footer">
+            <span class="similar-project-price">USD{{ similar_project.project.price_usd|floatformat:0 }}</span>
+            <div class="similar-project-stats">
+              <div class="similar-project-stat">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+                {{ similar_project.project.downloads }}
+              </div>
+              <a href="{% url 'app:project_detail' similar_project.project.id %}" class="btn-view">VIEW</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+  const projectId = {{ project.id }};
+  const projectPrice = {{ price }};
+  
+  // Debug: Log Paystack key info
+  const paystackKey = '{{ paystack_public_key }}';
+  console.log('Paystack key (first 15 chars):', paystackKey.substring(0, 15) + '...');
+  console.log('Paystack key length:', paystackKey.length);
+  console.log('Paystack key starts with pk_:', paystackKey.startsWith('pk_'));
+  
+  // Validate key before using
+  if (!paystackKey || !paystackKey.startsWith('pk_')) {
+    console.error('INVALID PAYSTACK KEY DETECTED!', paystackKey);
+  }
+
+  function initializePayment() {
+    const email = document.getElementById('paymentEmail').value.trim();
+    const payButton = document.getElementById('payButton');
+    const messageDiv = document.getElementById('paymentMessage');
+    const paystackKey = '{{ paystack_public_key }}';
+
+    if (!email) {
+      showMessage('Please enter your email address', 'error');
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      showMessage('Please enter a valid email address', 'error');
+      return;
+    }
+
+    // Validate Paystack key
+    if (!paystackKey || !paystackKey.startsWith('pk_')) {
+      showMessage('Payment gateway configuration error. Please contact support.', 'error');
+      console.error('Invalid Paystack public key:', paystackKey);
+      return;
+    }
+
+    payButton.disabled = true;
+    payButton.innerHTML = '<svg class="animate-spin" width="20" height="20" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...';
+
+    // Convert USD to GHS (approximate rate: 1 USD = 13.5 GHS)
+    const amountGHS = projectPrice * 13.5;
+    const amountPesewas = Math.round(amountGHS * 100);
+
+    // Validate amount
+    if (amountPesewas <= 0) {
+      showMessage('Invalid payment amount. Please contact support.', 'error');
+      payButton.disabled = false;
+      payButton.innerHTML = '<svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Validate & Download';
+      return;
+    }
+
+    try {
+      // Initialize payment with Paystack
+      const handler = PaystackPop.setup({
+        key: paystackKey,
+        email: email,
+        amount: amountPesewas,
+        currency: 'GHS',
+        ref: 'project_' + projectId + '_' + Date.now(),
+        metadata: {
+          project_id: projectId,
+          project_title: '{{ project.project_title|escapejs }}',
+        },
+        callback: function(response) {
+          // Verify payment
+          verifyPayment(response.reference, email);
+        },
+        onClose: function() {
+          payButton.disabled = false;
+          payButton.innerHTML = '<svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Validate & Download';
+        }
+      });
+
+      handler.openIframe();
+    } catch (error) {
+      console.error('Paystack initialization error:', error);
+      showMessage('Failed to initialize payment. Please try again or contact support.', 'error');
+      payButton.disabled = false;
+      payButton.innerHTML = '<svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Validate & Download';
+    }
+  }
+
+  function verifyPayment(reference, email) {
+    const payButton = document.getElementById('payButton');
+    const messageDiv = document.getElementById('paymentMessage');
+
+    payButton.disabled = true;
+    payButton.innerHTML = '<svg class="animate-spin" width="20" height="20" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Verifying...';
+
+    fetch('{% url "app:verify_project_payment" project.id %}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({
+        email: email,
+        reference: reference
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        showMessage(data.message, 'success');
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } else {
+        showMessage(data.error || 'Payment verification failed', 'error');
+        payButton.disabled = false;
+        payButton.innerHTML = '<svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Validate & Download';
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      showMessage('An error occurred. Please try again.', 'error');
+      payButton.disabled = false;
+      payButton.innerHTML = '<svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Validate & Download';
+    });
+  }
+
+  function showMessage(message, type) {
+    const messageDiv = document.getElementById('paymentMessage');
+    messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
+    messageDiv.textContent = message;
+    messageDiv.style.display = 'block';
+  }
+</script>
+{% endblock %}
+

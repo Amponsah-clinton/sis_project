@@ -68,8 +68,27 @@ class ArticleAuthor(models.Model):
 
 # Journal Model
 class Journal(models.Model):
+    JOURNAL_TYPE_CHOICES = [
+        ('open-access', 'Open-Access Journal'),
+        ('subscription', 'Subscription-Based Journal'),
+        ('hybrid', 'Hybrid'),
+        ('trade', 'Trade Journal'),
+        ('current-affairs', 'Current affairs/Opinion Magazine'),
+        ('popular', 'Popular Magazine'),
+        ('preprint', 'Pre-Print Journal'),
+    ]
+    
+    JOURNAL_FORMAT_CHOICES = [
+        ('print', 'Print'),
+        ('online', 'Online'),
+        ('both', 'Both Print and Online'),
+    ]
+    
     journal_name = models.CharField(max_length=300)
     journal_abbreviation = models.CharField(max_length=100, blank=True)
+    journal_cover_image = models.ImageField(upload_to='journals/covers/', blank=True, null=True)
+    journal_logo = models.ImageField(upload_to='journals/logos/', blank=True, null=True)
+    journal_url = models.URLField(blank=True)
     publisher_name = models.CharField(max_length=300)
     publisher_address = models.TextField(blank=True)
     publisher_country = models.CharField(max_length=100)
@@ -84,7 +103,11 @@ class Journal(models.Model):
     publication_frequency = models.CharField(max_length=100, blank=True)
     first_publication_year = models.IntegerField(blank=True, null=True)
     journal_scope = models.TextField(blank=True)
-    journal_logo = models.ImageField(upload_to='journals/logos/', blank=True, null=True)
+    journal_type = models.CharField(max_length=50, choices=JOURNAL_TYPE_CHOICES, blank=True)
+    journal_format = models.CharField(max_length=50, choices=JOURNAL_FORMAT_CHOICES, blank=True)
+    publication_fee = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    open_access = models.BooleanField(default=False)
+    peer_review = models.BooleanField(default=False)
     terms_accepted = models.BooleanField(default=False)
     submitted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -137,6 +160,9 @@ class Project(models.Model):
     )
     additional_info = models.TextField(blank=True)
     submitted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    views = models.IntegerField(default=0)
+    downloads = models.IntegerField(default=0)
+    price_usd = models.DecimalField(max_digits=10, decimal_places=2, default=10.00)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -157,6 +183,27 @@ class ProjectContributor(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.project.project_title}"
+
+# Project Payment Model - Track payments and downloads
+class ProjectPayment(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='payments')
+    email = models.EmailField()
+    payment_reference = models.CharField(max_length=255, unique=True)
+    amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_status = models.CharField(max_length=20, default='pending', choices=[
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+    ])
+    document_sent = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.email} - {self.project.project_title} - {self.payment_reference}"
 
 # Membership Request Model
 class MembershipRequest(models.Model):
@@ -467,6 +514,22 @@ class SiteSettings(models.Model):
     # General Settings - Theme
     default_banner_image = models.ImageField(upload_to='settings/banners/', blank=True, null=True)
     default_app_font_size = models.IntegerField(default=20, help_text="Font size in pixels")
+    
+    # Carousel Images (3 images with text)
+    carousel_image_1 = models.ImageField(upload_to='settings/carousel/', blank=True, null=True)
+    carousel_image_1_url = models.URLField(blank=True, help_text="Alternative: Provide image URL instead of uploading")
+    carousel_image_1_title = models.CharField(max_length=500, blank=True, default="Advancing Research Through Innovation")
+    carousel_image_1_subtitle = models.TextField(blank=True, default="Explore groundbreaking research papers, cutting-edge methodologies, and innovative findings that shape the future of knowledge and discovery.")
+    
+    carousel_image_2 = models.ImageField(upload_to='settings/carousel/', blank=True, null=True)
+    carousel_image_2_url = models.URLField(blank=True, help_text="Alternative: Provide image URL instead of uploading")
+    carousel_image_2_title = models.CharField(max_length=500, blank=True, default="Advancing Research Through Innovation")
+    carousel_image_2_subtitle = models.TextField(blank=True, default="Explore groundbreaking research papers, cutting-edge methodologies, and innovative findings that shape the future of knowledge and discovery.")
+    
+    carousel_image_3 = models.ImageField(upload_to='settings/carousel/', blank=True, null=True)
+    carousel_image_3_url = models.URLField(blank=True, help_text="Alternative: Provide image URL instead of uploading")
+    carousel_image_3_title = models.CharField(max_length=500, blank=True, default="Advancing Research Through Innovation")
+    carousel_image_3_subtitle = models.TextField(blank=True, default="Explore groundbreaking research papers, cutting-edge methodologies, and innovative findings that shape the future of knowledge and discovery.")
     
     # Address & Contact
     phone = models.CharField(max_length=50, blank=True, default="+19517275906")

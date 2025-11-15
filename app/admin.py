@@ -2,8 +2,9 @@ from django.contrib import admin
 from django.utils.html import format_html
 from .models import (
     UserProfile, Article, ArticleAuthor, Journal, JournalEditor, Project, ProjectContributor,
-    MembershipRequest, DirectoryApplication, HallOfFameApplication, PlagiarismCheck,
-    PlagiarismWork, ThesisToArticle, ThesisToBook, ThesisToBookChapter, PowerPointPreparation
+    ProjectPayment, MembershipRequest, DirectoryApplication, HallOfFameApplication, PlagiarismCheck,
+    PlagiarismWork, ThesisToArticle, ThesisToBook, ThesisToBookChapter, PowerPointPreparation,
+    SiteSettings, Blog
 )
 from .forms import ProjectForm
 
@@ -55,15 +56,15 @@ class JournalEditorInline(admin.TabularInline):
 # Journal Admin
 @admin.register(Journal)
 class JournalAdmin(admin.ModelAdmin):
-    list_display = ('journal_name', 'publisher_name', 'subject_area', 'created_at')
-    list_filter = ('publisher_country', 'language', 'created_at')
-    search_fields = ('journal_name', 'journal_abbreviation', 'publisher_name', 'issn_print', 'issn_online', 'e_issn')
+    list_display = ('journal_name', 'publisher_name', 'subject_area', 'journal_type', 'created_at')
+    list_filter = ('publisher_country', 'language', 'journal_type', 'journal_format', 'open_access', 'peer_review', 'created_at')
+    search_fields = ('journal_name', 'journal_abbreviation', 'publisher_name', 'issn_print', 'issn_online', 'e_issn', 'journal_url')
     readonly_fields = ('created_at', 'updated_at')
     raw_id_fields = ('submitted_by',)
     inlines = [JournalEditorInline]
     fieldsets = (
         ('Journal Information', {
-            'fields': ('journal_name', 'journal_abbreviation', 'subject_area', 'language', 'journal_scope', 'journal_logo')
+            'fields': ('journal_name', 'journal_abbreviation', 'journal_cover_image', 'journal_logo', 'journal_url', 'subject_area', 'language', 'journal_scope')
         }),
         ('Publisher Information', {
             'fields': ('publisher_name', 'publisher_address', 'publisher_country', 'publisher_email', 'publisher_phone', 'publisher_website')
@@ -72,7 +73,10 @@ class JournalAdmin(admin.ModelAdmin):
             'fields': ('issn_print', 'issn_online', 'e_issn')
         }),
         ('Publication Details', {
-            'fields': ('publication_frequency', 'first_publication_year', 'terms_accepted')
+            'fields': ('journal_type', 'journal_format', 'publication_frequency', 'first_publication_year', 'publication_fee', 'open_access', 'peer_review')
+        }),
+        ('Terms', {
+            'fields': ('terms_accepted',)
         }),
         ('Metadata', {
             'fields': ('submitted_by', 'created_at', 'updated_at')
@@ -89,10 +93,10 @@ class ProjectContributorInline(admin.TabularInline):
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
     form = ProjectForm
-    list_display = ('project_title', 'project_type', 'category', 'institution', 'status', 'created_at')
+    list_display = ('project_title', 'project_type', 'category', 'institution', 'status', 'price_usd', 'views', 'downloads', 'created_at')
     list_filter = ('project_type', 'status', 'category', 'created_at')
     search_fields = ('project_title', 'description', 'institution', 'category')
-    readonly_fields = ('created_at', 'updated_at')
+    readonly_fields = ('created_at', 'updated_at', 'views', 'downloads')
     raw_id_fields = ('submitted_by',)
     inlines = [ProjectContributorInline]
     fieldsets = (
@@ -102,8 +106,31 @@ class ProjectAdmin(admin.ModelAdmin):
         ('Details', {
             'fields': ('description', 'start_date', 'end_date', 'project_file', 'additional_info')
         }),
+        ('Pricing & Stats', {
+            'fields': ('price_usd', 'views', 'downloads')
+        }),
         ('Metadata', {
             'fields': ('submitted_by', 'created_at', 'updated_at')
+        }),
+    )
+
+# Project Payment Admin
+@admin.register(ProjectPayment)
+class ProjectPaymentAdmin(admin.ModelAdmin):
+    list_display = ('email', 'project', 'payment_reference', 'amount_paid', 'payment_status', 'document_sent', 'created_at')
+    list_filter = ('payment_status', 'document_sent', 'created_at')
+    search_fields = ('email', 'payment_reference', 'project__project_title')
+    readonly_fields = ('created_at', 'updated_at')
+    raw_id_fields = ('project',)
+    fieldsets = (
+        ('Payment Information', {
+            'fields': ('project', 'email', 'payment_reference', 'amount_paid', 'payment_status')
+        }),
+        ('Document Delivery', {
+            'fields': ('document_sent',)
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at')
         }),
     )
 
@@ -325,5 +352,100 @@ class PowerPointPreparationAdmin(admin.ModelAdmin):
         }),
         ('Metadata', {
             'fields': ('terms_accepted', 'privacy_accepted', 'submitted_by', 'created_at', 'updated_at')
+        }),
+    )
+
+# Site Settings Admin - Singleton pattern
+@admin.register(SiteSettings)
+class SiteSettingsAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request):
+        # Only allow one instance
+        return not SiteSettings.objects.exists()
+    
+    def has_delete_permission(self, request, obj=None):
+        # Prevent deletion of the only instance
+        return False
+    
+    list_display = ('__str__', 'email_address', 'phone', 'updated_at')
+    fieldsets = (
+        ('General Settings', {
+            'fields': ('default_banner_image', 'default_app_font_size')
+        }),
+        ('Carousel Images', {
+            'fields': (
+                ('carousel_image_1', 'carousel_image_1_url', 'carousel_image_1_title', 'carousel_image_1_subtitle'),
+                ('carousel_image_2', 'carousel_image_2_url', 'carousel_image_2_title', 'carousel_image_2_subtitle'),
+                ('carousel_image_3', 'carousel_image_3_url', 'carousel_image_3_title', 'carousel_image_3_subtitle'),
+            )
+        }),
+        ('Contact Information', {
+            'fields': ('phone', 'office_location_address', 'email_address', 'whatsapp_url', 'youtube_url', 'twitter_url', 'facebook_url')
+        }),
+        ('Payment Gateway', {
+            'fields': ('api_secret_key', 'api_public_key')
+        }),
+        ('Map', {
+            'fields': ('map_index',)
+        }),
+        ('Landing Page', {
+            'fields': ('banner_title', 'banner_subtitle', 'footer_video', 'enable_service_features')
+        }),
+        ('Navigator Settings', {
+            'fields': (
+                ('documentations_nav_image', 'documentations_nav_title', 'documentations_nav_subtitle'),
+                ('communities_nav_image', 'communities_nav_title', 'communities_nav_subtitle'),
+                ('requests_nav_image', 'requests_nav_title', 'requests_nav_subtitle'),
+                ('about_nav_image', 'about_nav_title', 'about_nav_subtitle'),
+            )
+        }),
+        ('Page Enable/Disable', {
+            'fields': (
+                ('enable_landing_page', 'enable_indexed_articles_page', 'enable_indexed_journals_page', 'enable_project_archive_page'),
+                ('enable_directory_researchers_page', 'enable_hall_of_fame_page', 'enable_council_members_page', 'enable_team_members_page'),
+                ('enable_sponsors_page', 'enable_about_sis_page', 'enable_mission_page', 'enable_criteria_page'),
+                ('enable_tolerance_policy_page', 'enable_service_solution_page', 'enable_policy_terms_page'),
+                ('enable_check_turnitin_page', 'enable_work_plagiarism_page', 'enable_thesis_to_article_page'),
+                ('enable_thesis_to_book_page', 'enable_thesis_to_book_chapter_page', 'enable_powerpoint_preparation_page'),
+            )
+        }),
+        ('Pricing - Sponsorship', {
+            'fields': (
+                ('premier_price', 'sustaining_price', 'basic_price', 'power_price'),
+                ('double_price', 'single_price', 'compact_price', 'inspired_price', 'charity_homes_price'),
+            )
+        }),
+        ('Pricing - Registrations', {
+            'fields': (
+                ('article_indexing_price', 'journal_indexing_price', 'project_archive_hosting_price', 'directory_researcher_price'),
+                ('hall_of_fame_price', 'check_plagiarism_price', 'work_plagiarism_price', 'thesis_to_article_price'),
+                ('thesis_to_book_price', 'thesis_to_book_chapter_price', 'powerpoint_preparation_price'),
+            )
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
+    readonly_fields = ('created_at', 'updated_at')
+
+# Blog Admin
+@admin.register(Blog)
+class BlogAdmin(admin.ModelAdmin):
+    list_display = ('title', 'category', 'is_published', 'order_priority', 'views', 'published_date', 'created_by')
+    list_filter = ('category', 'is_published', 'order_priority', 'published_date', 'created_at')
+    search_fields = ('title', 'content', 'tag')
+    readonly_fields = ('created_at', 'updated_at', 'views')
+    raw_id_fields = ('created_by',)
+    fieldsets = (
+        ('Blog Content', {
+            'fields': ('title', 'content', 'image', 'category', 'tag')
+        }),
+        ('Publication Settings', {
+            'fields': ('is_published', 'order_priority', 'published_date')
+        }),
+        ('Statistics', {
+            'fields': ('views',)
+        }),
+        ('Metadata', {
+            'fields': ('created_by', 'created_at', 'updated_at')
         }),
     )

@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
       slide.style.left = '0';
       slide.style.right = '0';
       slide.style.width = '100%';
-      slide.style.transition = 'opacity 1s ease-in-out';
+      slide.style.transition = 'opacity 0.5s ease-in-out';
       slide.style.opacity = i === 0 ? '1' : '0';
       slide.style.visibility = i === 0 ? 'visible' : 'visible';
       slide.style.pointerEvents = i === 0 ? 'auto' : 'none';
@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
       slide.style.right = '0';
       slide.style.width = '100%';
       slide.style.height = '100%';
-      slide.style.transition = 'opacity 1s ease-in-out';
+      slide.style.transition = 'opacity 0.5s ease-in-out';
       slide.style.opacity = i === 0 ? '1' : '0';
       slide.style.visibility = 'visible';
       slide.style.pointerEvents = i === 0 ? 'auto' : 'none';
@@ -171,18 +171,36 @@ document.addEventListener('DOMContentLoaded', function() {
         textSlides[index].style.zIndex = '2';
         imageSlides[index].style.zIndex = '2';
         isTransitioning = false;
-      }, 1000);
+      }, 500);
     });
   }
 
   // Function to start/restart carousel
   function startCarousel() {
     clearInterval(carouselInterval);
-    if (textSlides.length > 1 && initialized) {
+    console.log('Hero carousel: startCarousel called', {
+      textSlides: textSlides.length,
+      imageSlides: imageSlides.length,
+      initialized: initialized
+    });
+    
+    if (textSlides.length > 1 && initialized && textSlides.length === imageSlides.length) {
+      console.log('Hero carousel: Starting auto-play interval');
       carouselInterval = setInterval(function() {
-        var nextSlide = (currentSlide + 1) % textSlides.length;
-        showSlide(nextSlide);
-      }, 5000);
+        if (!isTransitioning) {
+          var nextSlide = (currentSlide + 1) % textSlides.length;
+          console.log('Hero carousel: Moving to slide', nextSlide);
+          showSlide(nextSlide);
+        } else {
+          console.log('Hero carousel: Skipping - transition in progress');
+        }
+      }, 1500);
+    } else {
+      console.warn('Hero carousel: Cannot start - conditions not met', {
+        hasMultipleSlides: textSlides.length > 1,
+        initialized: initialized,
+        slidesMatch: textSlides.length === imageSlides.length
+      });
     }
   }
 
@@ -193,6 +211,24 @@ document.addEventListener('DOMContentLoaded', function() {
       return;
     }
     
+    // Convert NodeLists to Arrays for easier manipulation
+    textSlides = Array.from(textSlides);
+    imageSlides = Array.from(imageSlides);
+    
+    // Make sure we have matching number of slides
+    if (textSlides.length !== imageSlides.length) {
+      console.warn('Hero carousel: Number of text slides (' + textSlides.length + ') does not match number of image slides (' + imageSlides.length + ')');
+      // Use the minimum count
+      var minCount = Math.min(textSlides.length, imageSlides.length);
+      textSlides = textSlides.slice(0, minCount);
+      imageSlides = imageSlides.slice(0, minCount);
+    }
+    
+    console.log('Hero carousel: Processed slides', {
+      textSlides: textSlides.length,
+      imageSlides: imageSlides.length
+    });
+    
     // Add error handlers for images
     imageSlides.forEach(function(img) {
       img.addEventListener('error', function() {
@@ -202,8 +238,24 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Wait a bit longer for images to potentially load, then initialize
     setTimeout(function() {
+      console.log('Hero carousel: Initializing slides...', {
+        textSlides: textSlides.length,
+        imageSlides: imageSlides.length
+      });
       initializeSlides();
-      startCarousel();
+      console.log('Hero carousel: Slides initialized, starting carousel...', {
+        initialized: initialized,
+        textSlides: textSlides.length,
+        imageSlides: imageSlides.length
+      });
+      if (textSlides.length > 1 && textSlides.length === imageSlides.length) {
+        startCarousel();
+      } else {
+        console.warn('Hero carousel: Cannot start - need at least 2 matching slides', {
+          textSlides: textSlides.length,
+          imageSlides: imageSlides.length
+        });
+      }
     }, 500);
   }
 
@@ -213,10 +265,30 @@ document.addEventListener('DOMContentLoaded', function() {
     textSlides = document.querySelectorAll('.slide-one-item-alt-text .slide-text');
     imageSlides = document.querySelectorAll('.slide-one-item-alt img');
     
+    console.log('Hero carousel: Looking for slides', {
+      textSlides: textSlides.length,
+      imageSlides: imageSlides.length,
+      textContainer: !!document.querySelector('.slide-one-item-alt-text'),
+      imageContainer: !!document.querySelector('.slide-one-item-alt')
+    });
+    
     if (textSlides.length > 0 && imageSlides.length > 0) {
+      console.log('Hero carousel: Found slides, initializing...');
       initCarousel();
     } else {
-      setTimeout(startInit, 200);
+      // Try again after a short delay, but limit retries
+      if (typeof startInit.retries === 'undefined') {
+        startInit.retries = 0;
+      }
+      startInit.retries++;
+      if (startInit.retries < 20) { // Try for up to 4 seconds (20 * 200ms)
+        setTimeout(startInit, 200);
+      } else {
+        console.warn('Hero carousel: Could not find slides after multiple attempts', {
+          textSlides: textSlides.length,
+          imageSlides: imageSlides.length
+        });
+      }
     }
   }
   

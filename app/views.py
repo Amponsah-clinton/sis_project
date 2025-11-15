@@ -12,6 +12,7 @@ from app.decorators import check_page_enabled
 import time
 import csv
 import io
+import os
 from .forms import (
     SearchForm, ContactForm, UserRegistrationForm, ArticleForm, ArticleAuthorForm,
     JournalForm, JournalEditorForm, ProjectForm, ProjectContributorForm,
@@ -20,7 +21,7 @@ from .forms import (
     ThesisToBookChapterForm, PowerPointPreparationForm
 )
 from .models import (
-    UserProfile, Article, ArticleAuthor, Journal, JournalEditor, Project, ProjectContributor,
+    UserProfile, Article, ArticleAuthor, Journal, JournalEditor, Project, ProjectContributor, ProjectPayment,
     MembershipRequest, DirectoryApplication, HallOfFameApplication, PlagiarismCheck,
     PlagiarismWork, ThesisToArticle, ThesisToBook, ThesisToBookChapter, PowerPointPreparation
 )
@@ -361,6 +362,41 @@ def indexed_journals(request):
     journals = Journal.objects.all().order_by('-created_at')
     return render(request, 'app/indexed_journals.html', {'journals': journals})
 
+def journal_detail(request, journal_id):
+    """Journal detail page view"""
+    from django.shortcuts import get_object_or_404
+    
+    journal = get_object_or_404(Journal, id=journal_id)
+    
+    # Get chief editor (first editor or first by order)
+    chief_editor = journal.editors.first()
+    
+    # Get similar journals (same subject area, excluding current)
+    similar_journals = Journal.objects.filter(
+        subject_area=journal.subject_area
+    ).exclude(id=journal.id).order_by('-created_at')[:4]
+    
+    # If not enough similar journals, get any other journals
+    if similar_journals.count() < 4:
+        other_journals = Journal.objects.exclude(id=journal.id).exclude(
+            id__in=[j.id for j in similar_journals]
+        ).order_by('-created_at')[:4 - similar_journals.count()]
+        similar_journals = list(similar_journals) + list(other_journals)
+    
+    # Generate journal number (SIS + ID + JI + timestamp)
+    if journal.created_at:
+        date_str = journal.created_at.strftime('%y%m%d')
+    else:
+        date_str = '000000'
+    journal_number = f"SIS{journal.id:06d}.JI{date_str}"
+    
+    return render(request, 'app/journal_detail.html', {
+        'journal': journal,
+        'chief_editor': chief_editor,
+        'similar_journals': similar_journals,
+        'journal_number': journal_number,
+    })
+
 @check_page_enabled('enable_project_archive_page')
 def project_archive(request):
     """Project | Research Archive page view"""
@@ -426,6 +462,256 @@ def project_archive(request):
         'current_year': year,
         'current_sort': sort_by,
     })
+
+@check_page_enabled('enable_project_archive_page')
+def project_detail(request, project_id):
+    """Project detail page view"""
+    project = get_object_or_404(Project, id=project_id)
+    
+    # Increment views
+    project.views += 1
+    project.save(update_fields=['views'])
+    
+    # Get project author (submitted_by)
+    author = project.submitted_by
+    
+    # Parse additional_info to extract price, chapters, pages
+    price = project.price_usd
+    chapters = "1-3"
+    pages = "1-90"
+    
+    if project.additional_info:
+        for line in project.additional_info.split('\n'):
+            if 'Price in USD:' in line:
+                try:
+                    price = float(line.split(':')[1].strip())
+                except:
+                    pass
+            elif 'Chapters:' in line:
+                chapters = line.split(':')[1].strip()
+            elif 'Pages:' in line:
+                pages = line.split(':')[1].strip()
+    
+    # Get similar projects (same category, excluding current)
+    similar_projects = Project.objects.filter(
+        category=project.category
+    ).exclude(id=project.id).order_by('-created_at')[:3]
+    
+    # If not enough similar projects, get any other projects
+    if similar_projects.count() < 3:
+        other_projects = Project.objects.exclude(id=project.id).exclude(
+            id__in=[p.id for p in similar_projects]
+        ).order_by('-created_at')[:3 - similar_projects.count()]
+        similar_projects = list(similar_projects) + list(other_projects)
+    
+    # Parse chapters and pages for similar projects
+    similar_projects_data = []
+    for sp in similar_projects:
+        sp_chapters = "1-3"
+        sp_pages = "1-90"
+        if sp.additional_info:
+            for line in sp.additional_info.split('\n'):
+                if 'Chapters:' in line:
+                    sp_chapters = line.split(':')[1].strip()
+                elif 'Pages:' in line:
+                    sp_pages = line.split(':')[1].strip()
+        similar_projects_data.append({
+            'project': sp,
+            'chapters': sp_chapters,
+            'pages': sp_pages,
+        })
+    
+    # Check if user has already paid (via email in session or payment record)
+    has_paid = False
+    payment_email = request.session.get('payment_email', '')
+    if payment_email:
+        has_paid = ProjectPayment.objects.filter(
+            project=project,
+            email=payment_email,
+            payment_status='completed'
+        ).exists()
+    
+    # Get Paystack public key - check environment variables first, then settings.py
+    import os
+    from django.conf import settings as django_settings
+    
+    # Check environment variables (VITE_ prefix or direct)
+    paystack_public_key = (
+        os.getenv('VITE_PAYSTACK_PUBLIC_KEY') or 
+        os.getenv('PAYSTACK_PUBLIC_KEY') or 
+        getattr(django_settings, 'PAYSTACK_PUBLIC_KEY', None)
+    )
+    
+    # Validate the key format
+    if not paystack_public_key or not isinstance(paystack_public_key, str) or not paystack_public_key.startswith('pk_'):
+        # Fallback to the known test key
+        paystack_public_key = 'pk_test_af37d26c0fa360522c4e66495f3877e498c18850'
+    
+    return render(request, 'app/project_detail.html', {
+        'project': project,
+        'author': author,
+        'price': price,
+        'chapters': chapters,
+        'pages': pages,
+        'similar_projects': similar_projects_data,
+        'has_paid': has_paid,
+        'payment_email': payment_email,
+        'paystack_public_key': paystack_public_key,
+    })
+
+def verify_project_payment(request, project_id):
+    """Verify payment and send document via email"""
+    import requests
+    import json
+    from django.http import JsonResponse
+    
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            email = data.get('email', '').strip()
+            payment_ref = data.get('reference', '').strip()
+            
+            if not email or not payment_ref:
+                return JsonResponse({'error': 'Email and payment reference are required'}, status=400)
+            
+            project = get_object_or_404(Project, id=project_id)
+            
+            # Verify payment with Paystack - check environment variables first, then settings.py
+            from django.conf import settings as django_settings
+            
+            # Check environment variables (VITE_ prefix or direct)
+            paystack_secret = (
+                os.getenv('VITE_PAYSTACK_SECRET_KEY') or 
+                os.getenv('PAYSTACK_SECRET_KEY') or 
+                getattr(django_settings, 'PAYSTACK_SECRET_KEY', None)
+            )
+            
+            # Fallback to default if not found
+            if not paystack_secret:
+                paystack_secret = 'sk_test_185fc53d96addab7232060c86f4221918ab59d1c'
+            
+            url = f'https://api.paystack.co/transaction/verify/{payment_ref}'
+            headers = {
+                'Authorization': f'Bearer {paystack_secret}',
+            }
+            
+            response = requests.get(url, headers=headers)
+            result = response.json()
+            
+            if result.get('status') and result.get('data', {}).get('status') == 'success':
+                # Payment successful
+                amount = float(result['data']['amount']) / 100  # Convert from pesewas to GHS, then to USD
+                amount_usd = amount / 13.5  # Approximate conversion
+                
+                # Create or update payment record
+                payment, created = ProjectPayment.objects.get_or_create(
+                    payment_reference=payment_ref,
+                    defaults={
+                        'project': project,
+                        'email': email,
+                        'amount_paid': amount_usd,
+                        'payment_status': 'completed',
+                    }
+                )
+                
+                if not created:
+                    payment.payment_status = 'completed'
+                    payment.save()
+                
+                # Send document via email if not already sent
+                if not payment.document_sent and project.project_file:
+                    try:
+                        from django.core.mail import EmailMessage
+                        from django.template.loader import render_to_string
+                        from django.conf import settings as django_settings
+                        import traceback
+                        
+                        subject = f'Your Project Document - {project.project_title}'
+                        html_message = render_to_string('app/emails/project_document.html', {
+                            'project': project,
+                            'email': email,
+                        })
+                        
+                        # Get email settings
+                        from_email = getattr(django_settings, 'DEFAULT_FROM_EMAIL', 'noreply@scholarindex.com')
+                        
+                        email_msg = EmailMessage(
+                            subject,
+                            html_message,
+                            from_email,
+                            [email],
+                        )
+                        email_msg.content_subtype = 'html'
+                        
+                        # Attach file - handle different storage backends
+                        try:
+                            # Try to get file path (works for local storage)
+                            if hasattr(project.project_file, 'path'):
+                                file_path = project.project_file.path
+                                if os.path.exists(file_path):
+                                    email_msg.attach_file(file_path)
+                                else:
+                                    raise Exception(f"File not found at path: {file_path}")
+                            else:
+                                # For cloud storage (S3, Cloudinary, etc.), read the file
+                                project.project_file.open('rb')
+                                file_content = project.project_file.read()
+                                file_name = project.project_file.name.split('/')[-1]
+                                
+                                # Determine content type based on file extension
+                                import mimetypes
+                                content_type, _ = mimetypes.guess_type(file_name)
+                                if not content_type:
+                                    if file_name.endswith('.pdf'):
+                                        content_type = 'application/pdf'
+                                    elif file_name.endswith(('.doc', '.docx')):
+                                        content_type = 'application/msword'
+                                    elif file_name.endswith('.zip'):
+                                        content_type = 'application/zip'
+                                    else:
+                                        content_type = 'application/octet-stream'
+                                
+                                email_msg.attach(file_name, file_content, content_type)
+                                project.project_file.close()
+                        except Exception as file_error:
+                            raise Exception(f"Failed to attach file: {str(file_error)}")
+                        
+                        # Send email
+                        email_sent = email_msg.send(fail_silently=False)
+                        
+                        if email_sent:
+                            payment.document_sent = True
+                            payment.save()
+                            
+                            # Increment downloads
+                            project.downloads += 1
+                            project.save(update_fields=['downloads'])
+                            
+                            # Store email in session
+                            request.session['payment_email'] = email
+                        else:
+                            raise Exception("Email send() returned 0")
+                        
+                    except Exception as e:
+                        import logging
+                        logger = logging.getLogger(__name__)
+                        logger.error(f"Error sending email: {str(e)}")
+                        logger.error(traceback.format_exc())
+                        return JsonResponse({
+                            'error': f'Payment verified but email failed to send: {str(e)}'
+                        }, status=500)
+                
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Payment verified successfully. Document sent to your email.',
+                })
+            else:
+                return JsonResponse({'error': 'Payment verification failed'}, status=400)
+                
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required
 def upload_article(request):
@@ -566,40 +852,96 @@ def upload_article(request):
 def register_journal(request):
     """Register Journal page view"""
     if request.method == 'POST':
-        form = JournalForm(request.POST, request.FILES)
+        # Validate captcha (handled by JavaScript, but verify server-side too)
+        captcha_input = request.POST.get('captcha_input', '').strip().upper()
+        captcha_code = request.session.get('captcha_code', '')
+        
+        if not captcha_code:
+            # Generate captcha if missing
+            import random
+            import string
+            captcha_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+            request.session['captcha_code'] = captcha_code
+        
+        if captcha_input != captcha_code:
+            messages.error(request, 'Invalid captcha code. Please try again.')
+            # Regenerate captcha for next attempt
+            import random
+            import string
+            new_captcha = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+            request.session['captcha_code'] = new_captcha
+            return render(request, 'app/register_journal.html', {
+                'form': JournalForm(),
+                'captcha_code': new_captcha,
+            })
+        
+        # Create a mutable copy of POST data
+        post_data = request.POST.copy()
+        
+        # Handle radio button values for open_access and peer_review
+        open_access_value = post_data.get('open_access', 'false')
+        peer_review_value = post_data.get('peer_review', 'false')
+        post_data['open_access'] = True if open_access_value == 'true' else False
+        post_data['peer_review'] = True if peer_review_value == 'true' else False
+        
+        form = JournalForm(post_data, request.FILES)
         if form.is_valid():
             journal = form.save(commit=False)
             journal.submitted_by = request.user
+            # Ensure boolean fields are set correctly
+            journal.open_access = open_access_value == 'true'
+            journal.peer_review = peer_review_value == 'true'
             journal.save()
             
-            # Handle editors
-            editor_count = int(request.POST.get('editor_count', 0))
-            for i in range(editor_count):
-                editor_name = request.POST.get(f'editor_{i}_name')
-                editor_email = request.POST.get(f'editor_{i}_email')
-                editor_affiliation = request.POST.get(f'editor_{i}_affiliation', '')
-                editor_role = request.POST.get(f'editor_{i}_role', '')
-                
-                if editor_name and editor_email:
-                    JournalEditor.objects.create(
-                        journal=journal,
-                        name=editor_name,
-                        email=editor_email,
-                        affiliation=editor_affiliation,
-                        role=editor_role,
-                        order=i
-                    )
+            # Handle Chief Editor
+            chief_editor_name = request.POST.get('chief_editor_name', '').strip()
+            chief_editor_email = request.POST.get('chief_editor_email', '').strip()
+            
+            if chief_editor_name and chief_editor_email:
+                JournalEditor.objects.create(
+                    journal=journal,
+                    name=chief_editor_name,
+                    email=chief_editor_email,
+                    role='Chief Editor',
+                    order=0
+                )
+            
+            # Clear captcha after successful submission
+            request.session.pop('captcha_code', None)
             
             messages.success(request, 'Journal registered successfully!')
             return redirect('app:indexed_journals')
         else:
+            # Regenerate captcha if form validation fails
+            import random
+            import string
+            new_captcha = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+            request.session['captcha_code'] = new_captcha
+            
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f'{field}: {error}')
     else:
         form = JournalForm()
+        # Generate initial captcha code if not exists
+        if 'captcha_code' not in request.session:
+            import random
+            import string
+            captcha_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+            request.session['captcha_code'] = captcha_code
     
-    return render(request, 'app/register_journal.html', {'form': form})
+    # Always get captcha code from session
+    captcha_code = request.session.get('captcha_code', '')
+    if not captcha_code:
+        import random
+        import string
+        captcha_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+        request.session['captcha_code'] = captcha_code
+    
+    return render(request, 'app/register_journal.html', {
+        'form': form,
+        'captcha_code': captcha_code,
+    })
 
 @check_page_enabled('enable_directory_researchers_page')
 def directory_researchers(request):
@@ -662,7 +1004,41 @@ def directory_researchers(request):
 def upload_project(request):
     """Upload | Archive Project page view"""
     if request.method == 'POST':
-        form = ProjectForm(request.POST, request.FILES)
+        # Create a mutable copy of POST data
+        post_data = request.POST.copy()
+        
+        # Map new form fields to model fields
+        # subject -> store in additional_info
+        # price_usd, chapters, pages -> store in additional_info
+        additional_info_parts = []
+        
+        subject = request.POST.get('subject', '')
+        price_usd = request.POST.get('price_usd', '')
+        chapters = request.POST.get('chapters', '')
+        pages = request.POST.get('pages', '')
+        
+        if subject:
+            additional_info_parts.append(f"Subject: {subject}")
+        if price_usd:
+            additional_info_parts.append(f"Price in USD: {price_usd}")
+        if chapters:
+            additional_info_parts.append(f"Chapters: {chapters}")
+        if pages:
+            additional_info_parts.append(f"Pages: {pages}")
+        
+        # Set project_type and status to defaults if not provided
+        if not post_data.get('project_type'):
+            post_data['project_type'] = 'research'
+        if not post_data.get('status'):
+            post_data['status'] = 'active'
+        if not post_data.get('institution'):
+            post_data['institution'] = 'Not specified'
+        
+        # Set additional_info
+        if additional_info_parts:
+            post_data['additional_info'] = '\n'.join(additional_info_parts)
+        
+        form = ProjectForm(post_data, request.FILES)
         if form.is_valid():
             project = form.save(commit=False)
             project.submitted_by = request.user
@@ -1254,9 +1630,6 @@ def settings(request):
             from app.models import SiteSettings
             site_settings = SiteSettings.get_settings()
             
-            if 'banner_image' in request.FILES:
-                site_settings.default_banner_image = request.FILES['banner_image']
-            
             font_size = request.POST.get('font_size')
             if font_size:
                 try:
@@ -1266,6 +1639,60 @@ def settings(request):
             
             site_settings.save()
             messages.success(request, 'General settings updated successfully!')
+        
+        elif section == 'carousel_1':
+            # Update carousel image 1
+            from app.models import SiteSettings
+            site_settings = SiteSettings.get_settings()
+            
+            if 'carousel_image_1' in request.FILES:
+                site_settings.carousel_image_1 = request.FILES['carousel_image_1']
+            
+            carousel_image_1_url = request.POST.get('carousel_image_1_url', '').strip()
+            if carousel_image_1_url:
+                site_settings.carousel_image_1_url = carousel_image_1_url
+            
+            site_settings.carousel_image_1_title = request.POST.get('carousel_image_1_title', '')
+            site_settings.carousel_image_1_subtitle = request.POST.get('carousel_image_1_subtitle', '')
+            
+            site_settings.save()
+            messages.success(request, 'Carousel image 1 updated successfully!')
+        
+        elif section == 'carousel_2':
+            # Update carousel image 2
+            from app.models import SiteSettings
+            site_settings = SiteSettings.get_settings()
+            
+            if 'carousel_image_2' in request.FILES:
+                site_settings.carousel_image_2 = request.FILES['carousel_image_2']
+            
+            carousel_image_2_url = request.POST.get('carousel_image_2_url', '').strip()
+            if carousel_image_2_url:
+                site_settings.carousel_image_2_url = carousel_image_2_url
+            
+            site_settings.carousel_image_2_title = request.POST.get('carousel_image_2_title', '')
+            site_settings.carousel_image_2_subtitle = request.POST.get('carousel_image_2_subtitle', '')
+            
+            site_settings.save()
+            messages.success(request, 'Carousel image 2 updated successfully!')
+        
+        elif section == 'carousel_3':
+            # Update carousel image 3
+            from app.models import SiteSettings
+            site_settings = SiteSettings.get_settings()
+            
+            if 'carousel_image_3' in request.FILES:
+                site_settings.carousel_image_3 = request.FILES['carousel_image_3']
+            
+            carousel_image_3_url = request.POST.get('carousel_image_3_url', '').strip()
+            if carousel_image_3_url:
+                site_settings.carousel_image_3_url = carousel_image_3_url
+            
+            site_settings.carousel_image_3_title = request.POST.get('carousel_image_3_title', '')
+            site_settings.carousel_image_3_subtitle = request.POST.get('carousel_image_3_subtitle', '')
+            
+            site_settings.save()
+            messages.success(request, 'Carousel image 3 updated successfully!')
             
         elif section == 'address':
             # Update address & contact settings
