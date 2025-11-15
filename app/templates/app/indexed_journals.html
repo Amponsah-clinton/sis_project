@@ -750,16 +750,22 @@
                 {% endif %}
                 <div class="journal-fee">Publication fee: {% if journal.publication_fee %}USD {{ journal.publication_fee|floatformat:0 }}{% else %}100 dollars{% endif %}</div>
                 <div class="journal-info">
-                  <p class="journal-info-item"><strong>Publisher:</strong> {{ journal.publisher_name }}</p>
-                  {% if journal.publication_frequency %}
-                  <p class="journal-info-item"><strong>Frequency:</strong> {{ journal.publication_frequency }}</p>
-                  {% endif %}
-                  {% if journal.editors.first %}
-                  <p class="journal-info-item"><strong>Chief editor:</strong> {{ journal.editors.first.name }}</p>
-                  {% endif %}
-                  {% if journal.first_publication_year %}
-                  <p class="journal-info-item"><strong>Started since:</strong> {{ journal.first_publication_year }}</p>
-                  {% endif %}
+                  <div class="journal-info-row">
+                    <p><strong>Publisher:</strong> {{ journal.publisher_name }}</p>
+                
+                    {% if journal.publication_frequency %}
+                    <p><strong>Frequency:</strong> {{ journal.publication_frequency }}</p>
+                    {% endif %}
+                
+                    {% if journal.editors.first %}
+                    <p><strong>Chief editor:</strong> {{ journal.editors.first.name }}</p>
+                    {% endif %}
+                
+                    {% if journal.first_publication_year %}
+                    <p><strong>Started since:</strong> {{ journal.first_publication_year }}</p>
+                    {% endif %}
+                </div>
+                
                 </div>
               </div>
             </div>
@@ -776,6 +782,20 @@
     </div>
   </div>
 </div>
+
+<style>
+  .journal-info-row {
+    display: flex;
+    gap: 15px;     /* space between items */
+    flex-wrap: wrap;  /* allows wrapping if screen is small */
+}
+
+.journal-info-row p {
+    margin: 0;
+    white-space: nowrap;  /* keeps each piece together */
+}
+
+</style>
 
 <script>
   function searchJournals() {
@@ -883,4 +903,6 @@
   }
 </script>
 {% endblock %}
+
+
 

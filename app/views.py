@@ -174,8 +174,80 @@ def logout_view(request):
 @check_page_enabled('enable_indexed_articles_page')
 def indexed_articles(request):
     """Indexed Articles page view"""
-    articles = Article.objects.all().order_by('-created_at')
-    return render(request, 'app/indexed_articles.html', {'articles': articles})
+    from django.utils import timezone
+    from datetime import timedelta
+    from django.db.models import Count
+    from django.core.paginator import Paginator
+    
+    # Show both approved and pending articles
+    articles = Article.objects.filter(status__in=['approved', 'pending']).order_by('-created_at')
+    
+    # Get unique disciplines (subjects) with counts
+    subjects = Article.objects.filter(status__in=['approved', 'pending']).values('discipline').annotate(count=Count('id')).order_by('discipline')
+    subjects_list = [{'name': s['discipline'], 'count': s['count']} for s in subjects if s['discipline']]
+    
+    # Get unique journals with counts
+    journals = Article.objects.filter(status__in=['approved', 'pending']).exclude(journal_name='').values('journal_name').annotate(count=Count('id')).order_by('journal_name')
+    journals_list = [{'name': j['journal_name'], 'count': j['count']} for j in journals if j['journal_name']]
+    
+    # Get unique years with counts
+    years = Article.objects.filter(status__in=['approved', 'pending']).exclude(year_of_publication__isnull=True).values('year_of_publication').annotate(count=Count('id')).order_by('-year_of_publication')
+    years_list = [{'name': str(y['year_of_publication']), 'count': y['count']} for y in years if y['year_of_publication']]
+    
+    # Pagination
+    try:
+        per_page = int(request.GET.get('limit', 40))  # Default 40 items per page
+        if per_page not in [20, 40, 60, 100]:
+            per_page = 40
+    except (ValueError, TypeError):
+        per_page = 40
+    paginator = Paginator(articles, per_page)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    
+    # Calculate record range
+    start_record = (page_obj.number - 1) * paginator.per_page + 1
+    end_record = min(start_record + paginator.per_page - 1, paginator.count)
+    
+    # Add time ago information for each article
+    articles_with_time = []
+    for article in page_obj:
+        if article.created_at:
+            time_diff = timezone.now() - article.created_at
+            if time_diff.days < 1:
+                time_ago = "Today"
+            elif time_diff.days == 1:
+                time_ago = "1 day ago"
+            elif time_diff.days < 30:
+                time_ago = f"{time_diff.days} days ago"
+            elif time_diff.days < 60:
+                time_ago = "1 month ago"
+            elif time_diff.days < 365:
+                months = time_diff.days // 30
+                time_ago = f"{months} months ago"
+            else:
+                years = time_diff.days // 365
+                time_ago = f"{years} year{'s' if years > 1 else ''} ago"
+        else:
+            time_ago = "Recently"
+        
+        articles_with_time.append({
+            'article': article,
+            'time_ago': time_ago
+        })
+    
+    return render(request, 'app/indexed_articles.html', {
+        'articles_with_time': articles_with_time,
+        'articles': articles,
+        'subjects': subjects_list,
+        'journals': journals_list,
+        'years': years_list,
+        'page_obj': page_obj,
+        'start_record': start_record,
+        'end_record': end_record,
+        'total_records': paginator.count,
+        'per_page': per_page,
+    })
 
 def article_detail(request, article_id):
     """Article detail page view"""
@@ -355,6 +427,210 @@ def article_detail(request, article_id):
         'keywords_list': keywords_list,
         'is_dummy': is_dummy,
     })
+
+def article_certificate(request, article_id):
+    """Generate and download article indexing certificate PDF using existing cert.pdf template"""
+    from django.shortcuts import get_object_or_404
+    from django.http import HttpResponse
+    from reportlab.lib.pagesizes import letter
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.units import inch
+    from reportlab.lib.colors import HexColor
+    from datetime import datetime
+    from PyPDF2 import PdfReader, PdfWriter
+    from reportlab.pdfgen import canvas
+    from io import BytesIO
+    import os
+    from django.conf import settings
+    
+    # Get article data (similar to article_detail)
+    try:
+        article = Article.objects.get(id=article_id)
+        authors_list = article.authors.all().order_by('order')
+        authors_names = ', '.join([author.name for author in authors_list]) if authors_list.exists() else article.authors_names or 'N/A'
+        article_number = f"SIS{article.id:06d}AI{article.created_at.strftime('%d%m%y') if article.created_at else '000000'}"
+        recorded_by = "Metascholar Limited"
+        volume = article.volume or 'N/A'
+        issue = article.issue or 'N/A'
+        pages = article.pages or 'N/A'
+        date_of_indexing = article.created_at.strftime('%B %d %Y') if article.created_at else datetime.now().strftime('%B %d %Y')
+        article_link = request.build_absolute_uri(f'/indexed_articles/view/{article.id}/')
+        article_title = article.title
+    except Article.DoesNotExist:
+        # Handle dummy articles
+        from datetime import date
+        dummy_articles = {
+            1: {'title': 'Blood-Pressure Targets in Comatose Survivors of Cardiac Arrest', 'article_number': 'SIS123456AI141125', 'volume': '10', 'issue': '4', 'pages': '123-130', 'authors': [{'name': 'Dr. Sarah Johnson'}, {'name': 'Dr. Michael Chen'}, {'name': 'Dr. Emily Rodriguez'}]},
+            2: {'title': 'Perceptions of School Administrators and Teachers on Educational Technology Integration', 'article_number': 'SIS789012ED150126', 'volume': '8', 'issue': '3', 'pages': '45-62', 'authors': [{'name': 'Dr. Robert Williams'}, {'name': 'Dr. Lisa Anderson'}]},
+            3: {'title': 'Liberal or Restrictive Transfusion Strategy in Patients with Acute Myocardial Infarction', 'article_number': 'SIS345678CA160127', 'volume': '12', 'issue': '2', 'pages': '234-251', 'authors': [{'name': 'Dr. James Thompson'}, {'name': 'Dr. Patricia Martinez'}, {'name': 'Dr. David Kim'}]},
+            4: {'title': 'Weekly Icodec versus Daily Glargine U100 in Type 2 Diabetes', 'article_number': 'SIS456789EN170128', 'volume': '15', 'issue': '1', 'pages': '78-95', 'authors': [{'name': 'Dr. Jennifer Lee'}, {'name': 'Dr. Christopher Brown'}]},
+        }
+        dummy_data = dummy_articles.get(article_id, dummy_articles[1])
+        authors_names = ', '.join([a['name'] for a in dummy_data['authors']])
+        article_number = dummy_data['article_number']
+        recorded_by = "Metascholar Limited"
+        volume = dummy_data['volume']
+        issue = dummy_data['issue']
+        pages = dummy_data['pages']
+        date_of_indexing = datetime.now().strftime('%B %d %Y')
+        article_link = request.build_absolute_uri(f'/indexed_articles/view/{article_id}/')
+        article_title = dummy_data['title']
+    
+    # Load existing cert.pdf template
+    cert_template_path = os.path.join(settings.BASE_DIR, 'app', 'static', 'app', 'docs', 'cert.pdf')
+    
+    # Create a BytesIO buffer for the overlay
+    overlay_buffer = BytesIO()
+    overlay_canvas = canvas.Canvas(overlay_buffer, pagesize=letter)
+    width, height = letter
+    
+    # Set font and color for text overlay - use serif fonts for professional look
+    overlay_canvas.setFillColor(HexColor('#000000'))
+    
+    # Use Times-Roman (serif) for a more professional certificate look
+    from reportlab.lib.utils import simpleSplit
+    
+    # Starting Y position for article details section - moved up to avoid signatures
+    start_y = height - 3.5 * inch
+    line_height = 22  # Reduced line height for tighter spacing
+    
+    # Authors field with label - bold and stylish, very tight spacing like attached
+    overlay_canvas.setFont("Times-Bold", 12)
+    authors_label_x = 1.5 * inch
+    overlay_canvas.drawString(authors_label_x, start_y, "Authors:")
+    overlay_canvas.setFont("Times-Roman", 12)
+    overlay_canvas.drawString(authors_label_x + 0.85 * inch, start_y, authors_names)
+    
+    # Article Number with label
+    overlay_canvas.setFont("Times-Bold", 12)
+    article_num_label_x = 1.5 * inch
+    overlay_canvas.drawString(article_num_label_x, start_y - line_height, "Article Number:")
+    overlay_canvas.setFont("Times-Roman", 12)
+    overlay_canvas.drawString(article_num_label_x + 1.4 * inch, start_y - line_height, article_number)
+    
+    # Recorded By with label
+    overlay_canvas.setFont("Times-Bold", 12)
+    recorded_label_x = 1.5 * inch
+    overlay_canvas.drawString(recorded_label_x, start_y - (line_height * 2), "Recorded By:")
+    overlay_canvas.setFont("Times-Roman", 12)
+    overlay_canvas.drawString(recorded_label_x + 1.2 * inch, start_y - (line_height * 2), recorded_by)
+    
+    # URL with label
+    overlay_canvas.setFont("Times-Bold", 12)
+    url_label_x = 1.5 * inch
+    overlay_canvas.drawString(url_label_x, start_y - (line_height * 3), "URL:")
+    overlay_canvas.setFont("Times-Roman", 12)
+    overlay_canvas.drawString(url_label_x + 0.45 * inch, start_y - (line_height * 3), "www.scholarindexing.com")
+    
+    # Volume, Issue, Pages on same line with labels - very tight spacing
+    vol_issue_y = start_y - (line_height * 4)
+    overlay_canvas.setFont("Times-Bold", 12)
+    vol_label_x = 1.5 * inch
+    overlay_canvas.drawString(vol_label_x, vol_issue_y, "Volume:")
+    overlay_canvas.setFont("Times-Roman", 12)
+    overlay_canvas.drawString(vol_label_x + 0.7 * inch, vol_issue_y, volume)
+    
+    overlay_canvas.setFont("Times-Bold", 12)
+    issue_label_x = 2.9 * inch
+    overlay_canvas.drawString(issue_label_x, vol_issue_y, "Issue:")
+    overlay_canvas.setFont("Times-Roman", 12)
+    overlay_canvas.drawString(issue_label_x + 0.55 * inch, vol_issue_y, issue)
+    
+    overlay_canvas.setFont("Times-Bold", 12)
+    pages_label_x = 4.7 * inch
+    overlay_canvas.drawString(pages_label_x, vol_issue_y, "Pages:")
+    overlay_canvas.setFont("Times-Roman", 12)
+    overlay_canvas.drawString(pages_label_x + 0.6 * inch, vol_issue_y, pages)
+    
+    # Article Title Acknowledgment (wrapped text) - moved up, bold and larger font, with space before
+    ack_y = start_y - (line_height * 5.2) - 20  # Added 20 points of space before
+    ack_text = f'This certificate acknowledges that the article titled "{article_title}" has been successfully indexed and recorded by Metascholar Limited.'
+    wrapped_ack = simpleSplit(ack_text, "Times-Bold", 13, width - 3*inch)
+    for i, line in enumerate(wrapped_ack):
+        overlay_canvas.setFont("Times-Bold", 13)
+        overlay_canvas.drawString(1.5 * inch, ack_y - (i * 16), line)
+    
+    # Date of Indexing with label - moved up (adjusted for new line spacing), very tight spacing like attached
+    date_y = ack_y - len(wrapped_ack) * 16 - 25
+    overlay_canvas.setFont("Times-Bold", 12)
+    date_label_x = 1.5 * inch
+    overlay_canvas.drawString(date_label_x, date_y, "Date of Indexing:")
+    overlay_canvas.setFont("Times-Roman", 12)
+    overlay_canvas.drawString(date_label_x + 1.25 * inch, date_y, date_of_indexing)
+    
+    # Article Link with label - moved up, extremely tight spacing like attached
+    link_y = date_y - line_height
+    overlay_canvas.setFont("Times-Bold", 12)
+    link_label_x = 1.5 * inch
+    overlay_canvas.drawString(link_label_x, link_y, "Article Link:")
+    overlay_canvas.setFont("Times-Roman", 11)
+    link_wrapped = simpleSplit(article_link, "Times-Roman", 11, width - (link_label_x + 1.25*inch))
+    for i, line in enumerate(link_wrapped):
+        overlay_canvas.drawString(link_label_x + 1.25 * inch, link_y - (i * 13), line)
+    
+    overlay_canvas.save()
+    
+    # Read the existing cert.pdf template
+    try:
+        with open(cert_template_path, 'rb') as template_file:
+            template_reader = PdfReader(template_file)
+            template_writer = PdfWriter()
+            
+            # Get the first page of the template
+            template_page = template_reader.pages[0]
+            
+            # Read the overlay PDF
+            overlay_buffer.seek(0)
+            overlay_reader = PdfReader(overlay_buffer)
+            overlay_page = overlay_reader.pages[0]
+            
+            # Merge overlay onto template page
+            template_page.merge_page(overlay_page)
+            
+            # Add the merged page to writer
+            template_writer.add_page(template_page)
+            
+            # Create response
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="article_certificate_{article_id}.pdf"'
+            
+            # Write to response
+            output_buffer = BytesIO()
+            template_writer.write(output_buffer)
+            output_buffer.seek(0)
+            response.write(output_buffer.read())
+            
+            return response
+    except FileNotFoundError:
+        # If cert.pdf doesn't exist, create a new PDF (fallback)
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="article_certificate_{article_id}.pdf"'
+        
+        p = canvas.Canvas(response, pagesize=letter)
+        width, height = letter
+        
+        # Draw basic certificate structure
+        p.setFont("Helvetica-Bold", 20)
+        p.drawCentredString(width/2, height - 1.5 * inch, "ARTICLE INDEXING CERTIFICATE")
+        
+        # Add article data
+        p.setFont("Helvetica", 11)
+        p.drawString(1.5 * inch, height - 3 * inch, f"Authors: {authors_names}")
+        p.drawString(1.5 * inch, height - 3.25 * inch, f"Article Number: {article_number}")
+        p.drawString(1.5 * inch, height - 3.5 * inch, f"Volume: {volume}, Issue: {issue}, Pages: {pages}")
+        p.drawString(1.5 * inch, height - 4 * inch, f"Date of Indexing: {date_of_indexing}")
+        p.drawString(1.5 * inch, height - 4.25 * inch, f"Article Link: {article_link}")
+        
+        # Article title acknowledgment
+        ack_text = f'This certificate acknowledges that the article titled "{article_title}" has been successfully indexed and recorded by Metascholar Limited.'
+        wrapped_ack = simpleSplit(ack_text, "Helvetica", 11, width - 3*inch)
+        for i, line in enumerate(wrapped_ack):
+            p.drawString(1.5 * inch, height - 4.5 * inch - (i * 15), line)
+        
+        p.showPage()
+        p.save()
+        
+        return response
 
 @check_page_enabled('enable_indexed_journals_page')
 def indexed_journals(request):
@@ -720,13 +996,18 @@ def upload_article(request):
         try:
             # Get form data
             title = request.POST.get('title', '').strip()
-            article_type_raw = request.POST.get('article_type', '').strip()
             discipline = request.POST.get('discipline', '').strip()
             abstract = request.POST.get('abstract', '').strip()
             keywords = request.POST.get('keywords', '').strip()
-            language = request.POST.get('language', '').strip()
-            publication_date = request.POST.get('publication_date', '').strip()
-            doi = request.POST.get('doi', '').strip()
+            authors_names = request.POST.get('authors_names', '').strip()
+            year_of_publication = request.POST.get('year_of_publication', '').strip()
+            volume = request.POST.get('volume', '').strip()
+            issue = request.POST.get('issue', '').strip()
+            pages = request.POST.get('pages', '').strip()
+            journal_name = request.POST.get('journal_name', '').strip()
+            country_of_publication = request.POST.get('country_of_publication', '').strip()
+            issn_or_doi = request.POST.get('issn_or_doi', '').strip()
+            cover_image = request.FILES.get('cover_image')
             article_file = request.FILES.get('article_file')
             
             # Validate required fields
@@ -734,48 +1015,72 @@ def upload_article(request):
                 messages.error(request, 'Article title is required.')
                 return render(request, 'app/upload_article.html', {'form': ArticleForm()})
             
-            if not article_type_raw:
-                messages.error(request, 'Article type is required.')
-                return render(request, 'app/upload_article.html', {'form': ArticleForm()})
-            
             if not discipline:
-                messages.error(request, 'Discipline is required.')
+                messages.error(request, 'Subject is required.')
                 return render(request, 'app/upload_article.html', {'form': ArticleForm()})
             
             if not abstract:
                 messages.error(request, 'Abstract is required.')
                 return render(request, 'app/upload_article.html', {'form': ArticleForm()})
             
-            if not language:
-                messages.error(request, 'Language is required.')
+            if not keywords:
+                messages.error(request, 'Keywords are required.')
                 return render(request, 'app/upload_article.html', {'form': ArticleForm()})
             
-            if not publication_date:
-                messages.error(request, 'Publication date is required.')
+            if not authors_names:
+                messages.error(request, 'Authors names are required.')
+                return render(request, 'app/upload_article.html', {'form': ArticleForm()})
+            
+            if not year_of_publication:
+                messages.error(request, 'Year of publication is required.')
+                return render(request, 'app/upload_article.html', {'form': ArticleForm()})
+            
+            if not volume:
+                messages.error(request, 'Volume is required.')
+                return render(request, 'app/upload_article.html', {'form': ArticleForm()})
+            
+            if not issue:
+                messages.error(request, 'Issue is required.')
+                return render(request, 'app/upload_article.html', {'form': ArticleForm()})
+            
+            if not pages:
+                messages.error(request, 'Page numbers are required.')
+                return render(request, 'app/upload_article.html', {'form': ArticleForm()})
+            
+            if not journal_name:
+                messages.error(request, 'Journal name is required.')
+                return render(request, 'app/upload_article.html', {'form': ArticleForm()})
+            
+            if not country_of_publication:
+                messages.error(request, 'Country of publication is required.')
+                return render(request, 'app/upload_article.html', {'form': ArticleForm()})
+            
+            if not issn_or_doi:
+                messages.error(request, 'ISSN or DOI is required.')
                 return render(request, 'app/upload_article.html', {'form': ArticleForm()})
             
             if not article_file:
                 messages.error(request, 'Article file is required.')
                 return render(request, 'app/upload_article.html', {'form': ArticleForm()})
             
-            # Map article_type from form values to model values
-            article_type_map = {
-                'research-article': 'research',
-                'review-article': 'review',
-                'case-study': 'case_study',
-                'short-communication': 'short_communication',
-                'letter': 'letter',
-                'editorial': 'letter',  # Default to letter if not mapped
-            }
-            article_type = article_type_map.get(article_type_raw, 'research')
+            # Set default article_type to 'research' if not provided
+            article_type = 'research'
             
-            # Create article
+            # Create publication date from year
             from datetime import datetime
             try:
-                pub_date = datetime.strptime(publication_date, '%Y-%m-%d').date()
+                year_int = int(year_of_publication)
+                pub_date = datetime(year_int, 1, 1).date()
             except:
-                messages.error(request, 'Invalid publication date format.')
-                return render(request, 'app/upload_article.html', {'form': ArticleForm()})
+                pub_date = None
+            
+            # Determine if issn_or_doi is DOI or ISSN
+            doi = ''
+            issn = ''
+            if issn_or_doi.startswith('10.') or 'doi' in issn_or_doi.lower():
+                doi = issn_or_doi
+            else:
+                issn = issn_or_doi
             
             article = Article.objects.create(
                 title=title,
@@ -783,58 +1088,34 @@ def upload_article(request):
                 discipline=discipline,
                 abstract=abstract,
                 keywords=keywords,
-                language=language,
+                language='English',  # Default language
                 publication_date=pub_date,
-                doi=doi if doi else '',
+                doi=doi,
                 article_file=article_file,
+                cover_image=cover_image,
+                volume=volume,
+                issue=issue,
+                pages=pages,
+                journal_name=journal_name,
+                country_of_publication=country_of_publication,
+                year_of_publication=year_int if year_of_publication else None,
+                authors_names=authors_names,
                 submitted_by=request.user,
                 status='pending'
             )
             
-            # Handle authors - the template uses authors[0][first_name] format
-            author_index = 0
-            while True:
-                first_name = request.POST.get(f'authors[{author_index}][first_name]', '').strip()
-                last_name = request.POST.get(f'authors[{author_index}][last_name]', '').strip()
-                email = request.POST.get(f'authors[{author_index}][email]', '').strip()
-                affiliation = request.POST.get(f'authors[{author_index}][affiliation]', '').strip()
-                
-                if not first_name and not last_name and not email:
-                    break  # No more authors
-                
-                if first_name and last_name and email:
-                    author_name = f"{first_name} {last_name}".strip()
+            # Handle authors from comma-separated names
+            if authors_names:
+                author_list = [name.strip() for name in authors_names.split(',') if name.strip()]
+                for index, author_name in enumerate(author_list):
                     ArticleAuthor.objects.create(
                         article=article,
                         name=author_name,
-                        email=email,
-                        affiliation=affiliation,
-                        is_corresponding=(author_index == 0),  # First author is corresponding
-                        order=author_index
+                        email=request.user.email if index == 0 else '',  # Use user email for first author
+                        affiliation='',
+                        is_corresponding=(index == 0),
+                        order=index
                     )
-                
-                author_index += 1
-            
-            # If no authors were found with the new format, try the old format
-            if author_index == 0:
-                author_count = int(request.POST.get('author_count', 0))
-                for i in range(author_count):
-                    author_name = request.POST.get(f'author_{i}_name', '').strip()
-                    author_email = request.POST.get(f'author_{i}_email', '').strip()
-                    author_affiliation = request.POST.get(f'author_{i}_affiliation', '').strip()
-                    author_orcid = request.POST.get(f'author_{i}_orcid', '').strip()
-                    is_corresponding = request.POST.get(f'author_{i}_corresponding') == 'on'
-                    
-                    if author_name and author_email:
-                        ArticleAuthor.objects.create(
-                            article=article,
-                            name=author_name,
-                            email=author_email,
-                            affiliation=author_affiliation,
-                            orcid=author_orcid,
-                            is_corresponding=is_corresponding,
-                            order=i
-                        )
             
             messages.success(request, 'Article uploaded successfully! It will be reviewed before being published.')
             return redirect('app:indexed_articles')

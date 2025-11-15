@@ -42,6 +42,14 @@ class Article(models.Model):
         upload_to='articles/',
         validators=[FileExtensionValidator(allowed_extensions=['pdf', 'doc', 'docx'])]
     )
+    cover_image = models.ImageField(upload_to='articles/covers/', blank=True, null=True)
+    volume = models.CharField(max_length=50, blank=True)
+    issue = models.CharField(max_length=50, blank=True)
+    pages = models.CharField(max_length=50, blank=True)
+    journal_name = models.CharField(max_length=300, blank=True)
+    country_of_publication = models.CharField(max_length=100, blank=True)
+    year_of_publication = models.IntegerField(blank=True, null=True)
+    authors_names = models.CharField(max_length=1000, blank=True, help_text="Comma-separated author names")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     submitted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

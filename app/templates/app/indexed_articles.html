@@ -5,143 +5,166 @@
 
 {% block content %}
 <style>
-  .articles-sidebar {
-    width: 320px;
-    background-color: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 1rem;
-    height: fit-content;
+  .indexed-articles-page {
+    padding: 2rem;
+    background-color: #f9fafb;
+    min-height: calc(100vh - 5rem);
   }
 
-  .filter-section {
-    margin-bottom: 1rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    background-color: #ffffff;
-    overflow: hidden;
+  .articles-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 2rem;
+    padding: 0;
   }
 
-  .filter-section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    cursor: pointer;
-    background-color: #ffffff;
-    user-select: none;
+  .main-content {
+    min-width: 0;
+    max-width: 800px;
   }
 
-  .filter-section.expanded .filter-section-header {
-    border-bottom: 1px solid #e5e7eb;
+  /* Search Bar */
+  .search-bar-container {
+    margin-bottom: 2rem;
   }
 
-  .filter-section-header h3 {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #374151;
-    margin: 0;
-    text-transform: uppercase;
-  }
-
-  .filter-chevron {
-    width: 16px;
-    height: 16px;
-    color: #6b7280;
-    transition: transform 0.2s;
-  }
-
-  .filter-section.expanded .filter-chevron {
-    transform: rotate(180deg);
-  }
-
-  .filter-section.collapsed .filter-content {
-    display: none !important;
-  }
-
-  .filter-content {
-    padding: 1rem;
-  }
-
-  .filter-search-input {
+  .search-bar {
     width: 100%;
-    padding: 0.5rem 0.75rem;
+    padding: 0.875rem 1rem;
     border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-size: 0.875rem;
-    margin-bottom: 0.75rem;
-    color: #374151;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    background-color: #ffffff;
+    transition: all 0.2s;
   }
 
-  .filter-search-input:focus {
+  .search-bar:focus {
     outline: none;
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
 
-  .filter-list {
-    max-height: 300px;
+  /* Filter Sidebar */
+  .filter-sidebar {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+    max-height: calc(100vh - 140px);
     overflow-y: auto;
-    padding-right: 0.5rem;
   }
 
-  .filter-list::-webkit-scrollbar {
-    width: 6px;
+  .filter-section {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    overflow: hidden;
   }
 
-  .filter-list::-webkit-scrollbar-track {
-    background: #f3f4f6;
-    border-radius: 3px;
+  .filter-header {
+    padding: 0.75rem;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: #111827;
+    user-select: none;
   }
 
-  .filter-list::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 3px;
+  .filter-header:hover {
+    background-color: #f9fafb;
   }
 
-  .filter-list::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
+  .filter-header svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s;
+  }
+
+  .filter-section.collapsed .filter-header svg {
+    transform: rotate(-90deg);
+  }
+
+  .filter-content {
+    padding: 0.75rem;
+    display: block;
+  }
+
+  .filter-section.collapsed .filter-content {
+    display: none;
+  }
+
+  .filter-search {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.8125rem;
+    margin-bottom: 0.5rem;
+    background-color: #ffffff;
+  }
+
+  .filter-search:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+
+  .filter-list {
+    max-height: 200px;
+    overflow-y: auto;
+    list-style: none;
+    padding: 0;
+    margin: 0;
   }
 
   .filter-item {
     display: flex;
     align-items: center;
-    padding: 0.5rem 0;
+    justify-content: space-between;
+    padding: 0.375rem 0;
     cursor: pointer;
-    gap: 0.75rem;
+  }
+
+  .filter-item:hover {
+    background-color: #f9fafb;
+    margin: 0 -0.5rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
   }
 
   .filter-item input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
+    margin-right: 0.5rem;
     cursor: pointer;
-    accent-color: #3b82f6;
-    flex-shrink: 0;
   }
 
-  .filter-item-text {
+  .filter-item-label {
     flex: 1;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     color: #374151;
-    line-height: 1.5;
+    cursor: pointer;
   }
 
   .filter-count {
     background-color: #f97316;
     color: #ffffff;
-    font-size: 0.75rem;
-    font-weight: 600;
     padding: 0.125rem 0.5rem;
     border-radius: 12px;
-    min-width: 2rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    min-width: 32px;
     text-align: center;
-    flex-shrink: 0;
   }
 
-  .filter-reset-btn {
+  .reset-button {
     width: 100%;
-    padding: 0.75rem 1rem;
-    background-color: #ef4444;
+    padding: 0.625rem 1rem;
+    background-color: #dc2626;
     color: #ffffff;
     border: none;
     border-radius: 6px;
@@ -149,532 +172,734 @@
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s;
-    margin-top: 1rem;
+    margin-top: 0.5rem;
   }
 
-  .filter-reset-btn:hover {
-    background-color: #dc2626;
-  }
-
-  .filter-reset-btn:active {
+  .reset-button:hover {
     background-color: #b91c1c;
   }
 
-  .articles-layout {
-    display: grid;
-    grid-template-columns: 320px 1fr;
-    gap: 2rem;
-    align-items: start;
+  /* Pagination */
+  .pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    padding: 1rem;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
   }
 
-  .articles-main {
-    position: relative;
-    z-index: 1;
+  .pagination-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.875rem;
   }
 
-  .results-header {
-    position: relative;
-    z-index: 2;
-    background-color: var(--background);
+  .pagination-info span {
+    color: #374151;
   }
 
-  @media (max-width: 968px) {
-    .articles-layout {
+  .pagination-info .pagination-value {
+    color: #f97316;
+    font-weight: 600;
+  }
+
+  .pagination-info-separator {
+    width: 1px;
+    height: 1.5rem;
+    background: #e5e7eb;
+  }
+
+  .pagination-page-select {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .pagination-page-select span {
+    color: #374151;
+  }
+
+  .page-input {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    background: white;
+    color: #111827;
+    cursor: pointer;
+    min-width: 60px;
+  }
+
+  .page-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+
+  .limit-input {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    background: white;
+    color: #111827;
+    cursor: pointer;
+    min-width: 60px;
+  }
+
+  .limit-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+
+  .pagination-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .pagination-btn {
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    background: white;
+    color: #111827;
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .pagination-btn:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+  }
+
+  .pagination-btn.active {
+    background: #f97316;
+    color: white;
+    border-color: #f97316;
+  }
+
+  .pagination-btn.arrow {
+    color: #111827;
+  }
+
+  .pagination-btn.arrow.next {
+    color: #f97316;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .page-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-header p {
+    font-size: 1rem;
+    color: #6b7280;
+    margin: 0;
+  }
+
+  .articles-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .article-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 1rem 0.5rem 1rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    margin-bottom: 1rem;
+  }
+
+  .article-card:hover {
+    border-color: #d1d5db;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .article-thumbnail {
+    width: 200px;
+    height: 120px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e5e7eb;
+  }
+
+  .article-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .article-thumbnail-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: #6366f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 2rem;
+    font-weight: 600;
+  }
+
+  .article-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0.375rem;
+    padding-bottom: 0;
+  }
+
+  .article-title {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.4;
+    margin: 0 0 0.25rem 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .article-authors {
+    font-size: 0.875rem;
+    color: #10b981;
+    font-weight: 500;
+    margin: 0 0 0.375rem 0;
+    line-height: 1.4;
+  }
+
+  .article-snippet {
+    font-size: 0.875rem;
+    color: #374151;
+    line-height: 1.6;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .article-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.125rem;
+    margin-bottom: 0;
+  }
+
+  .article-platform-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .article-platform-icon.instagram {
+    background-color: #e4405f;
+    color: white;
+  }
+
+  .article-platform-icon.facebook {
+    background-color: #1877f2;
+    color: white;
+  }
+
+  .article-platform-icon.twitter {
+    background-color: #1da1f2;
+    color: white;
+  }
+
+  .article-platform-icon.journal {
+    background-color: #059669;
+    color: white;
+  }
+
+  .article-platform-icon.research {
+    background-color: #4f46e5;
+    color: white;
+  }
+
+  .article-platform-text {
+    font-size: 0.875rem;
+    color: #f97316;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .empty-state h3 {
+    font-size: 1.5rem;
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-state p {
+    color: #6b7280;
+    font-size: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .indexed-articles-page {
+      padding: 1.5rem 1rem;
+    }
+
+    .page-header h1 {
+      font-size: 1.75rem;
+    }
+
+    .article-card {
+      flex-direction: column;
+      padding: 1rem;
+    }
+
+    .article-thumbnail {
+      width: 100%;
+      height: 150px;
+    }
+
+    .articles-container {
       grid-template-columns: 1fr;
     }
 
-    .articles-sidebar {
-      width: 100%;
-      margin-bottom: 2rem;
+    .filter-sidebar {
+      position: relative;
+      top: 0;
+      max-height: none;
     }
   }
 </style>
 
 <div class="indexed-articles-page">
-  <div class="container">
-    <!-- Page Header -->
-    <div class="page-header">
-      <h1>Indexed Articles</h1>
-      <p>Browse through our comprehensive collection of indexed research articles</p>
-    </div>
+  <div class="articles-container">
+    <!-- Filter Sidebar -->
+    <aside class="filter-sidebar">
+      <!-- Subject Filter -->
+      <div class="filter-section" id="subject-filter">
+        <div class="filter-header" onclick="toggleFilter('subject-filter')">
+          <span>SUBJECT</span>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </div>
+        <div class="filter-content">
+          <input type="text" class="filter-search" id="subject-search" placeholder="Search subject" onkeyup="filterSubjects()">
+          <ul class="filter-list" id="subject-list">
+            {% for subject in subjects %}
+            <li class="filter-item">
+              <label class="filter-item-label">
+                <input type="checkbox" class="filter-checkbox" data-type="subject" data-value="{{ subject.name }}" onchange="applyFilters()">
+                <span>{{ subject.name }}</span>
+              </label>
+              <span class="filter-count">{{ subject.count }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
 
-    <div class="articles-layout">
-      <!-- Sidebar Filters -->
-      <aside class="articles-sidebar">
-        <!-- SUBJECT Section (Expanded) -->
-        <div class="filter-section expanded" id="subjectSection">
-          <div class="filter-section-header" onclick="toggleFilterSection('subjectSection')">
-            <h3>SUBJECT</h3>
-            <svg class="filter-chevron" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </div>
-          <div class="filter-content">
-            <input type="text" class="filter-search-input" placeholder="Search subject" id="subjectSearch">
-            <div class="filter-list" id="subjectList">
-              <label class="filter-item">
-                <input type="checkbox" value="medicine-health">
-                <span class="filter-item-text">Medicine and Health</span>
-                <span class="filter-count">1822</span>
+      <!-- Journal Filter -->
+      <div class="filter-section collapsed" id="journal-filter">
+        <div class="filter-header" onclick="toggleFilter('journal-filter')">
+          <span>JOURNAL</span>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </div>
+        <div class="filter-content">
+          <input type="text" class="filter-search" id="journal-search" placeholder="Search journal" onkeyup="filterJournals()">
+          <ul class="filter-list" id="journal-list">
+            {% for journal in journals %}
+            <li class="filter-item">
+              <label class="filter-item-label">
+                <input type="checkbox" class="filter-checkbox" data-type="journal" data-value="{{ journal.name }}" onchange="applyFilters()">
+                <span>{{ journal.name }}</span>
               </label>
-              <label class="filter-item">
-                <input type="checkbox" value="technology">
-                <span class="filter-item-text">Technology</span>
-                <span class="filter-count">69</span>
+              <span class="filter-count">{{ journal.count }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+
+      <!-- Year Filter -->
+      <div class="filter-section collapsed" id="year-filter">
+        <div class="filter-header" onclick="toggleFilter('year-filter')">
+          <span>YEAR OF PUBLICATION</span>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </div>
+        <div class="filter-content">
+          <ul class="filter-list" id="year-list">
+            {% for year in years %}
+            <li class="filter-item">
+              <label class="filter-item-label">
+                <input type="checkbox" class="filter-checkbox" data-type="year" data-value="{{ year.name }}" onchange="applyFilters()">
+                <span>{{ year.name }}</span>
               </label>
-              <label class="filter-item">
-                <input type="checkbox" value="engineering">
-                <span class="filter-item-text">Engineering</span>
-                <span class="filter-count">6</span>
-              </label>
-              <label class="filter-item">
-                <input type="checkbox" value="computer-science">
-                <span class="filter-item-text">Computer Science</span>
-                <span class="filter-count">6</span>
-              </label>
-              <label class="filter-item">
-                <input type="checkbox" value="art-humanities">
-                <span class="filter-item-text">Art and Humanities</span>
-                <span class="filter-count">488</span>
-              </label>
-              <label class="filter-item">
-                <input type="checkbox" value="social-science">
-                <span class="filter-item-text">Social Science and Behavioral Sciences</span>
-                <span class="filter-count">824</span>
-              </label>
-              <label class="filter-item">
-                <input type="checkbox" value="chemical-engineering">
-                <span class="filter-item-text">Chemical Engineering</span>
-                <span class="filter-count">6</span>
-              </label>
-              <label class="filter-item">
-                <input type="checkbox" value="economics">
-                <span class="filter-item-text">Economics, Econometrics and Finance</span>
-                <span class="filter-count">22</span>
-              </label>
-              <label class="filter-item">
-                <input type="checkbox" value="biochemistry">
-                <span class="filter-item-text">Biochemistry, Genetics, and Molecular Biology</span>
-                <span class="filter-count">12</span>
-              </label>
+              <span class="filter-count">{{ year.count }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+
+      <button class="reset-button" onclick="resetFilters()">Reset</button>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1>Indexed Articles</h1>
+        <p>Browse through our comprehensive collection of indexed research articles</p>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="search-bar-container">
+        <input type="text" class="search-bar" id="article-search" placeholder="Search articles by title, author, or abstract..." onkeyup="filterArticles()">
+      </div>
+
+      <!-- Articles List -->
+      <div class="articles-list" id="articles-list">
+      {% if articles_with_time %}
+        {% for item in articles_with_time %}
+          {% with article=item.article time_ago=item.time_ago %}
+          <a href="{% url 'app:article_detail' article.id %}" class="article-card">
+            <!-- Thumbnail -->
+            <div class="article-thumbnail">
+              {% if article.cover_image %}
+                <img src="{{ article.cover_image.url }}" alt="{{ article.title }}">
+              {% else %}
+                <div class="article-thumbnail-placeholder">
+                  {{ article.title|slice:":1"|upper }}
+                </div>
+              {% endif %}
             </div>
+
+            <!-- Content -->
+            <div class="article-content">
+              <h3 class="article-title">{{ article.title }}</h3>
+              
+              {% if article.authors_names %}
+                <p class="article-authors">{{ article.authors_names }}</p>
+              {% elif article.articleauthor_set.all %}
+                <p class="article-authors">
+                  {% for author in article.articleauthor_set.all %}
+                    {{ author.name }}{% if not forloop.last %}, {% endif %}
+                  {% endfor %}
+                </p>
+              {% endif %}
+
+              {% if article.abstract %}
+                <p class="article-snippet">
+                  {% autoescape off %}
+                    {{ article.abstract|striptags|truncatewords:30 }}
+                  {% endautoescape %}
+                </p>
+              {% endif %}
+
+              <div class="article-meta">
+                <span class="article-platform-text">{{ time_ago }}</span>
+              </div>
+            </div>
+          </a>
+          {% endwith %}
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <h3>No Articles Found</h3>
+          <p>There are no indexed articles available at the moment.</p>
+        </div>
+      {% endif %}
+      </div>
+
+      <!-- Pagination -->
+      {% if page_obj.has_other_pages or page_obj.paginator.count > 0 %}
+      <div class="pagination-container">
+        <div class="pagination-info">
+          <span>Records: <span class="pagination-value">{{ end_record }}</span> of <span class="pagination-value">{{ total_records }}</span></span>
+          <div class="pagination-info-separator"></div>
+          <div class="pagination-page-select">
+            <span>Page :</span>
+            <select class="page-input" onchange="goToPage(this.value)">
+              {% for page_num in page_obj.paginator.page_range %}
+                <option value="{{ page_num }}" {% if page_num == page_obj.number %}selected{% endif %}>{{ page_num }}</option>
+              {% endfor %}
+            </select>
+            <span>of <span class="pagination-value">{{ page_obj.paginator.num_pages }}</span></span>
+          </div>
+          <div class="pagination-info-separator"></div>
+          <div class="pagination-page-select">
+            <span>Limit</span>
+            <select class="limit-input" onchange="changeLimit(this.value)">
+              <option value="20" {% if per_page == 20 %}selected{% endif %}>20</option>
+              <option value="40" {% if per_page == 40 %}selected{% endif %}>40</option>
+              <option value="60" {% if per_page == 60 %}selected{% endif %}>60</option>
+              <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
+            </select>
           </div>
         </div>
-
-        <!-- JOURNAL Section (Collapsed) -->
-        <div class="filter-section collapsed" id="journalSection">
-          <div class="filter-section-header" onclick="toggleFilterSection('journalSection')">
-            <h3>JOURNAL</h3>
-            <svg class="filter-chevron" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </div>
-          <div class="filter-content" style="display: none;">
-            <input type="text" class="filter-search-input" placeholder="Search journal" id="journalSearch">
-            <div class="filter-list" id="journalList">
-              <!-- Journal items will be populated here -->
-            </div>
-          </div>
-        </div>
-
-        <!-- YEAR OF PUBLICATION Section (Collapsed) -->
-        <div class="filter-section collapsed" id="yearSection">
-          <div class="filter-section-header" onclick="toggleFilterSection('yearSection')">
-            <h3>YEAR OF PUBLICATION</h3>
-            <svg class="filter-chevron" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </div>
-          <div class="filter-content" style="display: none;">
-            <div class="filter-list" id="yearList">
-              <label class="filter-item">
-                <input type="checkbox" value="2024">
-                <span class="filter-item-text">2024</span>
-                <span class="filter-count">450</span>
-              </label>
-              <label class="filter-item">
-                <input type="checkbox" value="2023">
-                <span class="filter-item-text">2023</span>
-                <span class="filter-count">380</span>
-              </label>
-              <label class="filter-item">
-                <input type="checkbox" value="2022">
-                <span class="filter-item-text">2022</span>
-                <span class="filter-count">320</span>
-              </label>
-              <label class="filter-item">
-                <input type="checkbox" value="2021">
-                <span class="filter-item-text">2021</span>
-                <span class="filter-count">280</span>
-              </label>
-              <label class="filter-item">
-                <input type="checkbox" value="2020">
-                <span class="filter-item-text">2020</span>
-                <span class="filter-count">250</span>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <!-- Reset Button -->
-        <button class="filter-reset-btn" onclick="resetFilters()">Reset</button>
-      </aside>
-
-      <!-- Main Content -->
-      <main class="articles-main">
-        <!-- Results Header -->
-        <div class="results-header">
-          <div class="results-count">
-            <span id="resultsCount">1,234</span> articles found
-          </div>
-          <div class="view-toggle">
-            <button class="view-btn active" data-view="grid" onclick="toggleView('grid')">
-              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+        
+        <div class="pagination-nav">
+          {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if per_page != 40 %}&limit={{ per_page }}{% endif %}" class="pagination-btn arrow">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 1rem; height: 1rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
               </svg>
-            </button>
-            <button class="view-btn" data-view="list" onclick="toggleView('list')">
-              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </a>
+          {% else %}
+            <span class="pagination-btn arrow" style="opacity: 0.5; cursor: not-allowed;">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 1rem; height: 1rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
               </svg>
-            </button>
-          </div>
+            </span>
+          {% endif %}
+          
+          {% for page_num in page_obj.paginator.page_range %}
+            {% if page_num == page_obj.number %}
+              <span class="pagination-btn active">{{ page_num }}</span>
+            {% elif page_num <= 5 %}
+              <a href="?page={{ page_num }}{% if per_page != 40 %}&limit={{ per_page }}{% endif %}" class="pagination-btn">{{ page_num }}</a>
+            {% endif %}
+          {% endfor %}
+          
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if per_page != 40 %}&limit={{ per_page }}{% endif %}" class="pagination-btn arrow next">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 1rem; height: 1rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </a>
+          {% else %}
+            <span class="pagination-btn arrow next" style="opacity: 0.5; cursor: not-allowed;">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 1rem; height: 1rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </span>
+          {% endif %}
         </div>
-
-        <!-- Articles Grid -->
-        <div class="articles-grid" id="articlesContainer">
-          <!-- Article Card 1 -->
-          <article class="article-card-indexed">
-            <div class="article-header">
-              <span class="article-badge">Computer Science</span>
-              <span class="article-year">2024</span>
-            </div>
-            <h3 class="article-title">
-              <a href="#">Machine Learning Applications in Natural Language Processing: A Comprehensive Survey</a>
-            </h3>
-            <p class="article-authors">
-              <strong>Authors:</strong> John Smith, Sarah Johnson, Michael Chen
-            </p>
-            <p class="article-abstract">
-              This paper presents a comprehensive survey of machine learning applications in natural language processing, covering recent advances in transformer architectures, attention mechanisms, and their practical implementations...
-            </p>
-            <div class="article-meta">
-              <span class="meta-item">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                </svg>
-                45 Citations
-              </span>
-              <span class="meta-item">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                Published: Jan 15, 2024
-              </span>
-            </div>
-            <div class="article-actions">
-              <a href="#" class="btn-download">Download PDF</a>
-              <a href="#" class="btn-view">View Details</a>
-            </div>
-          </article>
-
-          <!-- Article Card 2 -->
-          <article class="article-card-indexed">
-            <div class="article-header">
-              <span class="article-badge">Physics</span>
-              <span class="article-year">2024</span>
-            </div>
-            <h3 class="article-title">
-              <a href="#">Quantum Computing: Recent Breakthroughs and Future Prospects</a>
-            </h3>
-            <p class="article-authors">
-              <strong>Authors:</strong> Dr. Emily Watson, Prof. Robert Lee
-            </p>
-            <p class="article-abstract">
-              We explore the latest developments in quantum computing, including advances in qubit stability, error correction methods, and potential applications in cryptography and drug discovery...
-            </p>
-            <div class="article-meta">
-              <span class="meta-item">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                </svg>
-                128 Citations
-              </span>
-              <span class="meta-item">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                Published: Feb 3, 2024
-              </span>
-            </div>
-            <div class="article-actions">
-              <a href="#" class="btn-download">Download PDF</a>
-              <a href="#" class="btn-view">View Details</a>
-            </div>
-          </article>
-
-          <!-- Article Card 3 -->
-          <article class="article-card-indexed">
-            <div class="article-header">
-              <span class="article-badge">Medicine</span>
-              <span class="article-year">2024</span>
-            </div>
-            <h3 class="article-title">
-              <a href="#">AI-Powered Diagnostic Tools: Revolutionizing Medical Imaging</a>
-            </h3>
-            <p class="article-authors">
-              <strong>Authors:</strong> Dr. Maria Garcia, Dr. James Wilson, Dr. Lisa Anderson
-            </p>
-            <p class="article-abstract">
-              This study examines the integration of artificial intelligence in medical imaging, focusing on improved accuracy in disease detection and the potential for early diagnosis of various conditions...
-            </p>
-            <div class="article-meta">
-              <span class="meta-item">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                </svg>
-                89 Citations
-              </span>
-              <span class="meta-item">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                Published: Mar 10, 2024
-              </span>
-            </div>
-            <div class="article-actions">
-              <a href="#" class="btn-download">Download PDF</a>
-              <a href="#" class="btn-view">View Details</a>
-            </div>
-          </article>
-
-          <!-- Article Card 4 -->
-          <article class="article-card-indexed">
-            <div class="article-header">
-              <span class="article-badge">Engineering</span>
-              <span class="article-year">2023</span>
-            </div>
-            <h3 class="article-title">
-              <a href="#">Sustainable Energy Solutions: Solar Panel Efficiency Improvements</a>
-            </h3>
-            <p class="article-authors">
-              <strong>Authors:</strong> Prof. David Kim, Dr. Jennifer Brown
-            </p>
-            <p class="article-abstract">
-              We present novel approaches to improving solar panel efficiency through advanced materials science and innovative cell designs, with potential to reduce costs and increase adoption...
-            </p>
-            <div class="article-meta">
-              <span class="meta-item">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                </svg>
-                67 Citations
-              </span>
-              <span class="meta-item">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                Published: Dec 20, 2023
-              </span>
-            </div>
-            <div class="article-actions">
-              <a href="#" class="btn-download">Download PDF</a>
-              <a href="#" class="btn-view">View Details</a>
-            </div>
-          </article>
-
-          <!-- Article Card 5 -->
-          <article class="article-card-indexed">
-            <div class="article-header">
-              <span class="article-badge">Biology</span>
-              <span class="article-year">2024</span>
-            </div>
-            <h3 class="article-title">
-              <a href="#">CRISPR Gene Editing: Ethical Considerations and Clinical Applications</a>
-            </h3>
-            <p class="article-authors">
-              <strong>Authors:</strong> Dr. Thomas Miller, Dr. Rachel Green, Dr. Kevin Park
-            </p>
-            <p class="article-abstract">
-              This comprehensive review discusses the ethical implications of CRISPR technology while exploring its potential applications in treating genetic disorders and advancing personalized medicine...
-            </p>
-            <div class="article-meta">
-              <span class="meta-item">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                </svg>
-                156 Citations
-              </span>
-              <span class="meta-item">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                Published: Apr 5, 2024
-              </span>
-            </div>
-            <div class="article-actions">
-              <a href="#" class="btn-download">Download PDF</a>
-              <a href="#" class="btn-view">View Details</a>
-            </div>
-          </article>
-
-          <!-- Article Card 6 -->
-          <article class="article-card-indexed">
-            <div class="article-header">
-              <span class="article-badge">Mathematics</span>
-              <span class="article-year">2024</span>
-            </div>
-            <h3 class="article-title">
-              <a href="#">Advanced Algorithms for Large-Scale Data Processing</a>
-            </h3>
-            <p class="article-authors">
-              <strong>Authors:</strong> Prof. Anna Martinez, Dr. Christopher Taylor
-            </p>
-            <p class="article-abstract">
-              We introduce new algorithmic approaches for processing massive datasets, with applications in machine learning, data mining, and real-time analytics systems...
-            </p>
-            <div class="article-meta">
-              <span class="meta-item">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                </svg>
-                34 Citations
-              </span>
-              <span class="meta-item">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                Published: May 12, 2024
-              </span>
-            </div>
-            <div class="article-actions">
-              <a href="#" class="btn-download">Download PDF</a>
-              <a href="#" class="btn-view">View Details</a>
-            </div>
-          </article>
-        </div>
-
-        <!-- Pagination -->
-        <div class="pagination">
-          <button class="pagination-btn" disabled>
-            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-            </svg>
-            Previous
-          </button>
-          <div class="pagination-numbers">
-            <button class="pagination-number active">1</button>
-            <button class="pagination-number">2</button>
-            <button class="pagination-number">3</button>
-            <button class="pagination-number">4</button>
-            <button class="pagination-number">5</button>
-            <span class="pagination-ellipsis">...</span>
-            <button class="pagination-number">24</button>
-          </div>
-          <button class="pagination-btn">
-            Next
-            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-          </button>
-        </div>
-      </main>
+      </div>
+      {% endif %}
     </div>
   </div>
 </div>
 
 <script>
-  function toggleView(view) {
-    const container = document.getElementById('articlesContainer');
-    const buttons = document.querySelectorAll('.view-btn');
-    
-    buttons.forEach(btn => btn.classList.remove('active'));
-    event.target.closest('.view-btn').classList.add('active');
-    
-    if (view === 'list') {
-      container.classList.add('list-view');
+  // Store all articles data for filtering
+  const allArticles = [
+    {% for item in articles_with_time %}
+    {
+      id: {{ item.article.id }},
+      title: "{{ item.article.title|escapejs }}",
+      authors: "{{ item.article.authors_names|default:""|escapejs }}",
+      abstract: "{{ item.article.abstract|default:""|escapejs }}",
+      discipline: "{{ item.article.discipline|escapejs }}",
+      journal: "{{ item.article.journal_name|default:""|escapejs }}",
+      year: {% if item.article.year_of_publication %}{{ item.article.year_of_publication }}{% else %}null{% endif %},
+      timeAgo: "{{ item.time_ago|escapejs }}",
+      coverImage: {% if item.article.cover_image %}"{{ item.article.cover_image.url|escapejs }}"{% else %}""{% endif %},
+      url: "{% url 'app:article_detail' item.article.id %}"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  function toggleFilter(filterId) {
+    const section = document.getElementById(filterId);
+    section.classList.toggle('collapsed');
+  }
+
+  function filterSubjects() {
+    const searchTerm = document.getElementById('subject-search').value.toLowerCase();
+    const items = document.querySelectorAll('#subject-list .filter-item');
+    items.forEach(item => {
+      const text = item.textContent.toLowerCase();
+      item.style.display = text.includes(searchTerm) ? 'flex' : 'none';
+    });
+  }
+
+  function filterJournals() {
+    const searchTerm = document.getElementById('journal-search').value.toLowerCase();
+    const items = document.querySelectorAll('#journal-list .filter-item');
+    items.forEach(item => {
+      const text = item.textContent.toLowerCase();
+      item.style.display = text.includes(searchTerm) ? 'flex' : 'none';
+    });
+  }
+
+  function applyFilters() {
+    const selectedSubjects = Array.from(document.querySelectorAll('input[data-type="subject"]:checked')).map(cb => cb.dataset.value);
+    const selectedJournals = Array.from(document.querySelectorAll('input[data-type="journal"]:checked')).map(cb => cb.dataset.value);
+    const selectedYears = Array.from(document.querySelectorAll('input[data-type="year"]:checked')).map(cb => cb.dataset.value);
+    const searchTerm = document.getElementById('article-search').value.toLowerCase();
+
+    const articlesList = document.getElementById('articles-list');
+    let visibleCount = 0;
+
+    articlesList.querySelectorAll('.article-card').forEach((card, index) => {
+      if (index >= allArticles.length) return;
+      
+      const article = allArticles[index];
+      let visible = true;
+
+      // Filter by search term
+      if (searchTerm) {
+        const matchesSearch = 
+          (article.title || '').toLowerCase().includes(searchTerm) ||
+          (article.authors || '').toLowerCase().includes(searchTerm) ||
+          (article.abstract || '').toLowerCase().includes(searchTerm);
+        if (!matchesSearch) visible = false;
+      }
+
+      // Filter by subject
+      if (selectedSubjects.length > 0) {
+        const articleDiscipline = article.discipline || '';
+        if (!selectedSubjects.includes(articleDiscipline)) {
+          visible = false;
+        }
+      }
+
+      // Filter by journal
+      if (selectedJournals.length > 0) {
+        const articleJournal = article.journal || '';
+        if (!selectedJournals.includes(articleJournal)) {
+          visible = false;
+        }
+      }
+
+      // Filter by year
+      if (selectedYears.length > 0) {
+        const articleYear = article.year ? String(article.year) : '';
+        if (!selectedYears.includes(articleYear)) {
+          visible = false;
+        }
+      }
+
+      if (visible) {
+        card.style.display = 'flex';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // Show empty state if no articles visible
+    const existingEmptyState = articlesList.querySelector('.empty-state');
+    if (visibleCount === 0) {
+      if (!existingEmptyState) {
+        const emptyStateDiv = document.createElement('div');
+        emptyStateDiv.className = 'empty-state';
+        emptyStateDiv.innerHTML = '<h3>No Articles Found</h3><p>No articles match your search criteria.</p>';
+        articlesList.appendChild(emptyStateDiv);
+      }
     } else {
-      container.classList.remove('list-view');
+      if (existingEmptyState) {
+        existingEmptyState.remove();
+      }
     }
   }
 
-  function toggleFilterSection(sectionId) {
-    const section = document.getElementById(sectionId);
-    const content = section.querySelector('.filter-content');
-    const chevron = section.querySelector('.filter-chevron');
-    
-    section.classList.toggle('expanded');
-    section.classList.toggle('collapsed');
-    
-    if (section.classList.contains('expanded')) {
-      content.style.display = 'block';
-    } else {
-      content.style.display = 'none';
-    }
+  function filterArticles() {
+    applyFilters();
   }
 
   function resetFilters() {
-    // Reset all checkboxes
-    document.querySelectorAll('.filter-item input[type="checkbox"]').forEach(checkbox => {
-      checkbox.checked = false;
+    // Clear search
+    document.getElementById('article-search').value = '';
+    
+    // Clear all checkboxes
+    document.querySelectorAll('.filter-checkbox').forEach(cb => cb.checked = false);
+    
+    // Clear filter searches
+    document.getElementById('subject-search').value = '';
+    document.getElementById('journal-search').value = '';
+    
+    // Show all subjects and journals
+    document.querySelectorAll('.filter-item').forEach(item => {
+      item.style.display = 'flex';
     });
     
-    // Clear search inputs
-    document.getElementById('subjectSearch').value = '';
-    document.getElementById('journalSearch').value = '';
-    
-    // Filter articles
-    filterArticles();
+    // Show all articles
+    document.querySelectorAll('.article-card').forEach(card => {
+      card.style.display = 'flex';
+    });
+
+    // Remove empty state if exists
+    const emptyState = document.querySelector('.empty-state');
+    if (emptyState && allArticles.length > 0) {
+      emptyState.remove();
+    }
   }
 
-  // Subject search functionality
-  document.getElementById('subjectSearch')?.addEventListener('input', function(e) {
-    const searchTerm = e.target.value.toLowerCase();
-    const items = document.querySelectorAll('#subjectList .filter-item');
-    
-    items.forEach(item => {
-      const text = item.querySelector('.filter-item-text').textContent.toLowerCase();
-      if (text.includes(searchTerm)) {
-        item.style.display = 'flex';
-      } else {
-        item.style.display = 'none';
-      }
-    });
+  // Initialize - make sure all articles are visible on load
+  document.addEventListener('DOMContentLoaded', function() {
+    if (allArticles.length > 0) {
+      applyFilters();
+    }
   });
 
-  // Journal search functionality
-  document.getElementById('journalSearch')?.addEventListener('input', function(e) {
-    const searchTerm = e.target.value.toLowerCase();
-    const items = document.querySelectorAll('#journalList .filter-item');
-    
-    items.forEach(item => {
-      const text = item.querySelector('.filter-item-text').textContent.toLowerCase();
-      if (text.includes(searchTerm)) {
-        item.style.display = 'flex';
-      } else {
-        item.style.display = 'none';
-      }
-    });
-  });
+  // Pagination functions
+  function goToPage(pageNum) {
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('page', pageNum);
+    const limit = urlParams.get('limit');
+    if (limit && limit !== '40') {
+      urlParams.set('limit', limit);
+    }
+    window.location.search = urlParams.toString();
+  }
 
-  // Filter functionality when checkboxes change
-  document.querySelectorAll('.filter-item input[type="checkbox"]').forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
-      filterArticles();
-    });
-  });
-
-  function filterArticles() {
-    // Get selected filters
-    const selectedSubjects = Array.from(document.querySelectorAll('#subjectList input[type="checkbox"]:checked'))
-      .map(cb => cb.value);
-    const selectedJournals = Array.from(document.querySelectorAll('#journalList input[type="checkbox"]:checked'))
-      .map(cb => cb.value);
-    const selectedYears = Array.from(document.querySelectorAll('#yearList input[type="checkbox"]:checked'))
-      .map(cb => cb.value);
-    
-    // Filter logic would go here
-    console.log('Filtering articles...', { selectedSubjects, selectedJournals, selectedYears });
+  function changeLimit(limit) {
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('limit', limit);
+    urlParams.set('page', '1'); // Reset to first page when changing limit
+    window.location.search = urlParams.toString();
   }
 </script>
 {% endblock %}

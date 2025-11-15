@@ -27,8 +27,8 @@ class ArticleAuthorInline(admin.TabularInline):
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ('title', 'article_type', 'discipline', 'status', 'submitted_by', 'created_at')
-    list_filter = ('status', 'article_type', 'discipline', 'language', 'created_at')
-    search_fields = ('title', 'abstract', 'keywords', 'doi')
+    list_filter = ('status', 'article_type', 'discipline', 'language', 'created_at', 'year_of_publication', 'country_of_publication')
+    search_fields = ('title', 'abstract', 'keywords', 'doi', 'journal_name', 'authors_names')
     readonly_fields = ('created_at', 'updated_at')
     raw_id_fields = ('submitted_by',)
     inlines = [ArticleAuthorInline]
@@ -37,10 +37,13 @@ class ArticleAdmin(admin.ModelAdmin):
             'fields': ('title', 'article_type', 'discipline', 'language', 'status')
         }),
         ('Content', {
-            'fields': ('abstract', 'keywords', 'article_file')
+            'fields': ('abstract', 'keywords', 'article_file', 'cover_image')
+        }),
+        ('Authors', {
+            'fields': ('authors_names',)
         }),
         ('Publication Details', {
-            'fields': ('publication_date', 'doi')
+            'fields': ('publication_date', 'year_of_publication', 'volume', 'issue', 'pages', 'journal_name', 'country_of_publication', 'doi')
         }),
         ('Metadata', {
             'fields': ('submitted_by', 'created_at', 'updated_at')

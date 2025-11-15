@@ -12,6 +12,7 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('indexed_articles/', views.indexed_articles, name='indexed_articles'),
     path('indexed_articles/view/<int:article_id>/', views.article_detail, name='article_detail'),
+    path('indexed_articles/certificate/<int:article_id>/', views.article_certificate, name='article_certificate'),
     path('indexed_journals/', views.indexed_journals, name='indexed_journals'),
     path('indexed_journals/view/<int:journal_id>/', views.journal_detail, name='journal_detail'),
     path('project_archive/', views.project_archive, name='project_archive'),
