@@ -80,10 +80,6 @@
     color: #9ca3af;
   }
 
-  .search-button-group {
-    display: flex;
-    gap: 0.5rem;
-  }
 
   .btn {
     padding: 0.625rem 1.25rem;
@@ -288,13 +284,6 @@
       min-width: 100%;
     }
 
-    .search-button-group {
-      width: 100%;
-    }
-
-    .search-button-group .btn {
-      flex: 1;
-    }
 
     .news-grid {
       grid-template-columns: 1fr;
@@ -308,13 +297,54 @@
   }
 </style>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const searchForm = document.getElementById('newsBrowseForm');
+  const searchInput = document.getElementById('search');
+  const tagSelect = document.getElementById('tag');
+  let searchTimeout;
+
+  if (searchForm && searchInput && tagSelect) {
+    // Auto-submit on search input (debounced)
+    searchInput.addEventListener('input', function() {
+      clearTimeout(searchTimeout);
+      
+      const query = this.value.trim();
+      
+      // Debounce search - wait 500ms after user stops typing
+      searchTimeout = setTimeout(function() {
+        if (query.length >= 2 || query.length === 0) {
+          // Only search if query is at least 2 characters or empty (to clear results)
+          searchForm.submit();
+        }
+      }, 500);
+    });
+
+    // Auto-submit immediately when tag filter changes
+    tagSelect.addEventListener('change', function() {
+      clearTimeout(searchTimeout);
+      searchForm.submit();
+    });
+
+    // Handle Enter key for immediate search
+    searchInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        clearTimeout(searchTimeout);
+        e.preventDefault();
+        searchForm.submit();
+      }
+    });
+  }
+});
+</script>
+
 <div class="browse-news-page">
   <div class="browse-news-container">
     <div class="browse-news-header">
       <h1>Browse All News</h1>
       
       <div class="search-filter-section">
-        <form method="get" action="{% url 'app:browse_all_news' %}" class="search-filter-form">
+        <form method="get" action="{% url 'app:browse_all_news' %}" class="search-filter-form" id="newsBrowseForm">
           <div class="form-group">
             <label for="search">Search News</label>
             <input 
@@ -338,17 +368,6 @@
             </select>
           </div>
           
-          <div class="search-button-group">
-            <button type="submit" class="btn btn-primary">
-              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 0.5rem;">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-              </svg>
-              Search
-            </button>
-            {% if search_query or selected_tag %}
-            <a href="{% url 'app:browse_all_news' %}" class="btn btn-secondary">Clear</a>
-            {% endif %}
-          </div>
         </form>
       </div>
     </div>

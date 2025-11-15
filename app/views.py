@@ -2073,13 +2073,37 @@ def hero_autocomplete(request):
         })
     
     # 4. Search News Page
-    news_articles = NewsArticle.objects.filter(
-        is_published=True
-    ).filter(
-        Q(title__icontains=query) | 
-        Q(excerpt__icontains=query) |
-        Q(content__icontains=query)
-    )[:8]
+    # Search in title, excerpt, content, and tags
+    query_lower = query.lower()
+    
+    # If query contains "news" or "article", also show some recent news articles
+    if 'news' in query_lower or 'article' in query_lower:
+        # Get matching articles first
+        news_articles = NewsArticle.objects.filter(
+            is_published=True
+        ).filter(
+            Q(title__icontains=query) | 
+            Q(excerpt__icontains=query) |
+            Q(content__icontains=query) |
+            Q(tags__name__icontains=query)
+        ).distinct()[:8]
+        
+        # If no matches but query contains "news", show recent articles
+        if not news_articles.exists() and 'news' in query_lower:
+            news_articles = NewsArticle.objects.filter(
+                is_published=True
+            ).order_by('-published_date')[:8]
+    else:
+        # Regular search
+        news_articles = NewsArticle.objects.filter(
+            is_published=True
+        ).filter(
+            Q(title__icontains=query) | 
+            Q(excerpt__icontains=query) |
+            Q(content__icontains=query) |
+            Q(tags__name__icontains=query)
+        ).distinct()[:8]
+    
     for news in news_articles:
         results.append({
             'title': clean_text(news.title),
@@ -2572,49 +2596,61 @@ def user_dashboard(request):
         user_requests.append({
             'id': req.id,
             'type': 'check_plagiarism',
-            'type_display': 'Check Turnitin Plagiarism',
+            'type_display': 'Check Plagiarism',
+            'description': req.document_title or f"Plagiarism Check {req.id}",
             'created_at': req.created_at,
-            'status': 'pending',
+            'status': 'pending',  # Default to pending, can be updated later with actual status field
+            'has_file': bool(req.document),
         })
     for req in user_plagiarism_works:
         user_requests.append({
             'id': req.id,
             'type': 'work_plagiarism',
-            'type_display': 'Work My Plagiarism',
+            'type_display': 'Work Plagiarism',
+            'description': req.submission_title or f"Plagiarism Work {req.id}",
             'created_at': req.created_at,
             'status': 'pending',
+            'has_file': bool(req.document),
         })
     for req in user_thesis_articles:
         user_requests.append({
             'id': req.id,
             'type': 'thesis_to_article',
             'type_display': 'Thesis To Article',
+            'description': req.submission_title or f"Thesis To Article {req.id}",
             'created_at': req.created_at,
             'status': 'pending',
+            'has_file': bool(req.thesis_file),
         })
     for req in user_thesis_books:
         user_requests.append({
             'id': req.id,
             'type': 'thesis_to_book',
             'type_display': 'Thesis To Book',
+            'description': req.submission_title or req.book_title or f"Thesis To Book {req.id}",
             'created_at': req.created_at,
             'status': 'pending',
+            'has_file': bool(req.thesis_file),
         })
     for req in user_thesis_chapters:
         user_requests.append({
             'id': req.id,
             'type': 'thesis_to_book_chapter',
             'type_display': 'Thesis To Book Chapter',
+            'description': req.submission_title or req.chapter_title or f"Thesis To Book Chapter {req.id}",
             'created_at': req.created_at,
             'status': 'pending',
+            'has_file': bool(req.thesis_file),
         })
     for req in user_powerpoints:
         user_requests.append({
             'id': req.id,
             'type': 'powerpoint_preparation',
             'type_display': 'Power Point Preparation',
+            'description': req.submission_title or f"PowerPoint {req.id}",
             'created_at': req.created_at,
             'status': 'pending',
+            'has_file': bool(req.thesis_file),
         })
     
     # Sort requests by created_at
