@@ -7,38 +7,43 @@
 <style>
   .thesis-chapter-page {
     padding: 3rem 1.5rem;
-    background-color: var(--background);
+    background-color: #f5f5f5;
     min-height: calc(100vh - 5rem);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
   }
 
   .thesis-wrapper {
     max-width: 900px;
-    margin: 0 auto;
+    width: 100%;
   }
 
   .thesis-header {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
   }
 
   .thesis-header h1 {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 700;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1.5rem;
     color: var(--foreground);
   }
 
-  .thesis-header p {
-    font-size: 1.125rem;
-    color: var(--muted-foreground);
+  .privacy-statement {
+    font-size: 0.9375rem;
+    color: var(--foreground);
+    margin-bottom: 2rem;
+    text-align: center;
+    font-style: italic;
   }
 
   .thesis-form {
     background-color: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 16px;
-    padding: 2.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
   .form-section {
@@ -46,12 +51,13 @@
   }
 
   .section-title {
-    font-size: 1.5rem;
+    font-size: 1.125rem;
     font-weight: 600;
-    margin-bottom: 1.5rem;
-    color: var(--foreground);
-    padding-bottom: 0.75rem;
-    border-bottom: 2px solid #e5e7eb;
+    margin-bottom: 1.25rem;
+    color: #ffffff;
+    background-color: #000000;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
   }
 
   .form-group {
@@ -86,6 +92,30 @@
     font-family: inherit;
   }
 
+  .form-group select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .form-group select:focus {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%233b82f6' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  }
+
+  .form-group select option {
+    direction: ltr;
+  }
+
+  .form-group {
+    position: relative;
+  }
+
   .form-group input:focus,
   .form-group select:focus,
   .form-group textarea:focus {
@@ -108,12 +138,16 @@
   .file-upload-area {
     border: 2px dashed #e5e7eb;
     border-radius: 8px;
-    padding: 3rem 2rem;
+    padding: 2.5rem 2rem;
     text-align: center;
     transition: all 0.3s ease;
     cursor: pointer;
-    background-color: #f9fafb;
+    background-color: #ffffff;
     position: relative;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .file-upload-area:hover {
@@ -151,8 +185,8 @@
   }
 
   .file-upload-text {
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: 0.9375rem;
+    font-weight: 400;
     color: var(--foreground);
     margin: 0;
   }
@@ -161,6 +195,7 @@
     font-size: 0.875rem;
     color: #6b7280;
     margin: 0;
+    margin-top: 0.5rem;
   }
 
   .file-name {
@@ -196,13 +231,11 @@
   .form-actions {
     display: flex;
     gap: 1rem;
-    justify-content: flex-end;
+    justify-content: center;
     padding-top: 1.5rem;
-    border-top: 2px solid #e5e7eb;
     margin-top: 2rem;
   }
 
-  .btn-cancel,
   .btn-submit {
     padding: 0.875rem 2rem;
     border-radius: 8px;
@@ -211,28 +244,24 @@
     cursor: pointer;
     transition: all 0.3s ease;
     border: none;
-  }
-
-  .btn-cancel {
-    background-color: #f3f4f6;
-    color: var(--foreground);
-    border: 1px solid #e5e7eb;
-  }
-
-  .btn-cancel:hover {
-    background-color: #e5e7eb;
-  }
-
-  .btn-submit {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    background-color: #ff6600;
     color: #ffffff;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .btn-submit:hover {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+    background-color: #e55a00;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .submit-icon {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
   }
 
   @media (max-width: 768px) {
@@ -256,7 +285,6 @@
       flex-direction: column;
     }
 
-    .btn-cancel,
     .btn-submit {
       width: 100%;
     }
@@ -264,127 +292,89 @@
 </style>
 
 <div class="thesis-chapter-page">
-  <div class="container">
-    <div class="thesis-wrapper">
-      <!-- Page Header -->
-      <div class="thesis-header">
-        <h1>Thesis To Book Chapter</h1>
-        <p>Convert a section of your thesis into a standalone book chapter with professional formatting</p>
+  <div class="thesis-wrapper">
+    <!-- Page Header -->
+    <div class="thesis-header">
+      <h1>Thesis to Book Chapter</h1>
+      <p class="privacy-statement">"We take your privacy very seriously. We do not share your details for marketing purposes with any external companies. Your information may only be shared with our third-party partners so that we may offer our service"</p>
+    </div>
+
+    <form class="thesis-form" method="post" action="{% url 'app:thesis_to_book_chapter' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <!-- Identity & Contact Section -->
+      <div class="form-section">
+        <h2 class="section-title">Identity & Contact</h2>
+        
+        <div class="form-group">
+          <label for="name">Full Name <span class="required">*</span></label>
+          <input type="text" id="name" name="name" required placeholder="Enter Full Name" value="{{ form.name.value|default:'' }}">
+        </div>
+
+        <div class="form-group">
+          <label for="email">Functional Email <span class="required">*</span></label>
+          <input type="email" id="email" name="email" required placeholder="Enter Functional Email" value="{{ form.email.value|default:'' }}">
+        </div>
+
+        <div class="form-group">
+          <label for="whatsapp_phone">WhatsApp Phone Number <span class="required">*</span></label>
+          <input type="text" id="whatsapp_phone" name="whatsapp_phone" required placeholder="Enter WhatsApp Phone Number" value="{{ form.whatsapp_phone.value|default:'' }}">
+        </div>
       </div>
 
-      <form class="thesis-form" method="post" action="{% url 'app:thesis_to_book_chapter' %}" enctype="multipart/form-data">
-        {% csrf_token %}
+      <!-- Request Info Section -->
+      <div class="form-section">
+        <h2 class="section-title">Request Info...</h2>
+        
+        <div class="form-group">
+          <label for="submission_title">Submission Title <span class="required">*</span></label>
+          <input type="text" id="submission_title" name="submission_title" required placeholder="Enter Submission Title" value="{{ form.submission_title.value|default:'' }}">
+        </div>
 
-        <!-- Thesis Upload Section -->
-        <div class="form-section">
-          <h2 class="section-title">Thesis Document</h2>
-          
-          <div class="form-group">
-            <label for="thesis_file">Upload Thesis <span class="required">*</span></label>
-            <div class="file-upload-area" id="thesisUploadArea" onclick="document.getElementById('thesis_file').click()">
-              <input type="file" id="thesis_file" name="thesis_file" accept=".pdf,.doc,.docx" required class="file-input" onchange="handleFileSelect(event, 'thesis')">
-              <div class="file-upload-content">
-                <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                </svg>
-                <p class="file-upload-text">Click to upload or drag and drop</p>
-                <p class="file-upload-hint">PDF, DOC, DOCX files (Max size: 50MB)</p>
-                <div class="file-name" id="thesisFileName"></div>
-              </div>
+        <div class="form-group">
+          <label for="number_of_chapters">Number Of chapters <span class="required">*</span></label>
+          <input type="text" id="number_of_chapters" name="number_of_chapters" required placeholder="Enter Number Of chapters" value="{{ form.number_of_chapters.value|default:'' }}">
+          <div class="form-hint">Number Of chapters (e.g 3, 3, or 5 document)</div>
+        </div>
+
+        <div class="form-group">
+          <label for="thesis_file">Upload document <span class="required">*</span></label>
+          <div class="file-upload-area" id="thesisUploadArea" onclick="document.getElementById('thesis_file').click()">
+            <input type="file" id="thesis_file" name="thesis_file" accept=".pdf,.doc,.docx" required class="file-input" onchange="handleFileSelect(event, 'thesis')">
+            <div class="file-upload-content">
+              <p class="file-upload-text">Choose files or drag and drop files to upload</p>
+              <div class="file-name" id="thesisFileName"></div>
             </div>
           </div>
+          <div class="form-hint">Upload document you want to work on</div>
         </div>
 
-        <!-- Chapter Requirements Section -->
-        <div class="form-section">
-          <h2 class="section-title">Chapter Requirements</h2>
-          
-          <div class="form-group">
-            <label for="chapter_title">Chapter Title</label>
-            <input type="text" id="chapter_title" name="chapter_title" placeholder="Enter chapter title (optional)">
-          </div>
-
-          <div class="form-group">
-            <label for="thesis_section">Thesis Section to Convert</label>
-            <select id="thesis_section" name="thesis_section">
-              <option value="">Select section (optional)</option>
-              <option value="introduction">Introduction</option>
-              <option value="literature-review">Literature Review</option>
-              <option value="methodology">Methodology</option>
-              <option value="results">Results</option>
-              <option value="discussion">Discussion</option>
-              <option value="conclusion">Conclusion</option>
-              <option value="specific-chapter">Specific Chapter</option>
-              <option value="entire-thesis">Entire Thesis</option>
-            </select>
-            <div class="form-hint">Select which part of the thesis should be converted to a book chapter</div>
-          </div>
-
-          <div class="form-group">
-            <label for="chapter_number">Chapter Number</label>
-            <input type="number" id="chapter_number" name="chapter_number" min="1" placeholder="e.g., 5">
-            <div class="form-hint">If this chapter will be part of a larger book, specify the chapter number</div>
-          </div>
-
-          <div class="form-group">
-            <label for="target_book">Target Book/Volume</label>
-            <input type="text" id="target_book" name="target_book" placeholder="Enter book or volume title (optional)">
-          </div>
-
-          <div class="form-group">
-            <label for="word_limit">Word Limit</label>
-            <input type="number" id="word_limit" name="word_limit" min="1000" placeholder="e.g., 8000" step="100">
-            <div class="form-hint">Target word count for the chapter (optional)</div>
-          </div>
-
-          <div class="form-group">
-            <label for="special_instructions">Special Instructions</label>
-            <textarea id="special_instructions" name="special_instructions" placeholder="Any specific requirements or instructions for the chapter conversion"></textarea>
-          </div>
+        <div class="form-group">
+          <label for="special_instructions">Message or Description (optional)</label>
+          <textarea id="special_instructions" name="special_instructions" rows="4" placeholder="Enter Message or Description (optional)">{{ form.special_instructions.value|default:'' }}</textarea>
         </div>
+      </div>
 
-        <!-- Contact Information Section -->
-        <div class="form-section">
-          <h2 class="section-title">Contact Information</h2>
-          
-          <div class="form-group">
-            <label for="email">Email Address <span class="required">*</span></label>
-            <input type="email" id="email" name="email" required placeholder="your.email@example.com">
-          </div>
-
-          <div class="form-group">
-            <label for="name">Your Name <span class="required">*</span></label>
-            <input type="text" id="name" name="name" required placeholder="Enter your name">
-          </div>
-
-          <div class="form-group">
-            <label for="phone">Phone Number</label>
-            <input type="tel" id="phone" name="phone" placeholder="+1234567890">
-          </div>
+      <!-- Terms and Conditions -->
+      <div class="form-section">
+        <div class="checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" name="terms_accepted" required>
+            <span>By clicking, you agree to our Terms</span>
+          </label>
         </div>
+      </div>
 
-        <!-- Terms and Conditions -->
-        <div class="form-section">
-          <div class="checkbox-group">
-            <label class="checkbox-label">
-              <input type="checkbox" name="terms" required>
-              <span>I agree to the <a href="#">Terms of Service</a> and understand the chapter conversion process <span class="required">*</span></span>
-            </label>
-
-            <label class="checkbox-label">
-              <input type="checkbox" name="privacy" required>
-              <span>I agree to the <a href="#">Privacy Policy</a> <span class="required">*</span></span>
-            </label>
-          </div>
-        </div>
-
-        <!-- Form Actions -->
-        <div class="form-actions">
-          <button type="button" class="btn-cancel" onclick="window.history.back()">Cancel</button>
-          <button type="submit" class="btn-submit">Submit for Conversion</button>
-        </div>
-      </form>
-    </div>
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="submit" class="btn-submit">
+          Submit
+          <svg class="submit-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+          </svg>
+        </button>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -427,6 +417,25 @@
       handleFileSelect({ target: thesisInput }, 'thesis');
     }
   });
+
+  // Ensure all select dropdowns open downward
+  document.querySelectorAll('select').forEach(function(select) {
+    select.addEventListener('mousedown', function(e) {
+      // Ensure dropdown opens downward by scrolling if needed
+      const rect = select.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const spaceBelow = viewportHeight - rect.bottom;
+      
+      // If there's not enough space below, scroll the select into view
+      if (spaceBelow < 200) {
+        setTimeout(function() {
+          select.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 10);
+      }
+    });
+    
+    // Prevent upward opening by ensuring proper positioning
+    select.style.setProperty('transform-origin', 'top center', 'important');
+  });
 </script>
 {% endblock %}
-

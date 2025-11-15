@@ -1,0 +1,462 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}News - ScholarIndex{% endblock %}
+
+{% block content %}
+<style>
+  .news-page {
+    padding: 3rem 1.5rem;
+    background-color: #ffffff;
+    min-height: calc(100vh - 5rem);
+  }
+
+  .news-header {
+    max-width: 1200px;
+    margin: 0 auto 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .news-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--foreground);
+  }
+
+  .news-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .browse-more-link {
+    color: var(--foreground);
+    text-decoration: none;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+
+  .browse-more-link:hover {
+    color: #3b82f6;
+  }
+
+  .create-news-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background-color: #ff6600;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .create-news-btn:hover {
+    background-color: #e55a00;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(255, 102, 0, 0.3);
+  }
+
+  .create-news-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2;
+  }
+
+  .news-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 3rem;
+  }
+
+  .latest-news-section {
+    background-color: #ffffff;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--foreground);
+  }
+
+  .latest-news-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .news-card {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .news-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .news-card-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    background-color: #f3f4f6;
+  }
+
+  .news-card-content {
+    padding: 1rem;
+  }
+
+  .news-card-category {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .news-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--foreground);
+    margin-bottom: 1rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .news-card-read-more {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: #ff6600;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+    pointer-events: none;
+  }
+
+  .news-card:hover .news-card-read-more {
+    background-color: #e55a00;
+  }
+
+  .sidebar-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .tags-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .tag-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e5e7eb;
+    transition: all 0.2s ease;
+  }
+
+  .tag-item:last-child {
+    border-bottom: none;
+  }
+
+  .tag-item:hover {
+    background-color: #f9fafb;
+    padding-left: 0.5rem;
+  }
+
+  .tag-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: #6b7280;
+    stroke-width: 1.5;
+  }
+
+  .tag-text {
+    font-size: 0.9375rem;
+    color: var(--foreground);
+    flex: 1;
+  }
+
+  .load-more-btn {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: transparent;
+    color: var(--foreground);
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .load-more-btn:hover {
+    background-color: #f9fafb;
+    border-color: #3b82f6;
+    color: #3b82f6;
+  }
+
+  .recommended-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .recommended-item {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e5e7eb;
+    transition: all 0.2s ease;
+  }
+
+  .recommended-item:last-child {
+    border-bottom: none;
+  }
+
+  .recommended-item:hover {
+    background-color: #f9fafb;
+  }
+
+  .recommended-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+    background-color: #f3f4f6;
+  }
+
+  .recommended-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .recommended-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--foreground);
+    margin-bottom: 0.25rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .recommended-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+  }
+
+  .recommended-date {
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+
+  .recommended-category {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 968px) {
+    .news-container {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .latest-news-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="news-page">
+  <div class="news-header">
+    <h1>Latest News</h1>
+    <div class="news-header-actions">
+      <a href="{% url 'app:create_news' %}" class="create-news-btn">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        Create News
+      </a>
+      <a href="#" class="browse-more-link">BROWSE MORE</a>
+    </div>
+  </div>
+
+  <div class="news-container">
+    <!-- Left Column - Latest News -->
+    <div class="latest-news-section">
+      <div class="latest-news-grid">
+        {% for article in latest_news %}
+        <a href="{% url 'app:news_detail' slug=article.slug %}" class="news-card" style="text-decoration: none; color: inherit;">
+          {% if article.featured_image %}
+          <img src="{{ article.featured_image.url }}" alt="{{ article.title }}" class="news-card-image">
+          {% else %}
+          <div class="news-card-image"></div>
+          {% endif %}
+          <div class="news-card-content">
+            {% if article.tags.first %}
+            <span class="news-card-category">{{ article.tags.first.name }}</span>
+            {% endif %}
+            <h3 class="news-card-title">{{ article.title }}</h3>
+            <span class="news-card-read-more">Read more</span>
+          </div>
+        </a>
+        {% empty %}
+        <p>No news articles available.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Right Column - Top Tags and Recommended News -->
+    <div class="sidebar">
+      <!-- Top Tags Section -->
+      <div class="sidebar-section">
+        <h2 class="section-title">Top Tags</h2>
+        <ul class="tags-list">
+          {% for tag in top_tags %}
+          <li class="tag-item">
+            <svg class="tag-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 5h14M5 9h14M5 13h14M5 17h14" />
+            </svg>
+            <span class="tag-text">{{ tag.name }}</span>
+          </li>
+          {% empty %}
+          <li class="tag-item">
+            <span class="tag-text">No tags available</span>
+          </li>
+          {% endfor %}
+        </ul>
+        <button class="load-more-btn" onclick="loadMoreTags()">Load more</button>
+      </div>
+
+      <!-- Recommended News Section -->
+      <div class="sidebar-section">
+        <h2 class="section-title">Recommended News</h2>
+        <ul class="recommended-list">
+          {% for article in recommended_news %}
+          <li class="recommended-item">
+            <a href="{% url 'app:news_detail' slug=article.slug %}" style="display: flex; gap: 0.75rem; text-decoration: none; color: inherit; width: 100%;">
+              {% if article.featured_image %}
+              <img src="{{ article.featured_image.url }}" alt="{{ article.title }}" class="recommended-image">
+              {% else %}
+              <div class="recommended-image"></div>
+              {% endif %}
+              <div class="recommended-content">
+                <h4 class="recommended-title">{{ article.title }}</h4>
+                <div class="recommended-meta">
+                  <span class="recommended-date">{{ article.formatted_date }}</span>
+                  {% if article.tags.first %}
+                  <span class="recommended-category">{{ article.tags.first.name }}</span>
+                  {% endif %}
+                </div>
+              </div>
+            </a>
+          </li>
+          {% empty %}
+          <li class="recommended-item">
+            <span>No recommended news available.</span>
+          </li>
+          {% endfor %}
+        </ul>
+        <button class="load-more-btn" onclick="loadMoreRecommended()">Load more</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let tagsOffset = 3; // Start after the initial 3 tags
+  let recommendedOffset = 9; // Start after the initial 9 items
+  
+  function loadMoreTags() {
+    const button = event.target;
+    const tagsList = button.previousElementSibling;
+    
+    // Disable button and show loading state
+    button.disabled = true;
+    button.textContent = 'Loading...';
+    
+    // Make AJAX request
+    fetch(`{% url 'app:load_more_tags' %}?offset=${tagsOffset}&limit=10`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.success && data.tags.length > 0) {
+          // Append new tags to the list
+          data.tags.forEach(tag => {
+            const li = document.createElement('li');
+            li.className = 'tag-item';
+            li.innerHTML = `
+              <svg class="tag-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 5h14M5 9h14M5 13h14M5 17h14" />
+              </svg>
+              <span class="tag-text">${tag.name}</span>
+            `;
+            tagsList.appendChild(li);
+          });
+          
+          // Update offset for next load
+          tagsOffset += data.tags.length;
+          
+          // Hide button if no more tags
+          if (!data.has_more) {
+            button.style.display = 'none';
+          } else {
+            button.disabled = false;
+            button.textContent = 'Load more';
+          }
+        } else {
+          // No more tags
+          button.style.display = 'none';
+        }
+      })
+      .catch(error => {
+        console.error('Error loading tags:', error);
+        button.disabled = false;
+        button.textContent = 'Load more';
+        alert('Failed to load more tags. Please try again.');
+      });
+  }
+
+  function loadMoreRecommended() {
+    // TODO: Implement AJAX call to load more recommended news
+    console.log('Load more recommended news');
+    alert('Load more recommended news feature coming soon!');
+  }
+</script>
+{% endblock %}

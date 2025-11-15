@@ -4,7 +4,7 @@ from .models import (
     UserProfile, Article, ArticleAuthor, Journal, JournalEditor, Project, ProjectContributor,
     ProjectPayment, MembershipRequest, DirectoryApplication, HallOfFameApplication, PlagiarismCheck,
     PlagiarismWork, ThesisToArticle, ThesisToBook, ThesisToBookChapter, PowerPointPreparation,
-    SiteSettings, Blog
+    SiteSettings, Blog, NewsTag, NewsWriter, NewsArticle, NewsComment
 )
 from .forms import ProjectForm
 
@@ -238,23 +238,23 @@ class PlagiarismCheckAdmin(admin.ModelAdmin):
 # Plagiarism Work Admin
 @admin.register(PlagiarismWork)
 class PlagiarismWorkAdmin(admin.ModelAdmin):
-    list_display = ('name', 'email', 'service_type', 'urgency', 'created_at')
-    list_filter = ('service_type', 'urgency', 'created_at')
-    search_fields = ('name', 'email', 'phone', 'instructions')
+    list_display = ('name', 'email', 'submission_title', 'plagiarism_percentage', 'created_at')
+    list_filter = ('plagiarism_percentage', 'created_at')
+    search_fields = ('name', 'email', 'whatsapp_phone', 'submission_title')
     readonly_fields = ('created_at', 'updated_at')
     raw_id_fields = ('submitted_by',)
     fieldsets = (
-        ('Document', {
-            'fields': ('document',)
+        ('Documents', {
+            'fields': ('document', 'plagiarism_report')
         }),
-        ('Service Details', {
-            'fields': ('service_type', 'instructions', 'urgency')
+        ('Request Details', {
+            'fields': ('submission_title', 'plagiarism_percentage')
         }),
         ('Contact Information', {
-            'fields': ('email', 'name', 'phone')
+            'fields': ('email', 'name', 'whatsapp_phone')
         }),
         ('Metadata', {
-            'fields': ('terms_accepted', 'privacy_accepted', 'submitted_by', 'created_at', 'updated_at')
+            'fields': ('terms_accepted', 'submitted_by', 'created_at', 'updated_at')
         }),
     )
 
@@ -452,3 +452,94 @@ class BlogAdmin(admin.ModelAdmin):
             'fields': ('created_by', 'created_at', 'updated_at')
         }),
     )
+
+# News Tag Admin
+@admin.register(NewsTag)
+class NewsTagAdmin(admin.ModelAdmin):
+    list_display = ('name', 'slug', 'order_priority', 'is_active', 'created_at')
+    list_filter = ('is_active', 'created_at')
+    search_fields = ('name', 'slug')
+    readonly_fields = ('slug', 'created_at', 'updated_at')
+    ordering = ('-order_priority', 'name')
+
+# News Writer Admin
+@admin.register(NewsWriter)
+class NewsWriterAdmin(admin.ModelAdmin):
+    list_display = ('name', 'slug', 'order_priority', 'is_active', 'email', 'created_at')
+    list_filter = ('is_active', 'created_at')
+    search_fields = ('name', 'slug', 'email', 'bio')
+    readonly_fields = ('slug', 'created_at', 'updated_at')
+    ordering = ('-order_priority', 'name')
+    fieldsets = (
+        ('Writer Information', {
+            'fields': ('name', 'slug', 'bio', 'profile_image', 'email')
+        }),
+        ('Settings', {
+            'fields': ('order_priority', 'is_active')
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
+
+# News Article Admin
+@admin.register(NewsArticle)
+class NewsArticleAdmin(admin.ModelAdmin):
+    list_display = ('title', 'writer', 'is_published', 'published_date', 'view_count', 'created_at')
+    list_filter = ('is_published', 'published_date', 'created_at', 'tags')
+    search_fields = ('title', 'content', 'excerpt')
+    readonly_fields = ('slug', 'view_count', 'published_date', 'created_at', 'updated_at')
+    raw_id_fields = ('writer', 'created_by')
+    filter_horizontal = ('tags',)
+    list_per_page = 25
+    date_hierarchy = 'published_date'
+    ordering = ('-published_date', '-created_at')
+    fieldsets = (
+        ('Article Content', {
+            'fields': ('title', 'slug', 'content', 'excerpt', 'featured_image')
+        }),
+        ('Categorization', {
+            'fields': ('tags', 'writer')
+        }),
+        ('Publication', {
+            'fields': ('is_published', 'published_date', 'view_count')
+        }),
+        ('Metadata', {
+            'fields': ('created_by', 'created_at', 'updated_at')
+        }),
+    )
+
+@admin.register(NewsComment)
+class NewsCommentAdmin(admin.ModelAdmin):
+    list_display = ('article', 'user', 'parent', 'is_approved', 'created_at', 'get_likes_count', 'get_dislikes_count')
+    list_filter = ('is_approved', 'created_at', 'article')
+    search_fields = ('content', 'user__username', 'article__title')
+    readonly_fields = ('created_at', 'updated_at', 'get_likes_count', 'get_dislikes_count', 'get_replies_count')
+    raw_id_fields = ('article', 'user', 'parent')
+    filter_horizontal = ('likes', 'dislikes')
+    fieldsets = (
+        ('Comment Content', {
+            'fields': ('article', 'parent', 'user', 'content')
+        }),
+        ('Engagement', {
+            'fields': ('likes', 'dislikes', 'get_likes_count', 'get_dislikes_count', 'get_replies_count')
+        }),
+        ('Moderation', {
+            'fields': ('is_approved',)
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
+    
+    def get_likes_count(self, obj):
+        return obj.get_likes_count()
+    get_likes_count.short_description = 'Likes'
+    
+    def get_dislikes_count(self, obj):
+        return obj.get_dislikes_count()
+    get_dislikes_count.short_description = 'Dislikes'
+    
+    def get_replies_count(self, obj):
+        return obj.get_replies_count()
+    get_replies_count.short_description = 'Replies'

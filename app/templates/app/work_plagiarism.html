@@ -1,44 +1,49 @@
 {% extends 'app/base.html' %}
 {% load static %}
 
-{% block title %}Work My Plagiarism - ScholarIndex{% endblock %}
+{% block title %}Plagiarism Reduction Service - ScholarIndex{% endblock %}
 
 {% block content %}
 <style>
   .work-plagiarism-page {
     padding: 3rem 1.5rem;
-    background-color: var(--background);
+    background-color: #f5f5f5;
     min-height: calc(100vh - 5rem);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
   }
 
   .work-wrapper {
     max-width: 900px;
-    margin: 0 auto;
+    width: 100%;
   }
 
   .work-header {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
   }
 
   .work-header h1 {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 700;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1rem;
     color: var(--foreground);
   }
 
-  .work-header p {
-    font-size: 1.125rem;
-    color: var(--muted-foreground);
+  .privacy-statement {
+    font-size: 0.9375rem;
+    color: var(--foreground);
+    margin-bottom: 2rem;
+    text-align: center;
+    font-style: italic;
   }
 
   .work-form {
     background-color: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 16px;
-    padding: 2.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
   .form-section {
@@ -46,12 +51,13 @@
   }
 
   .section-title {
-    font-size: 1.5rem;
+    font-size: 1.125rem;
     font-weight: 600;
-    margin-bottom: 1.5rem;
-    color: var(--foreground);
-    padding-bottom: 0.75rem;
-    border-bottom: 2px solid #e5e7eb;
+    margin-bottom: 1.25rem;
+    color: #ffffff;
+    background-color: #000000;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
   }
 
   .form-group {
@@ -86,6 +92,30 @@
     font-family: inherit;
   }
 
+  .form-group select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .form-group select:focus {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%233b82f6' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  }
+
+  .form-group select option {
+    direction: ltr;
+  }
+
+  .form-group {
+    position: relative;
+  }
+
   .form-group input:focus,
   .form-group select:focus,
   .form-group textarea:focus {
@@ -108,12 +138,16 @@
   .file-upload-area {
     border: 2px dashed #e5e7eb;
     border-radius: 8px;
-    padding: 3rem 2rem;
+    padding: 2.5rem 2rem;
     text-align: center;
     transition: all 0.3s ease;
     cursor: pointer;
-    background-color: #f9fafb;
+    background-color: #ffffff;
     position: relative;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .file-upload-area:hover {
@@ -151,8 +185,8 @@
   }
 
   .file-upload-text {
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: 0.9375rem;
+    font-weight: 400;
     color: var(--foreground);
     margin: 0;
   }
@@ -196,13 +230,11 @@
   .form-actions {
     display: flex;
     gap: 1rem;
-    justify-content: flex-end;
+    justify-content: center;
     padding-top: 1.5rem;
-    border-top: 2px solid #e5e7eb;
     margin-top: 2rem;
   }
 
-  .btn-cancel,
   .btn-submit {
     padding: 0.875rem 2rem;
     border-radius: 8px;
@@ -211,28 +243,24 @@
     cursor: pointer;
     transition: all 0.3s ease;
     border: none;
-  }
-
-  .btn-cancel {
-    background-color: #f3f4f6;
-    color: var(--foreground);
-    border: 1px solid #e5e7eb;
-  }
-
-  .btn-cancel:hover {
-    background-color: #e5e7eb;
-  }
-
-  .btn-submit {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    background-color: #ff6600;
     color: #ffffff;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .btn-submit:hover {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+    background-color: #e55a00;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .submit-icon {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
   }
 
   @media (max-width: 768px) {
@@ -256,7 +284,6 @@
       flex-direction: column;
     }
 
-    .btn-cancel,
     .btn-submit {
       width: 100%;
     }
@@ -264,120 +291,115 @@
 </style>
 
 <div class="work-plagiarism-page">
-  <div class="container">
-    <div class="work-wrapper">
-      <!-- Page Header -->
-      <div class="work-header">
-        <h1>Work My Plagiarism</h1>
-        <p>Get help improving your document by reducing plagiarism and enhancing originality</p>
+  <div class="work-wrapper">
+    <!-- Page Header -->
+    <div class="work-header">
+      <h1>Plagiarism Reduction Service</h1>
+      <p class="privacy-statement">"We take your privacy very seriously. We do not share your details for marketing purposes with any external companies. Your information may only be shared with our third-party partners so that we may offer our service"</p>
+    </div>
+
+    <form class="work-form" method="post" action="{% url 'app:work_plagiarism' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <!-- Identity & Contact Section -->
+      <div class="form-section">
+        <h2 class="section-title">Identity & Contact</h2>
+        
+        <div class="form-group">
+          <label for="name">Full Name <span class="required">*</span></label>
+          <input type="text" id="name" name="name" required placeholder="Enter Your Full Name">
+        </div>
+
+        <div class="form-group">
+          <label for="email">Functional Email <span class="required">*</span></label>
+          <input type="email" id="email" name="email" required placeholder="Enter Functional Email">
+        </div>
+
+        <div class="form-group">
+          <label for="whatsapp_phone">WhatsApp Phone Number <span class="required">*</span></label>
+          <input type="text" id="whatsapp_phone" name="whatsapp_phone" required placeholder="Enter WhatsApp Phone Number">
+        </div>
       </div>
 
-      <form class="work-form" method="post" action="{% url 'app:work_plagiarism' %}" enctype="multipart/form-data">
-        {% csrf_token %}
+      <!-- Request Info Section -->
+      <div class="form-section">
+        <h2 class="section-title">Request Info...</h2>
+        
+        <div class="form-group">
+          <label for="submission_title">Submission title <span class="required">*</span></label>
+          <input type="text" id="submission_title" name="submission_title" required placeholder="Enter Submission title">
+        </div>
 
-        <!-- Document Upload Section -->
-        <div class="form-section">
-          <h2 class="section-title">Upload Document</h2>
-          
-          <div class="form-group">
-            <label for="document">Document File <span class="required">*</span></label>
-            <div class="file-upload-area" id="uploadArea" onclick="document.getElementById('document').click()">
-              <input type="file" id="document" name="document" accept=".pdf,.doc,.docx,.txt" required class="file-input" onchange="handleFileSelect(event)">
-              <div class="file-upload-content">
-                <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                </svg>
-                <p class="file-upload-text">Click to upload or drag and drop</p>
-                <p class="file-upload-hint">PDF, DOC, DOCX, TXT files (Max size: 25MB)</p>
-                <div class="file-name" id="fileName"></div>
-              </div>
+        <div class="form-group">
+          <label for="plagiarism_percentage">Plagiarism Percentage <span class="required">*</span></label>
+          <select id="plagiarism_percentage" name="plagiarism_percentage" required>
+            <option value="">Select a value ...</option>
+            <option value="0-10">0-10%</option>
+            <option value="11-20">11-20%</option>
+            <option value="21-30">21-30%</option>
+            <option value="31-40">31-40%</option>
+            <option value="41-50">41-50%</option>
+            <option value="51-60">51-60%</option>
+            <option value="61-70">61-70%</option>
+            <option value="71-80">71-80%</option>
+            <option value="81-90">81-90%</option>
+            <option value="91-100">91-100%</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="plagiarism_report">Upload Plagiarism Report (PDF) & File to work (MS Word) <span class="required">*</span></label>
+          <div class="file-upload-area" id="uploadArea" onclick="document.getElementById('plagiarism_report').click()">
+            <input type="file" id="plagiarism_report" name="plagiarism_report" accept=".pdf" required class="file-input" onchange="handleFileSelect(event, 'plagiarism_report')">
+            <input type="file" id="document" name="document" accept=".doc,.docx" required class="file-input" style="display: none;" onchange="handleFileSelect(event, 'document')">
+            <div class="file-upload-content">
+              <p class="file-upload-text">Choose files or drag and drop files to upload</p>
+              <div class="file-name" id="fileName"></div>
             </div>
           </div>
-        </div>
-
-        <!-- Service Options Section -->
-        <div class="form-section">
-          <h2 class="section-title">Service Options</h2>
-          
-          <div class="form-group">
-            <label for="service_type">Service Type <span class="required">*</span></label>
-            <select id="service_type" name="service_type" required>
-              <option value="">Select service type</option>
-              <option value="paraphrasing">Paraphrasing & Rewriting</option>
-              <option value="editing">Plagiarism Editing</option>
-              <option value="revision">Complete Revision</option>
-              <option value="consultation">Plagiarism Consultation</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="instructions">Special Instructions</label>
-            <textarea id="instructions" name="instructions" placeholder="Provide any specific instructions or requirements for working on your document"></textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="urgency">Urgency Level</label>
-            <select id="urgency" name="urgency">
-              <option value="normal">Normal (3-5 business days)</option>
-              <option value="urgent">Urgent (1-2 business days)</option>
-              <option value="very-urgent">Very Urgent (24 hours)</option>
-            </select>
+          <div style="margin-top: 0.5rem;">
+            <button type="button" onclick="document.getElementById('document').click()" style="padding: 0.5rem 1rem; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 4px; cursor: pointer; font-size: 0.875rem;">Upload MS Word File</button>
           </div>
         </div>
+      </div>
 
-        <!-- Contact Information Section -->
-        <div class="form-section">
-          <h2 class="section-title">Contact Information</h2>
-          
-          <div class="form-group">
-            <label for="email">Email Address <span class="required">*</span></label>
-            <input type="email" id="email" name="email" required placeholder="your.email@example.com">
-          </div>
-
-          <div class="form-group">
-            <label for="name">Your Name <span class="required">*</span></label>
-            <input type="text" id="name" name="name" required placeholder="Enter your name">
-          </div>
-
-          <div class="form-group">
-            <label for="phone">Phone Number</label>
-            <input type="tel" id="phone" name="phone" placeholder="+1234567890">
-          </div>
+      <!-- Terms Checkbox -->
+      <div class="form-section">
+        <div class="checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" name="terms_accepted" required>
+            <span>By clicking, you agree to our Terms</span>
+          </label>
         </div>
+      </div>
 
-        <!-- Terms and Conditions -->
-        <div class="form-section">
-          <div class="checkbox-group">
-            <label class="checkbox-label">
-              <input type="checkbox" name="terms" required>
-              <span>I agree to the <a href="#">Terms of Service</a> and understand the service terms <span class="required">*</span></span>
-            </label>
-
-            <label class="checkbox-label">
-              <input type="checkbox" name="privacy" required>
-              <span>I agree to the <a href="#">Privacy Policy</a> <span class="required">*</span></span>
-            </label>
-          </div>
-        </div>
-
-        <!-- Form Actions -->
-        <div class="form-actions">
-          <button type="button" class="btn-cancel" onclick="window.history.back()">Cancel</button>
-          <button type="submit" class="btn-submit">Submit Request</button>
-        </div>
-      </form>
-    </div>
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="submit" class="btn-submit">
+          Submit
+          <svg class="submit-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+          </svg>
+        </button>
+      </div>
+    </form>
   </div>
 </div>
 
 <script>
-  function handleFileSelect(event) {
+  function handleFileSelect(event, inputType) {
     const file = event.target.files[0];
     const fileName = document.getElementById('fileName');
     const uploadArea = document.getElementById('uploadArea');
+    const pdfFile = document.getElementById('plagiarism_report').files[0];
+    const docFile = document.getElementById('document').files[0];
     
-    if (file) {
-      fileName.textContent = file.name;
+    let fileNames = [];
+    if (pdfFile) fileNames.push('PDF: ' + pdfFile.name);
+    if (docFile) fileNames.push('Word: ' + docFile.name);
+    
+    if (fileNames.length > 0) {
+      fileName.textContent = fileNames.join(' | ');
       uploadArea.classList.add('has-file');
     } else {
       fileName.textContent = '';
@@ -385,9 +407,30 @@
     }
   }
 
+  // Ensure all select dropdowns open downward
+  document.querySelectorAll('select').forEach(function(select) {
+    select.addEventListener('mousedown', function(e) {
+      // Ensure dropdown opens downward by scrolling if needed
+      const rect = select.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const spaceBelow = viewportHeight - rect.bottom;
+      
+      // If there's not enough space below, scroll the select into view
+      if (spaceBelow < 200) {
+        setTimeout(function() {
+          select.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 10);
+      }
+    });
+    
+    // Prevent upward opening by ensuring proper positioning
+    select.style.setProperty('transform-origin', 'top center', 'important');
+  });
+
   // Drag and drop functionality
   const uploadArea = document.getElementById('uploadArea');
-  const fileInput = document.getElementById('document');
+  const pdfInput = document.getElementById('plagiarism_report');
+  const docInput = document.getElementById('document');
 
   uploadArea.addEventListener('dragover', function(e) {
     e.preventDefault();
@@ -404,9 +447,20 @@
     uploadArea.classList.remove('drag-over');
     
     const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      fileInput.files = files;
-      handleFileSelect({ target: fileInput });
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (file.type === 'application/pdf') {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        pdfInput.files = dataTransfer.files;
+        handleFileSelect({ target: pdfInput }, 'plagiarism_report');
+      } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || 
+                 file.type === 'application/msword') {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        docInput.files = dataTransfer.files;
+        handleFileSelect({ target: docInput }, 'document');
+      }
     }
   });
 </script>

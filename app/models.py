@@ -285,12 +285,261 @@ class HallOfFameApplication(models.Model):
         ('nomination', 'Nominate Someone Else'),
     ]
 
+    DISCIPLINE_STATUS_CHOICES = [
+        ('teacher', 'Teacher'),
+        ('tattoo-artist', 'Tattoo Artist'),
+        ('special-effects-consultant', 'Special Effects Consultant'),
+        ('set-designer', 'Set Designer'),
+        ('sculptor', 'Sculptor'),
+        ('product-designer', 'Product Designer'),
+        ('photographer', 'Photographer'),
+        ('performer', 'Performer'),
+        ('painter', 'Painter'),
+        ('non-profit-administrator', 'Non-profit Administrator'),
+        ('museum-director', 'Museum Director'),
+        ('multimedia-consultant', 'Multimedia Consultant'),
+        ('medical-illustrator', 'Medical Illustrator'),
+        ('landscape-designer', 'Landscape Designer'),
+        ('journalist', 'Journalist'),
+        ('jewelry-designer', 'Jewelry Designer'),
+        ('interior-decorator', 'Interior Decorator'),
+        ('illustrator', 'Illustrator'),
+        ('historian', 'Historian'),
+        ('graphic-designer', 'Graphic Designer'),
+        ('gallery-director', 'Gallery Director'),
+        ('furniture-designer', 'Furniture Designer'),
+        ('fashion-designer', 'Fashion Designer'),
+        ('exhibit-designer', 'Exhibit Designer'),
+        ('engraver', 'Engraver'),
+        ('curator', 'Curator'),
+        ('critic', 'Critic'),
+        ('courtroom-sketch-artist', 'Courtroom Sketch Artist'),
+        ('cinematographer', 'Cinematographer'),
+        ('cartoonist', 'Cartoonist'),
+        ('artist', 'Artist'),
+        ('art-gallery-director', 'Art Gallery Director'),
+        ('art-editor', 'Art Editor'),
+        ('art-consultant', 'Art Consultant'),
+        ('archivist', 'Archivist'),
+        ('architect', 'Architect'),
+        ('political-leader', 'Political Leader'),
+        ('military', 'Military'),
+        ('military-and-political-leader', 'Military and Political Leader'),
+        ('goddess', 'Goddess'),
+        ('monk', 'Monk'),
+        ('emperor', 'Emperor'),
+        ('princess', 'Princess'),
+        ('prince', 'Prince'),
+        ('queen', 'Queen'),
+        ('king', 'King'),
+        ('playwright', 'Playwright'),
+        ('entrepreneur', 'Entrepreneur'),
+        ('ecology-and-evolutionary-biology', 'Ecology and Evolutionary Biology'),
+        ('genetics-and-genomics', 'Genetics and Genomics'),
+        ('laboratory-and-basic-science-research', 'Laboratory and Basic Science Research'),
+        ('microbiology', 'Microbiology'),
+        ('plant-sciences', 'Plant Sciences'),
+        ('biotechnology', 'Biotechnology'),
+        ('biology', 'Biology'),
+        ('biodiversity', 'Biodiversity'),
+        ('biochemistry-biophysics-and-structural-biology', 'Biochemistry, Biophysics, and Structural Biology'),
+        ('animal-sciences', 'Animal Sciences'),
+        ('agriculture-science', 'Agriculture Science'),
+        ('data-science', 'Data Science'),
+        ('mathematics', 'Mathematics'),
+        ('environmental-science', 'Environmental Science'),
+        ('earth-sciences', 'Earth Sciences'),
+        ('chemist-and-biologist', 'Chemist and Biologist'),
+        ('chemistry', 'Chemistry'),
+        ('applied-mathematics', 'Applied Mathematics'),
+        ('education', 'Education'),
+        ('medical-doctor', 'Medical Doctor'),
+        ('inventor', 'Inventor'),
+        ('writer', 'Writer'),
+        ('spiritual-teacher', 'Spiritual Teacher'),
+        ('christian-missionary', 'Christian Missionary'),
+        ('poet', 'Poet'),
+        ('philosopher', 'Philosopher'),
+        ('scientist', 'Scientist'),
+        ('musician', 'Musician'),
+        ('professional-boxer', 'Professional Boxer'),
+        ('professional-wrestler', 'Professional Wrestler'),
+        ('actress', 'Actress'),
+        ('actor', 'Actor'),
+        ('antitrust-law', 'Antitrust Law'),
+        ('arbitration', 'Arbitration'),
+        ('civil-law', 'Civil Law'),
+        ('comparative-law', 'Comparative Law'),
+        ('constitutional-administrative-law', 'Constitutional & Administrative Law'),
+        ('construction-law', 'Construction Law'),
+        ('contract-law', 'Contract Law'),
+        ('corporate-law', 'Corporate Law'),
+        ('criminal-law', 'Criminal Law'),
+        ('employment-labor-law', 'Employment & Labor Law'),
+        ('environment-energy-law', 'Environment & Energy Law'),
+        ('european-union-law', 'European Union Law'),
+        ('family-law', 'Family Law'),
+        ('financial-law', 'Financial Law'),
+        ('history-of-law', 'History of Law'),
+        ('human-rights-immigration', 'Human Rights & Immigration'),
+        ('intellectual-property-law', 'Intellectual Property Law'),
+        ('international-law', 'International Law'),
+        ('it-communications-law', 'IT & Communications Law'),
+        ('jurisprudence-philosophy-of-law', 'Jurisprudence & Philosophy of Law'),
+        ('law-politics', 'Law & Politics'),
+        ('law-society', 'Law & Society'),
+        ('legal-system-practice', 'Legal System & Practice'),
+        ('medical-healthcare-law', 'Medical & Healthcare Law'),
+        ('philosophy-of-law', 'Philosophy of Law'),
+        ('policing', 'Policing'),
+        ('property-law', 'Property Law'),
+        ('study-revision', 'Study & Revision'),
+        ('terrorism-national-security-law', 'Terrorism & National Security Law'),
+        ('tort-law', 'Tort Law'),
+        ('trusts-law', 'Trusts Law'),
+        ('media-law', 'Media Law'),
+        ('allied-health-professions', 'Allied Health Professions'),
+        ('anesthesiology', 'Anesthesiology'),
+        ('clinical-medicine', 'Clinical Medicine'),
+        ('clinical-neuroscience', 'Clinical Neuroscience'),
+        ('critical-care', 'Critical Care'),
+        ('dentistry', 'Dentistry'),
+        ('emergency-medicine', 'Emergency Medicine'),
+        ('family-practice', 'Family Practice'),
+        ('forensic-medicine', 'Forensic Medicine'),
+        ('hematology', 'Hematology'),
+        ('history-of-medicine', 'History of Medicine'),
+        ('medical-dentistry', 'Medical Dentistry'),
+        ('medical-ethics', 'Medical Ethics'),
+        ('medical-skills', 'Medical Skills'),
+        ('medical-statistics-methodology', 'Medical Statistics & Methodology'),
+        ('midwifery', 'Midwifery'),
+        ('nursing-studies', 'Nursing Studies'),
+        ('nursing', 'Nursing'),
+        ('obstetrics-gynecology', 'Obstetrics & Gynecology'),
+        ('occupational-medicine', 'Occupational Medicine'),
+        ('ophthalmology', 'Ophthalmology'),
+        ('otolaryngology', 'Otolaryngology (Ear, Nose, Throat)'),
+        ('pathology', 'Pathology'),
+        ('pediatrics', 'Pediatrics'),
+        ('pharmacology', 'Pharmacology'),
+        ('popular-health', 'Popular Health'),
+        ('preclinical-medicine', 'Preclinical Medicine'),
+        ('psychiatry', 'Psychiatry'),
+        ('psychotherapy', 'Psychotherapy'),
+        ('public-health-epidemiology', 'Public Health & Epidemiology'),
+        ('radiology', 'Radiology'),
+        ('biological-sciences', 'Biological Sciences'),
+        ('computer-science', 'Computer Science'),
+        ('computing', 'Computing'),
+        ('earth-sciences-geography', 'Earth Sciences & Geography'),
+        ('engineering-technology', 'Engineering & Technology'),
+        ('environmental-science', 'Environmental Science'),
+        ('history-of-science-technology', 'History of Science & Technology'),
+        ('materials-science', 'Materials Science'),
+        ('neuroscience', 'Neuroscience'),
+        ('physics', 'Physics'),
+        ('psychology', 'Psychology'),
+        ('anthropology', 'Anthropology'),
+        ('business-management', 'Business & Management'),
+        ('entrepreneurial-small-business-operations', 'Entrepreneurial and Small Business Operations'),
+        ('entrepreneurial-large-business-operations', 'Entrepreneurial and Large Business Operations'),
+        ('business-analytics', 'Business Analytics'),
+        ('business-administration-management-operations', 'Business Administration, Management, and Operations'),
+        ('accounting', 'Accounting'),
+        ('management-information-systems', 'Management Information Systems'),
+        ('technology-and-innovation', 'Technology and Innovation'),
+        ('business-intelligence', 'Business Intelligence'),
+        ('criminology-criminal-justice', 'Criminology & Criminal Justice'),
+        ('development-studies', 'Development Studies'),
+        ('economics', 'Economics'),
+        ('environment', 'Environment'),
+        ('human-geography', 'Human Geography'),
+        ('interdisciplinary-studies', 'Interdisciplinary Studies'),
+        ('museums-libraries-information-sciences', 'Museums, Libraries, & Information Sciences'),
+        ('politician', 'Politician'),
+        ('regional-area-studies', 'Regional & Area Studies'),
+        ('research-information', 'Research & Information'),
+        ('sociology', 'Sociology'),
+        ('social-work', 'Social Work'),
+        ('warfare-defense', 'Warfare & Defense'),
+        ('legal-studies', 'Legal Studies'),
+        ('leadership-studies', 'Leadership Studies'),
+        ('international-and-area-studies', 'International and Area Studies'),
+        ('disability-studies', 'Disability Studies'),
+        ('geography', 'Geography'),
+        ('communication', 'Communication'),
+        ('archaeology', 'Archaeology'),
+        ('architecture', 'Architecture'),
+        ('art', 'Art'),
+        ('biography', 'Biography'),
+        ('byzantine-studies', 'Byzantine Studies'),
+        ('classical-studies', 'Classical Studies'),
+        ('digital-humanities', 'Digital Humanities'),
+        ('egyptology', 'Egyptology'),
+        ('history', 'History'),
+        ('journalism', 'Journalism'),
+        ('language-teaching-learning', 'Language Teaching & Learning'),
+        ('linguistics', 'Linguistics'),
+        ('literature', 'Literature'),
+        ('media-studies', 'Media Studies'),
+        ('music', 'Music'),
+        ('music-sheet-music', 'Music – Sheet Music'),
+        ('performing-arts', 'Performing Arts'),
+        ('philosophy', 'Philosophy'),
+        ('publishing', 'Publishing'),
+        ('society-culture', 'Society & Culture'),
+        ('africana-studies', 'Africana Studies'),
+        ('religion', 'Religion'),
+        ('american-studies', 'American Studies'),
+        ('creative-writing', 'Creative Writing'),
+        ('east-asian-languages-societies', 'East Asian Languages and Societies'),
+        ('feminist-gender-sexuality-studies', 'Feminist, Gender, and Sexuality Studies'),
+        ('theatre-performance', 'Theatre and Performance'),
+        ('reading-language', 'Reading and Language'),
+        ('race-ethnicity-post-colonial-studies', 'Race, Ethnicity and Post-Colonial Studies'),
+        ('modern-literature', 'Modern Literature'),
+        ('modern-languages', 'Modern Languages'),
+        ('athlete', 'Athlete'),
+        ('politics', 'Politics'),
+        ('professional-soccer-player', 'Professional Soccer Player'),
+        ('finance', 'Finance'),
+    ]
+
+    CATEGORY_CHOICES = [
+        ('inspirational-people', 'Inspirational people'),
+        ('humanitarians', 'Humanitarians'),
+        ('royalty', 'Royalty'),
+        ('sport', 'Sport'),
+        ('celebrities', 'Celebrities'),
+        ('theater-fine-art', 'Theater (Fine Art)'),
+        ('visual-arts', 'Visual Arts'),
+        ('womens-rights-activists', "Women's Rights Activists"),
+        ('famous-outlaws', 'Famous Outlaws'),
+        ('famous-lawyers', 'Famous Lawyers'),
+        ('controversial-people', 'Controversial People'),
+        ('famous-historical-figures', 'Famous Historical Figures'),
+        ('courageous-people', 'Courageous People'),
+        ('famous-people', 'Famous People'),
+        ('influential-people', 'Influential People'),
+        ('eminent-individuals', 'Eminent Individuals'),
+        ('law', 'Law'),
+        ('medicine-and-health', 'Medicine and Health'),
+        ('science-and-mathematics', 'Science and Mathematics'),
+        ('social-and-behavioral-sciences', 'Social and Behavioral Sciences'),
+        ('physical-sciences-and-mathematics', 'Physical Sciences and Mathematics'),
+        ('art-and-humanities', 'Art and Humanities'),
+        ('life-sciences', 'Life Sciences'),
+    ]
+
     application_type = models.CharField(max_length=50, choices=APPLICATION_TYPE_CHOICES)
     nominee_first_name = models.CharField(max_length=100)
     nominee_last_name = models.CharField(max_length=100)
     nominee_email = models.EmailField()
     nominee_institution = models.CharField(max_length=300)
     nominee_position = models.CharField(max_length=200)
+    discipline_or_status = models.CharField(max_length=100, choices=DISCIPLINE_STATUS_CHOICES, blank=True, null=True)
+    category = models.CharField(max_length=100, choices=CATEGORY_CHOICES, blank=True, null=True)
     research_achievements = models.TextField()
     impact_description = models.TextField()
     supporting_documents = models.FileField(
@@ -321,13 +570,15 @@ class PlagiarismCheck(models.Model):
         upload_to='plagiarism_checks/',
         validators=[FileExtensionValidator(allowed_extensions=['pdf', 'doc', 'docx', 'txt'])]
     )
-    document_title = models.CharField(max_length=300, blank=True)
-    check_type = models.CharField(max_length=50, choices=CHECK_TYPE_CHOICES)
+    document_title = models.CharField(max_length=300)
+    check_type = models.CharField(max_length=50, choices=CHECK_TYPE_CHOICES, default='standard')
     exclude_quotes = models.BooleanField(default=False)
     exclude_bibliography = models.BooleanField(default=False)
     exclude_small_matches = models.BooleanField(default=False)
     email = models.EmailField()
-    name = models.CharField(max_length=200, blank=True)
+    name = models.CharField(max_length=200)
+    whatsapp_phone = models.CharField(max_length=20, blank=True, null=True)
+    message = models.TextField(blank=True)
     similarity_score = models.FloatField(null=True, blank=True)
     report_file = models.FileField(upload_to='plagiarism_reports/', blank=True, null=True)
     terms_accepted = models.BooleanField(default=False)
@@ -341,31 +592,37 @@ class PlagiarismCheck(models.Model):
 
 # Plagiarism Work Model
 class PlagiarismWork(models.Model):
-    SERVICE_TYPE_CHOICES = [
-        ('paraphrasing', 'Paraphrasing & Rewriting'),
-        ('editing', 'Plagiarism Editing'),
-        ('revision', 'Complete Revision'),
-        ('consultation', 'Plagiarism Consultation'),
-    ]
-
-    URGENCY_CHOICES = [
-        ('normal', 'Normal (3-5 business days)'),
-        ('urgent', 'Urgent (1-2 business days)'),
-        ('very-urgent', 'Very Urgent (24 hours)'),
+    PLAGIARISM_PERCENTAGE_CHOICES = [
+        ('0-10', '0-10%'),
+        ('11-20', '11-20%'),
+        ('21-30', '21-30%'),
+        ('31-40', '31-40%'),
+        ('41-50', '41-50%'),
+        ('51-60', '51-60%'),
+        ('61-70', '61-70%'),
+        ('71-80', '71-80%'),
+        ('81-90', '81-90%'),
+        ('91-100', '91-100%'),
     ]
 
     document = models.FileField(
         upload_to='plagiarism_work/',
-        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'doc', 'docx', 'txt'])]
+        validators=[FileExtensionValidator(allowed_extensions=['doc', 'docx'])],
+        help_text='MS Word file to work on'
     )
-    service_type = models.CharField(max_length=50, choices=SERVICE_TYPE_CHOICES)
-    instructions = models.TextField(blank=True)
-    urgency = models.CharField(max_length=50, choices=URGENCY_CHOICES, default='normal')
+    plagiarism_report = models.FileField(
+        upload_to='plagiarism_work/reports/',
+        validators=[FileExtensionValidator(allowed_extensions=['pdf'])],
+        help_text='Plagiarism report in PDF format',
+        blank=True,
+        null=True
+    )
+    submission_title = models.CharField(max_length=300, blank=True, null=True)
+    plagiarism_percentage = models.CharField(max_length=20, choices=PLAGIARISM_PERCENTAGE_CHOICES, default='0-10')
     email = models.EmailField()
     name = models.CharField(max_length=200)
-    phone = models.CharField(max_length=20, blank=True)
+    whatsapp_phone = models.CharField(max_length=20, blank=True, null=True)
     terms_accepted = models.BooleanField(default=False)
-    privacy_accepted = models.BooleanField(default=False)
     submitted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -387,8 +644,10 @@ class ThesisToArticle(models.Model):
         upload_to='thesis_to_article/',
         validators=[FileExtensionValidator(allowed_extensions=['pdf', 'doc', 'docx'])]
     )
+    submission_title = models.CharField(max_length=300, blank=True, null=True)
+    number_of_article = models.CharField(max_length=50, blank=True, null=True, help_text='Number of articles to be extracted (e.g., 3, 4, or 5)')
     target_journal = models.CharField(max_length=300, blank=True)
-    article_type = models.CharField(max_length=50, choices=ARTICLE_TYPE_CHOICES)
+    article_type = models.CharField(max_length=50, choices=ARTICLE_TYPE_CHOICES, default='research-article')
     word_limit = models.IntegerField(null=True, blank=True)
     include_abstract = models.BooleanField(default=True)
     include_keywords = models.BooleanField(default=True)
@@ -401,6 +660,7 @@ class ThesisToArticle(models.Model):
     special_instructions = models.TextField(blank=True)
     email = models.EmailField()
     name = models.CharField(max_length=200)
+    whatsapp_phone = models.CharField(max_length=20, blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True)
     terms_accepted = models.BooleanField(default=False)
     privacy_accepted = models.BooleanField(default=False)
@@ -424,14 +684,17 @@ class ThesisToBook(models.Model):
         upload_to='thesis_to_book/',
         validators=[FileExtensionValidator(allowed_extensions=['pdf', 'doc', 'docx'])]
     )
-    book_title = models.CharField(max_length=300, blank=True)
-    book_type = models.CharField(max_length=50, choices=BOOK_TYPE_CHOICES)
-    target_audience = models.CharField(max_length=300, blank=True)
-    chapter_structure = models.TextField(blank=True)
-    special_requirements = models.TextField(blank=True)
+    submission_title = models.CharField(max_length=300, blank=True, null=True)
+    number_of_books = models.CharField(max_length=50, blank=True, null=True, help_text='Number of books to be extracted (e.g., 3, 4, or 5)')
+    book_title = models.CharField(max_length=300, blank=True, null=True)
+    book_type = models.CharField(max_length=50, choices=BOOK_TYPE_CHOICES, blank=True, null=True)
+    target_audience = models.CharField(max_length=300, blank=True, null=True)
+    chapter_structure = models.TextField(blank=True, null=True)
+    special_requirements = models.TextField(blank=True, null=True)
     email = models.EmailField()
     name = models.CharField(max_length=200)
-    phone = models.CharField(max_length=20, blank=True)
+    whatsapp_phone = models.CharField(max_length=20, blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
     terms_accepted = models.BooleanField(default=False)
     privacy_accepted = models.BooleanField(default=False)
     submitted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
@@ -447,15 +710,18 @@ class ThesisToBookChapter(models.Model):
         upload_to='thesis_to_book_chapter/',
         validators=[FileExtensionValidator(allowed_extensions=['pdf', 'doc', 'docx'])]
     )
-    chapter_title = models.CharField(max_length=300, blank=True)
-    thesis_section = models.CharField(max_length=100, blank=True)
+    submission_title = models.CharField(max_length=300, blank=True, null=True)
+    number_of_chapters = models.CharField(max_length=50, blank=True, null=True, help_text='Number of chapters to be extracted (e.g., 3, 4, or 5)')
+    chapter_title = models.CharField(max_length=300, blank=True, null=True)
+    thesis_section = models.CharField(max_length=100, blank=True, null=True)
     chapter_number = models.IntegerField(null=True, blank=True)
-    target_book = models.CharField(max_length=300, blank=True)
+    target_book = models.CharField(max_length=300, blank=True, null=True)
     word_limit = models.IntegerField(null=True, blank=True)
-    special_instructions = models.TextField(blank=True)
+    special_instructions = models.TextField(blank=True, null=True)
     email = models.EmailField()
     name = models.CharField(max_length=200)
-    phone = models.CharField(max_length=20, blank=True)
+    whatsapp_phone = models.CharField(max_length=20, blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
     terms_accepted = models.BooleanField(default=False)
     privacy_accepted = models.BooleanField(default=False)
     submitted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
@@ -496,23 +762,26 @@ class PowerPointPreparation(models.Model):
         upload_to='powerpoint_preparation/',
         validators=[FileExtensionValidator(allowed_extensions=['pdf', 'doc', 'docx'])]
     )
-    presentation_type = models.CharField(max_length=50, choices=PRESENTATION_TYPE_CHOICES)
-    duration = models.CharField(max_length=10, choices=DURATION_CHOICES, blank=True)
+    submission_title = models.CharField(max_length=300, blank=True, null=True)
+    number_of_slides = models.CharField(max_length=50, blank=True, null=True, help_text='Number of PowerPoint slides (e.g., 10, 3, 44 or 53)')
+    presentation_type = models.CharField(max_length=50, choices=PRESENTATION_TYPE_CHOICES, blank=True, null=True)
+    duration = models.CharField(max_length=10, choices=DURATION_CHOICES, blank=True, null=True)
     slide_count = models.IntegerField(null=True, blank=True)
-    include_title = models.BooleanField(default=True)
-    include_intro = models.BooleanField(default=True)
-    include_objectives = models.BooleanField(default=True)
-    include_methodology = models.BooleanField(default=True)
-    include_results = models.BooleanField(default=True)
-    include_discussion = models.BooleanField(default=True)
-    include_conclusion = models.BooleanField(default=True)
-    include_references = models.BooleanField(default=True)
-    include_acknowledgments = models.BooleanField(default=False)
-    design_style = models.CharField(max_length=50, choices=DESIGN_STYLE_CHOICES, blank=True)
-    special_instructions = models.TextField(blank=True)
+    include_title = models.BooleanField(default=True, blank=True)
+    include_intro = models.BooleanField(default=True, blank=True)
+    include_objectives = models.BooleanField(default=True, blank=True)
+    include_methodology = models.BooleanField(default=True, blank=True)
+    include_results = models.BooleanField(default=True, blank=True)
+    include_discussion = models.BooleanField(default=True, blank=True)
+    include_conclusion = models.BooleanField(default=True, blank=True)
+    include_references = models.BooleanField(default=True, blank=True)
+    include_acknowledgments = models.BooleanField(default=False, blank=True)
+    design_style = models.CharField(max_length=50, choices=DESIGN_STYLE_CHOICES, blank=True, null=True)
+    special_instructions = models.TextField(blank=True, null=True)
     email = models.EmailField()
     name = models.CharField(max_length=200)
-    phone = models.CharField(max_length=20, blank=True)
+    whatsapp_phone = models.CharField(max_length=20, blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
     terms_accepted = models.BooleanField(default=False)
     privacy_accepted = models.BooleanField(default=False)
     submitted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
@@ -679,6 +948,124 @@ class Blog(models.Model):
     
     def __str__(self):
         return self.title
+    
+    def formatted_date(self):
+        """Return formatted date like '3rd September, 2024'"""
+        day = self.published_date.day
+        if 4 <= day <= 20 or 24 <= day <= 30:
+            suffix = "th"
+        else:
+            suffix = ["st", "nd", "rd"][day % 10 - 1]
+        
+        return self.published_date.strftime(f"%d{suffix} %B, %Y")
+
+# News Comment Model
+class NewsComment(models.Model):
+    article = models.ForeignKey('NewsArticle', on_delete=models.CASCADE, related_name='comments')
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='news_comments')
+    content = models.TextField()
+    likes = models.ManyToManyField(User, related_name='liked_news_comments', blank=True)
+    dislikes = models.ManyToManyField(User, related_name='disliked_news_comments', blank=True)
+    is_approved = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'News Comment'
+        verbose_name_plural = 'News Comments'
+    
+    def __str__(self):
+        return f"Comment by {self.user.username} on {self.article.title}"
+    
+    def get_likes_count(self):
+        return self.likes.count()
+    
+    def get_dislikes_count(self):
+        return self.dislikes.count()
+    
+    def get_replies_count(self):
+        return self.replies.filter(is_approved=True).count()
+
+# News Tag Model
+class NewsTag(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True, blank=True)
+    order_priority = models.IntegerField(default=0, help_text="Higher numbers appear first")
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-order_priority', 'name']
+        verbose_name = 'News Tag'
+        verbose_name_plural = 'News Tags'
+    
+    def __str__(self):
+        return self.name
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+# News Writer Model
+class NewsWriter(models.Model):
+    name = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=200, unique=True, blank=True)
+    bio = models.TextField(blank=True, null=True)
+    profile_image = models.ImageField(upload_to='writers/', blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
+    order_priority = models.IntegerField(default=0, help_text="Higher numbers appear first")
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-order_priority', 'name']
+        verbose_name = 'News Writer'
+        verbose_name_plural = 'News Writers'
+    
+    def __str__(self):
+        return self.name
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+# News Article Model
+class NewsArticle(models.Model):
+    title = models.CharField(max_length=300)
+    slug = models.SlugField(max_length=300, unique=True, blank=True)
+    content = models.TextField()
+    excerpt = models.TextField(max_length=500, blank=True, null=True)
+    featured_image = models.ImageField(upload_to='news/', blank=True, null=True)
+    tags = models.ManyToManyField(NewsTag, related_name='articles', blank=True)
+    writer = models.ForeignKey(NewsWriter, on_delete=models.SET_NULL, null=True, blank=True, related_name='articles')
+    is_published = models.BooleanField(default=True)
+    published_date = models.DateTimeField(auto_now_add=True)
+    view_count = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    class Meta:
+        ordering = ['-published_date']
+        verbose_name = 'News Article'
+        verbose_name_plural = 'News Articles'
+    
+    def __str__(self):
+        return self.title
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
     
     def formatted_date(self):
         """Return formatted date like '3rd September, 2024'"""

@@ -18,12 +18,13 @@ from .forms import (
     JournalForm, JournalEditorForm, ProjectForm, ProjectContributorForm,
     MembershipRequestForm, DirectoryApplicationForm, HallOfFameApplicationForm,
     PlagiarismCheckForm, PlagiarismWorkForm, ThesisToArticleForm, ThesisToBookForm,
-    ThesisToBookChapterForm, PowerPointPreparationForm
+    ThesisToBookChapterForm, PowerPointPreparationForm, NewsArticleForm
 )
 from .models import (
     UserProfile, Article, ArticleAuthor, Journal, JournalEditor, Project, ProjectContributor, ProjectPayment,
     MembershipRequest, DirectoryApplication, HallOfFameApplication, PlagiarismCheck,
-    PlagiarismWork, ThesisToArticle, ThesisToBook, ThesisToBookChapter, PowerPointPreparation
+    PlagiarismWork, ThesisToArticle, ThesisToBook, ThesisToBookChapter, PowerPointPreparation,
+    NewsTag, NewsWriter, NewsArticle, NewsComment
 )
 
 def landing(request):
@@ -1705,7 +1706,18 @@ def hall_of_fame(request):
 def hall_of_fame_apply(request):
     """Apply For Hall of Fame page view"""
     if request.method == 'POST':
-        form = HallOfFameApplicationForm(request.POST, request.FILES)
+        # Handle full name splitting
+        post_data = request.POST.copy()
+        if 'nominee_first_name' in post_data and post_data['nominee_first_name']:
+            full_name = post_data['nominee_first_name'].strip()
+            name_parts = full_name.split(' ', 1)
+            post_data['nominee_first_name'] = name_parts[0]
+            if len(name_parts) > 1:
+                post_data['nominee_last_name'] = name_parts[1]
+            else:
+                post_data['nominee_last_name'] = ''
+        
+        form = HallOfFameApplicationForm(post_data, request.FILES)
         if form.is_valid():
             application = form.save(commit=False)
             if request.user.is_authenticated:
@@ -1877,6 +1889,257 @@ def service_solution(request):
 def policy_terms(request):
     """Policy Terms and Conditions page view"""
     return render(request, 'app/policy_terms.html')
+
+def news(request):
+    """News page view with Latest News, Top Tags, and Recommended News"""
+    # Get latest news articles (6 for the grid)
+    latest_news = NewsArticle.objects.filter(is_published=True)[:6]
+    
+    # Get top tags (ordered by priority, then name, limit to 3 initially)
+    top_tags = NewsTag.objects.filter(is_active=True).order_by('-order_priority', 'name')[:3]
+    
+    # Get recommended news articles (9 items)
+    recommended_news = NewsArticle.objects.filter(is_published=True)[:9]
+    
+    return render(request, 'app/news.html', {
+        'latest_news': latest_news,
+        'top_tags': top_tags,
+        'recommended_news': recommended_news,
+    })
+
+def load_more_tags(request):
+    """AJAX endpoint to load more tags"""
+    offset = int(request.GET.get('offset', 3))
+    limit = int(request.GET.get('limit', 10))
+    
+    # Get tags with limit + 1 to check if there are more
+    all_tags = NewsTag.objects.filter(is_active=True).order_by('-order_priority', 'name')
+    total_count = all_tags.count()
+    tags = all_tags[offset:offset + limit]
+    
+    tags_data = []
+    for tag in tags:
+        tags_data.append({
+            'id': tag.id,
+            'name': tag.name,
+        })
+    
+    # Check if there are more tags available
+    has_more = (offset + len(tags_data)) < total_count
+    
+    return JsonResponse({
+        'success': True,
+        'tags': tags_data,
+        'has_more': has_more
+    })
+
+@login_required
+def create_news(request):
+    """Create new news article page"""
+    # Get or create NewsWriter for the logged-in user
+    writer_name = request.user.get_full_name() or request.user.username
+    writer, created = NewsWriter.objects.get_or_create(
+        name=writer_name,
+        defaults={
+            'email': request.user.email or '',
+            'is_active': True
+        }
+    )
+    
+    if request.method == 'POST':
+        form = NewsArticleForm(request.POST, request.FILES)
+        
+        # Debug: Print form data
+        print(f"Form data: {request.POST}")
+        print(f"Content value: {request.POST.get('content', 'NOT SET')}")
+        print(f"Title value: {request.POST.get('title', 'NOT SET')}")
+        
+        if form.is_valid():
+            article = form.save(commit=False)
+            article.created_by = request.user
+            article.writer = writer  # Auto-set writer
+            
+            # Handle draft vs publish
+            action = request.POST.get('action', 'publish')
+            if action == 'draft':
+                article.is_published = False
+            else:
+                article.is_published = form.cleaned_data.get('is_published', False)
+            
+            article.save()
+            form.save_m2m()  # Save many-to-many relationships (tags)
+            
+            if action == 'draft':
+                messages.success(request, 'News article saved as draft!')
+            else:
+                messages.success(request, 'News article created successfully!')
+            return redirect('app:news')
+        else:
+            # Display all form errors
+            print(f"Form errors: {form.errors}")
+            print(f"Form non-field errors: {form.non_field_errors()}")
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
+            # Also show a general error message
+            if not form.errors:
+                messages.error(request, 'Please check the form and try again.')
+    else:
+        form = NewsArticleForm(initial={'writer': writer})
+    
+    # Get predefined tags or create them
+    predefined_tags = [
+        'Breaking News', 'Politics', 'Business', 'Technology', 'Sports',
+        'Entertainment', 'Health', 'World News', 'Local News', 'Economy',
+        'Crime', 'Education', 'Environment', 'Opinion'
+    ]
+    
+    # Ensure all predefined tags exist
+    for tag_name in predefined_tags:
+        NewsTag.objects.get_or_create(
+            name=tag_name,
+            defaults={'is_active': True}
+        )
+    
+    tags = NewsTag.objects.filter(is_active=True).order_by('name')
+    
+    return render(request, 'app/create_news.html', {
+        'form': form,
+        'tags': tags,
+        'predefined_tags': predefined_tags
+    })
+
+def news_detail(request, slug):
+    """News article detail page"""
+    article = get_object_or_404(NewsArticle, slug=slug, is_published=True)
+    
+    # Increment view count
+    article.view_count += 1
+    article.save(update_fields=['view_count'])
+    
+    # Get sidebar articles (other published articles, excluding current)
+    sidebar_articles = NewsArticle.objects.filter(
+        is_published=True
+    ).exclude(id=article.id).order_by('-published_date')[:5]
+    
+    # Get related articles (same tags, excluding current article)
+    related_articles = NewsArticle.objects.filter(
+        tags__in=article.tags.all(),
+        is_published=True
+    ).exclude(id=article.id).distinct()[:4]
+    
+    # Get approved comments (top-level only, replies are loaded via AJAX)
+    comments = NewsComment.objects.filter(
+        article=article,
+        parent=None,
+        is_approved=True
+    ).order_by('-created_at')
+    
+    return render(request, 'app/news_detail.html', {
+        'article': article,
+        'sidebar_articles': sidebar_articles,
+        'related_articles': related_articles,
+        'comments': comments,
+    })
+
+@login_required
+def add_news_comment(request, article_slug):
+    """Add a comment to a news article"""
+    if request.method == 'POST':
+        article = get_object_or_404(NewsArticle, slug=article_slug, is_published=True)
+        content = request.POST.get('content', '').strip()
+        parent_id = request.POST.get('parent_id', None)
+        
+        if content:
+            comment = NewsComment.objects.create(
+                article=article,
+                user=request.user,
+                content=content,
+                parent_id=parent_id if parent_id else None
+            )
+            messages.success(request, 'Your comment has been added!')
+        else:
+            messages.error(request, 'Comment cannot be empty.')
+    
+    return redirect('app:news_detail', slug=article_slug)
+
+@login_required
+def like_news_comment(request, comment_id):
+    """Like or unlike a comment"""
+    comment = get_object_or_404(NewsComment, id=comment_id, is_approved=True)
+    
+    if request.user in comment.likes.all():
+        comment.likes.remove(request.user)
+        action = 'unliked'
+    else:
+        comment.likes.add(request.user)
+        comment.dislikes.remove(request.user)  # Remove from dislikes if present
+        action = 'liked'
+    
+    return JsonResponse({
+        'success': True,
+        'action': action,
+        'likes_count': comment.get_likes_count(),
+        'dislikes_count': comment.get_dislikes_count()
+    })
+
+@login_required
+def dislike_news_comment(request, comment_id):
+    """Dislike or undislike a comment"""
+    comment = get_object_or_404(NewsComment, id=comment_id, is_approved=True)
+    
+    if request.user in comment.dislikes.all():
+        comment.dislikes.remove(request.user)
+        action = 'undisliked'
+    else:
+        comment.dislikes.add(request.user)
+        comment.likes.remove(request.user)  # Remove from likes if present
+        action = 'disliked'
+    
+    return JsonResponse({
+        'success': True,
+        'action': action,
+        'likes_count': comment.get_likes_count(),
+        'dislikes_count': comment.get_dislikes_count()
+    })
+
+def get_comment_replies(request, comment_id):
+    """Get replies for a comment (AJAX)"""
+    comment = get_object_or_404(NewsComment, id=comment_id, is_approved=True)
+    replies = comment.replies.filter(is_approved=True).order_by('created_at')
+    
+    replies_data = []
+    for reply in replies:
+        replies_data.append({
+            'id': reply.id,
+            'user': reply.user.username,
+            'content': reply.content,
+            'created_at': reply.created_at.strftime('%B %d, %Y at %I:%M %p'),
+            'likes_count': reply.get_likes_count(),
+            'dislikes_count': reply.get_dislikes_count(),
+            'user_liked': request.user.is_authenticated and request.user in reply.likes.all(),
+            'user_disliked': request.user.is_authenticated and request.user in reply.dislikes.all(),
+        })
+    
+    return JsonResponse({'success': True, 'replies': replies_data})
+
+@login_required
+def delete_news_comment(request, comment_id):
+    """Delete a comment (admin only)"""
+    comment = get_object_or_404(NewsComment, id=comment_id)
+    
+    # Check if user is admin or staff
+    if not (request.user.is_staff or request.user.is_superuser):
+        return JsonResponse({'success': False, 'error': 'Permission denied'}, status=403)
+    
+    article_slug = comment.article.slug
+    comment.delete()
+    messages.success(request, 'Comment deleted successfully.')
+    
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({'success': True})
+    
+    return redirect('app:news_detail', slug=article_slug)
 
 @login_required
 def news_list(request):

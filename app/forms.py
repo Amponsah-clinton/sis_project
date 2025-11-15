@@ -1,10 +1,12 @@
 from django import forms
+from django.core.validators import FileExtensionValidator
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import (
     UserProfile, Article, ArticleAuthor, Journal, JournalEditor, Project, ProjectContributor,
     MembershipRequest, DirectoryApplication, HallOfFameApplication, PlagiarismCheck,
-    PlagiarismWork, ThesisToArticle, ThesisToBook, ThesisToBookChapter, PowerPointPreparation
+    PlagiarismWork, ThesisToArticle, ThesisToBook, ThesisToBookChapter, PowerPointPreparation,
+    NewsArticle
 )
 
 class SearchForm(forms.Form):
@@ -244,12 +246,24 @@ class DirectoryApplicationForm(forms.ModelForm):
 
 # Hall of Fame Application Form
 class HallOfFameApplicationForm(forms.ModelForm):
+    discipline_or_status = forms.ChoiceField(
+        choices=HallOfFameApplication.DISCIPLINE_STATUS_CHOICES,
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    category = forms.ChoiceField(
+        choices=HallOfFameApplication.CATEGORY_CHOICES,
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    
     class Meta:
         model = HallOfFameApplication
         fields = ['application_type', 'nominee_first_name', 'nominee_last_name', 'nominee_email',
-                  'nominee_institution', 'nominee_position', 'research_achievements',
-                  'impact_description', 'supporting_documents', 'nominator_first_name',
-                  'nominator_last_name', 'nominator_email', 'nominator_relationship', 'terms_accepted']
+                  'nominee_institution', 'nominee_position', 'discipline_or_status', 'category',
+                  'research_achievements', 'impact_description', 'supporting_documents', 
+                  'nominator_first_name', 'nominator_last_name', 'nominator_email', 
+                  'nominator_relationship', 'terms_accepted']
         widgets = {
             'application_type': forms.Select(attrs={'class': 'form-control'}),
             'nominee_first_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -269,140 +283,127 @@ class HallOfFameApplicationForm(forms.ModelForm):
 
 # Plagiarism Check Form
 class PlagiarismCheckForm(forms.ModelForm):
+    whatsapp_phone = forms.CharField(max_length=20, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    
     class Meta:
         model = PlagiarismCheck
-        fields = ['document', 'document_title', 'check_type', 'exclude_quotes',
-                  'exclude_bibliography', 'exclude_small_matches', 'email', 'name',
-                  'terms_accepted', 'privacy_accepted']
+        fields = ['document', 'document_title', 'email', 'name', 'whatsapp_phone', 'message']
         widgets = {
             'document': forms.FileInput(attrs={'class': 'form-control'}),
             'document_title': forms.TextInput(attrs={'class': 'form-control'}),
-            'check_type': forms.Select(attrs={'class': 'form-control'}),
-            'exclude_quotes': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'exclude_bibliography': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'exclude_small_matches': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'terms_accepted': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'privacy_accepted': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'message': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
         }
 
 # Plagiarism Work Form
 class PlagiarismWorkForm(forms.ModelForm):
+    whatsapp_phone = forms.CharField(max_length=20, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    plagiarism_report = forms.FileField(required=True, widget=forms.FileInput(attrs={'class': 'form-control'}), 
+                                        validators=[FileExtensionValidator(allowed_extensions=['pdf'])])
+    submission_title = forms.CharField(max_length=300, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    
     class Meta:
         model = PlagiarismWork
-        fields = ['document', 'service_type', 'instructions', 'urgency', 'email',
-                  'name', 'phone', 'terms_accepted', 'privacy_accepted']
+        fields = ['document', 'plagiarism_report', 'submission_title', 'plagiarism_percentage', 
+                  'email', 'name', 'whatsapp_phone', 'terms_accepted']
         widgets = {
             'document': forms.FileInput(attrs={'class': 'form-control'}),
-            'service_type': forms.Select(attrs={'class': 'form-control'}),
-            'instructions': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
-            'urgency': forms.Select(attrs={'class': 'form-control'}),
+            'plagiarism_percentage': forms.Select(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'phone': forms.TextInput(attrs={'class': 'form-control'}),
             'terms_accepted': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'privacy_accepted': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
 # Thesis Forms
 class ThesisToArticleForm(forms.ModelForm):
+    whatsapp_phone = forms.CharField(max_length=20, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    submission_title = forms.CharField(max_length=300, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    number_of_article = forms.CharField(max_length=50, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    
     class Meta:
         model = ThesisToArticle
-        fields = ['thesis_file', 'target_journal', 'article_type', 'word_limit',
-                  'include_abstract', 'include_keywords', 'include_introduction',
-                  'include_methodology', 'include_results', 'include_discussion',
-                  'include_conclusion', 'include_references', 'special_instructions',
-                  'email', 'name', 'phone', 'terms_accepted', 'privacy_accepted']
+        fields = ['thesis_file', 'submission_title', 'number_of_article', 'special_instructions',
+                  'email', 'name', 'whatsapp_phone', 'terms_accepted']
         widgets = {
             'thesis_file': forms.FileInput(attrs={'class': 'form-control'}),
-            'target_journal': forms.TextInput(attrs={'class': 'form-control'}),
-            'article_type': forms.Select(attrs={'class': 'form-control'}),
-            'word_limit': forms.NumberInput(attrs={'class': 'form-control'}),
-            'include_abstract': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'include_keywords': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'include_introduction': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'include_methodology': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'include_results': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'include_discussion': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'include_conclusion': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'include_references': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'special_instructions': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'phone': forms.TextInput(attrs={'class': 'form-control'}),
             'terms_accepted': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'privacy_accepted': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
 class ThesisToBookForm(forms.ModelForm):
+    whatsapp_phone = forms.CharField(max_length=20, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    submission_title = forms.CharField(max_length=300, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    number_of_books = forms.CharField(max_length=50, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    
     class Meta:
         model = ThesisToBook
-        fields = ['thesis_file', 'book_title', 'book_type', 'target_audience',
-                  'chapter_structure', 'special_requirements', 'email', 'name',
-                  'phone', 'terms_accepted', 'privacy_accepted']
+        fields = ['thesis_file', 'submission_title', 'number_of_books', 'special_requirements',
+                  'email', 'name', 'whatsapp_phone', 'terms_accepted']
         widgets = {
             'thesis_file': forms.FileInput(attrs={'class': 'form-control'}),
-            'book_title': forms.TextInput(attrs={'class': 'form-control'}),
-            'book_type': forms.Select(attrs={'class': 'form-control'}),
-            'target_audience': forms.TextInput(attrs={'class': 'form-control'}),
-            'chapter_structure': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'special_requirements': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'phone': forms.TextInput(attrs={'class': 'form-control'}),
             'terms_accepted': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'privacy_accepted': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
 class ThesisToBookChapterForm(forms.ModelForm):
+    whatsapp_phone = forms.CharField(max_length=20, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    submission_title = forms.CharField(max_length=300, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    number_of_chapters = forms.CharField(max_length=50, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    
     class Meta:
         model = ThesisToBookChapter
-        fields = ['thesis_file', 'chapter_title', 'thesis_section', 'chapter_number',
-                  'target_book', 'word_limit', 'special_instructions', 'email',
-                  'name', 'phone', 'terms_accepted', 'privacy_accepted']
+        fields = ['thesis_file', 'submission_title', 'number_of_chapters', 'special_instructions',
+                  'email', 'name', 'whatsapp_phone', 'terms_accepted']
         widgets = {
             'thesis_file': forms.FileInput(attrs={'class': 'form-control'}),
-            'chapter_title': forms.TextInput(attrs={'class': 'form-control'}),
-            'thesis_section': forms.Select(attrs={'class': 'form-control'}),
-            'chapter_number': forms.NumberInput(attrs={'class': 'form-control'}),
-            'target_book': forms.TextInput(attrs={'class': 'form-control'}),
-            'word_limit': forms.NumberInput(attrs={'class': 'form-control'}),
             'special_instructions': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'phone': forms.TextInput(attrs={'class': 'form-control'}),
             'terms_accepted': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'privacy_accepted': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
 class PowerPointPreparationForm(forms.ModelForm):
+    whatsapp_phone = forms.CharField(max_length=20, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    submission_title = forms.CharField(max_length=300, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    number_of_slides = forms.CharField(max_length=50, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    
     class Meta:
         model = PowerPointPreparation
-        fields = ['thesis_file', 'presentation_type', 'duration', 'slide_count',
-                  'include_title', 'include_intro', 'include_objectives', 'include_methodology',
-                  'include_results', 'include_discussion', 'include_conclusion',
-                  'include_references', 'include_acknowledgments', 'design_style',
-                  'special_instructions', 'email', 'name', 'phone', 'terms_accepted', 'privacy_accepted']
+        fields = ['thesis_file', 'submission_title', 'number_of_slides', 'special_instructions',
+                  'email', 'name', 'whatsapp_phone', 'terms_accepted']
         widgets = {
             'thesis_file': forms.FileInput(attrs={'class': 'form-control'}),
-            'presentation_type': forms.Select(attrs={'class': 'form-control'}),
-            'duration': forms.Select(attrs={'class': 'form-control'}),
-            'slide_count': forms.NumberInput(attrs={'class': 'form-control'}),
-            'include_title': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'include_intro': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'include_objectives': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'include_methodology': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'include_results': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'include_discussion': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'include_conclusion': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'include_references': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'include_acknowledgments': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'design_style': forms.Select(attrs={'class': 'form-control'}),
             'special_instructions': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'phone': forms.TextInput(attrs={'class': 'form-control'}),
             'terms_accepted': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'privacy_accepted': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+class NewsArticleForm(forms.ModelForm):
+    class Meta:
+        model = NewsArticle
+        fields = ['title', 'content', 'excerpt', 'featured_image', 'tags', 'writer', 'is_published']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter article title'}),
+            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 10, 'placeholder': 'Enter article content'}),
+            'excerpt': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Enter article excerpt (optional)'}),
+            'featured_image': forms.FileInput(attrs={'class': 'form-control'}),
+            'tags': forms.SelectMultiple(attrs={'class': 'form-control', 'style': 'display: none;'}),
+            'writer': forms.Select(attrs={'class': 'form-control', 'style': 'display: none;'}),
+            'is_published': forms.CheckboxInput(attrs={'class': 'publish-checkbox'}),
+        }
+    
+    def clean_content(self):
+        content = self.cleaned_data.get('content', '').strip()
+        # Remove empty HTML tags
+        import re
+        content = re.sub(r'<p><br></p>', '', content)
+        content = re.sub(r'<p></p>', '', content)
+        if not content or len(content.strip()) < 10:
+            raise forms.ValidationError('Please enter article content (at least 10 characters).')
+        return content
