@@ -1954,6 +1954,7 @@ def load_more_tags(request):
 def browse_all_news(request):
     """Browse all news with search and filter functionality"""
     from django.db.models import Q
+    from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
     
     # Get all published news articles
     articles = NewsArticle.objects.filter(is_published=True)
@@ -1969,8 +1970,13 @@ def browse_all_news(request):
     
     # Filter by tag
     tag_filter = request.GET.get('tag', '')
+    selected_tag_obj = None
     if tag_filter:
-        articles = articles.filter(tags__id=tag_filter)
+        try:
+            selected_tag_obj = NewsTag.objects.get(id=tag_filter, is_active=True)
+            articles = articles.filter(tags__id=tag_filter)
+        except NewsTag.DoesNotExist:
+            tag_filter = ''
     
     # Filter by date range (optional - can be added later)
     # date_from = request.GET.get('date_from', '')
@@ -1982,14 +1988,24 @@ def browse_all_news(request):
     # Get all active tags for filter dropdown
     all_tags = NewsTag.objects.filter(is_active=True).order_by('name')
     
-    # Pagination (optional - can be added later if needed)
-    # For now, show all filtered results
+    # Pagination - 15 articles per page
+    paginator = Paginator(articles, 15)
+    page = request.GET.get('page', 1)
+    
+    try:
+        page_obj = paginator.get_page(page)
+    except PageNotAnInteger:
+        page_obj = paginator.get_page(1)
+    except EmptyPage:
+        page_obj = paginator.get_page(paginator.num_pages)
     
     return render(request, 'app/browse_all_news.html', {
-        'articles': articles,
+        'articles': page_obj,
+        'page_obj': page_obj,
         'all_tags': all_tags,
         'search_query': search_query,
         'selected_tag': tag_filter,
+        'selected_tag_obj': selected_tag_obj,
     })
 
 def hero_autocomplete(request):
@@ -2591,65 +2607,85 @@ def user_dashboard(request):
     user_journals = Journal.objects.filter(submitted_by=user).order_by('-created_at')
     
     # Get user's requests (combined)
+    import hashlib
     user_requests = []
     for req in user_plagiarism_checks:
+        # Generate unique ID from request
+        req_id = hashlib.md5(f"check_plagiarism_{req.id}_{req.created_at}".encode()).hexdigest()[:12]
+        description = req.document_title or f"Document {req.id}"
         user_requests.append({
             'id': req.id,
             'type': 'check_plagiarism',
             'type_display': 'Check Plagiarism',
-            'description': req.document_title or f"Plagiarism Check {req.id}",
+            'description': description,
+            'unique_id': req_id.upper(),
             'created_at': req.created_at,
-            'status': 'pending',  # Default to pending, can be updated later with actual status field
+            'status': 'declined' if not req.terms_accepted else 'pending',
             'has_file': bool(req.document),
         })
     for req in user_plagiarism_works:
+        req_id = hashlib.md5(f"work_plagiarism_{req.id}_{req.created_at}".encode()).hexdigest()[:12]
+        description = req.submission_title or f"Work {req.id}"
         user_requests.append({
             'id': req.id,
             'type': 'work_plagiarism',
             'type_display': 'Work Plagiarism',
-            'description': req.submission_title or f"Plagiarism Work {req.id}",
+            'description': description,
+            'unique_id': req_id.upper(),
             'created_at': req.created_at,
-            'status': 'pending',
+            'status': 'declined' if not req.terms_accepted else 'pending',
             'has_file': bool(req.document),
         })
     for req in user_thesis_articles:
+        req_id = hashlib.md5(f"thesis_to_article_{req.id}_{req.created_at}".encode()).hexdigest()[:12]
+        description = req.submission_title or f"Thesis {req.id}"
         user_requests.append({
             'id': req.id,
             'type': 'thesis_to_article',
             'type_display': 'Thesis To Article',
-            'description': req.submission_title or f"Thesis To Article {req.id}",
+            'description': description,
+            'unique_id': req_id.upper(),
             'created_at': req.created_at,
-            'status': 'pending',
+            'status': 'declined' if not req.terms_accepted else 'pending',
             'has_file': bool(req.thesis_file),
         })
     for req in user_thesis_books:
+        req_id = hashlib.md5(f"thesis_to_book_{req.id}_{req.created_at}".encode()).hexdigest()[:12]
+        description = req.submission_title or req.book_title or f"Book {req.id}"
         user_requests.append({
             'id': req.id,
             'type': 'thesis_to_book',
             'type_display': 'Thesis To Book',
-            'description': req.submission_title or req.book_title or f"Thesis To Book {req.id}",
+            'description': description,
+            'unique_id': req_id.upper(),
             'created_at': req.created_at,
-            'status': 'pending',
+            'status': 'declined' if not req.terms_accepted else 'pending',
             'has_file': bool(req.thesis_file),
         })
     for req in user_thesis_chapters:
+        req_id = hashlib.md5(f"thesis_to_book_chapter_{req.id}_{req.created_at}".encode()).hexdigest()[:12]
+        description = req.submission_title or req.chapter_title or f"Chapter {req.id}"
         user_requests.append({
             'id': req.id,
             'type': 'thesis_to_book_chapter',
             'type_display': 'Thesis To Book Chapter',
-            'description': req.submission_title or req.chapter_title or f"Thesis To Book Chapter {req.id}",
+            'description': description,
+            'unique_id': req_id.upper(),
             'created_at': req.created_at,
-            'status': 'pending',
+            'status': 'declined' if not req.terms_accepted else 'pending',
             'has_file': bool(req.thesis_file),
         })
     for req in user_powerpoints:
+        req_id = hashlib.md5(f"powerpoint_preparation_{req.id}_{req.created_at}".encode()).hexdigest()[:12]
+        description = req.submission_title or f"Presentation {req.id}"
         user_requests.append({
             'id': req.id,
             'type': 'powerpoint_preparation',
             'type_display': 'Power Point Preparation',
-            'description': req.submission_title or f"PowerPoint {req.id}",
+            'description': description,
+            'unique_id': req_id.upper(),
             'created_at': req.created_at,
-            'status': 'pending',
+            'status': 'declined' if not req.terms_accepted else 'pending',
             'has_file': bool(req.thesis_file),
         })
     
@@ -2658,6 +2694,10 @@ def user_dashboard(request):
     
     # Get user's bookmarks
     user_bookmarks = NewsBookmark.objects.filter(user=user).select_related('article').prefetch_related('article__tags').order_by('-created_at')
+    
+    # Get user's news articles
+    user_news_articles = NewsArticle.objects.filter(created_by=user).order_by('-created_at')
+    user_news_articles_count = user_news_articles.count()
     
     return render(request, 'app/user_dashboard.html', {
         'user': user,
@@ -2669,6 +2709,8 @@ def user_dashboard(request):
         'user_journals': user_journals,
         'user_requests': user_requests,
         'user_bookmarks': user_bookmarks,
+        'user_news_articles': user_news_articles,
+        'user_news_articles_count': user_news_articles_count,
     })
 
 @login_required
