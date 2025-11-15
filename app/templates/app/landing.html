@@ -3,76 +3,7 @@
 
 {% block content %}
   <!-- Hero Section -->
-  <div class="intro-section custom-owl-carousel" id="home-section">
-    <div class="container">
-      <div class="row align-items-center">
-        <div class="col-lg-5 mr-auto" data-aos="fade-up">
-
-          <div class="owl-carousel slide-one-item-alt-text">
-            <!-- Carousel Slide 1 -->
-            <div class="slide-text">
-              <h1>{% if site_settings.carousel_image_1_title %}{{ site_settings.carousel_image_1_title }}{% else %}{% if site_settings.banner_title %}{{ site_settings.banner_title }}{% else %}Advancing Research Through Innovation{% endif %}{% endif %}</h1>
-              <p class="mb-5">{% if site_settings.carousel_image_1_subtitle %}{{ site_settings.carousel_image_1_subtitle }}{% else %}{% if site_settings.banner_subtitle %}{{ site_settings.banner_subtitle }}{% else %}Explore groundbreaking research papers, cutting-edge methodologies, and innovative findings that shape the future of knowledge and discovery.{% endif %}{% endif %}</p>
-              <p><a href="{% url 'app:browse' %}" class="btn btn-outline-light py-3 px-5">Browse Papers</a></p>
-            </div>
-            
-            <!-- Carousel Slide 2 -->
-            {% if site_settings.carousel_image_2 or site_settings.carousel_image_2_url %}
-            <div class="slide-text">
-              <h1>{% if site_settings.carousel_image_2_title %}{{ site_settings.carousel_image_2_title }}{% else %}Advancing Research Through Innovation{% endif %}</h1>
-              <p class="mb-5">{% if site_settings.carousel_image_2_subtitle %}{{ site_settings.carousel_image_2_subtitle }}{% else %}Explore groundbreaking research papers, cutting-edge methodologies, and innovative findings that shape the future of knowledge and discovery.{% endif %}</p>
-              <p><a href="{% url 'app:browse' %}" class="btn btn-outline-light py-3 px-5">Browse Papers</a></p>
-            </div>
-            {% endif %}
-            
-            <!-- Carousel Slide 3 -->
-            {% if site_settings.carousel_image_3 or site_settings.carousel_image_3_url %}
-            <div class="slide-text">
-              <h1>{% if site_settings.carousel_image_3_title %}{{ site_settings.carousel_image_3_title }}{% else %}Advancing Research Through Innovation{% endif %}</h1>
-              <p class="mb-5">{% if site_settings.carousel_image_3_subtitle %}{{ site_settings.carousel_image_3_subtitle }}{% else %}Explore groundbreaking research papers, cutting-edge methodologies, and innovative findings that shape the future of knowledge and discovery.{% endif %}</p>
-              <p><a href="{% url 'app:browse' %}" class="btn btn-outline-light py-3 px-5">Browse Papers</a></p>
-            </div>
-            {% endif %}
-          </div>
-
-        </div>
-        <div class="col-lg-6 ml-auto"  data-aos="fade-up" data-aos-delay="100">
-                      
-          <div class="owl-carousel slide-one-item-alt">
-            <!-- Carousel Image 1 -->
-            {% if site_settings.carousel_image_1 %}
-              <img src="{{ site_settings.carousel_image_1.url }}" alt="{% if site_settings.carousel_image_1_title %}{{ site_settings.carousel_image_1_title }}{% else %}Research Innovation{% endif %}" class="img-fluid">
-            {% elif site_settings.carousel_image_1_url %}
-              <img src="{{ site_settings.carousel_image_1_url }}" alt="{% if site_settings.carousel_image_1_title %}{{ site_settings.carousel_image_1_title }}{% else %}Research Innovation{% endif %}" class="img-fluid">
-            {% elif site_settings.default_banner_image %}
-              <img src="{{ site_settings.default_banner_image.url }}" alt="Banner Image" class="img-fluid">
-            {% else %}
-              <img src="https://res.cloudinary.com/dmqizfpyz/image/upload/v1763149807/bg1_svob3l.png" alt="Research Innovation" class="img-fluid">
-            {% endif %}
-            
-            <!-- Carousel Image 2 -->
-            {% if site_settings.carousel_image_2 %}
-              <img src="{{ site_settings.carousel_image_2.url }}" alt="{% if site_settings.carousel_image_2_title %}{{ site_settings.carousel_image_2_title }}{% else %}Research Publication{% endif %}" class="img-fluid">
-            {% elif site_settings.carousel_image_2_url %}
-              <img src="{{ site_settings.carousel_image_2_url }}" alt="{% if site_settings.carousel_image_2_title %}{{ site_settings.carousel_image_2_title }}{% else %}Research Publication{% endif %}" class="img-fluid">
-            {% elif not site_settings.carousel_image_1 and not site_settings.carousel_image_1_url and not site_settings.default_banner_image %}
-              <img src="https://res.cloudinary.com/dmqizfpyz/image/upload/v1763149807/bg2_dlnqkz.png" alt="Research Publication" class="img-fluid">
-            {% endif %}
-            
-            <!-- Carousel Image 3 -->
-            {% if site_settings.carousel_image_3 %}
-              <img src="{{ site_settings.carousel_image_3.url }}" alt="{% if site_settings.carousel_image_3_title %}{{ site_settings.carousel_image_3_title }}{% else %}Research Discovery{% endif %}" class="img-fluid">
-            {% elif site_settings.carousel_image_3_url %}
-              <img src="{{ site_settings.carousel_image_3_url }}" alt="{% if site_settings.carousel_image_3_title %}{{ site_settings.carousel_image_3_title }}{% else %}Research Discovery{% endif %}" class="img-fluid">
-            {% elif not site_settings.carousel_image_1 and not site_settings.carousel_image_1_url and not site_settings.default_banner_image %}
-              <img src="https://res.cloudinary.com/dmqizfpyz/image/upload/v1763149806/bg3_gv0clb.png" alt="Research Discovery" class="img-fluid">
-            {% endif %}
-          </div>
-
-        </div>
-      </div>
-    </div>
-  </div>
+  {% include 'app/hero.html' %}
 
   <!-- Stats Section -->
   <section class="stats-section">
