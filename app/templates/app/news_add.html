@@ -88,7 +88,10 @@
             </select>
         </div>
         
-        <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+        <div style="margin-top: 2rem; display: flex; justify-content: flex-end; gap: 1rem;">
+            <a href="{% url 'app:news_list' %}" style="background: #f3f4f6; color: #374151; border: none; border-radius: 0.375rem; padding: 0.625rem 1.25rem; font-size: 0.875rem; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-block;">
+                Cancel
+            </a>
             <button type="submit" style="background: #ff6b6b; color: white; border: none; border-radius: 0.375rem; padding: 0.625rem 1.25rem; font-size: 0.875rem; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem;">
                 Submit
                 <i data-lucide="send" style="width: 1rem; height: 1rem;"></i>
