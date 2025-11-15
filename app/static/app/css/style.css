@@ -58,6 +58,32 @@
       transition: background-color 0.3s ease, color 0.3s ease;
     }
 
+    /* Center all major headers */
+    h1, h2 {
+      text-align: center;
+    }
+
+    /* Exceptions - keep left-aligned in specific contexts */
+    .intro-section h1,
+    .slide-text h1,
+    .hero h1,
+    .hero h2,
+    .dashboard-header h1,
+    .header-left h1,
+    .page-header h1,
+    .page-title,
+    .about-header h1,
+    nav h1,
+    nav h2,
+    header h1,
+    header h2,
+    .nav-links h1,
+    .nav-links h2,
+    .stat-card-title,
+    .content-title {
+      text-align: left;
+    }
+
     /* Container */
     .container {
       max-width: 1200px;

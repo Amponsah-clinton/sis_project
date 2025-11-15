@@ -439,8 +439,12 @@
       // Initialize page loader animation
       // initPageLoader();
       
-      // Initialize carousel
-      initCarousel();
+      // Initialize hero carousel (only if hero carousel exists, otherwise skip)
+      // Note: Hero carousel is handled by hero.js
+      var heroCarousel = document.querySelector('.slide-one-item-alt-text');
+      if (!heroCarousel) {
+        initCarousel(); // Only init if it's not the hero carousel
+      }
       
       // Initialize articles carousel
       initArticlesCarousel();

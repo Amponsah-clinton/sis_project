@@ -16,6 +16,17 @@
     margin: 0 auto;
   }
 
+  .upload-header {
+    margin-bottom: 2rem;
+  }
+
+  .upload-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+  }
+
   .upload-form {
     background-color: #ffffff;
     border-radius: 12px;
@@ -473,6 +484,10 @@
         {% endfor %}
       </div>
     {% endif %}
+
+    <div class="upload-header">
+      <h1>Upload Article</h1>
+    </div>
 
     <form class="upload-form" method="post" action="{% url 'app:upload_article' %}" enctype="multipart/form-data" id="articleForm">
       {% csrf_token %}
